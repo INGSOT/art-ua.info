@@ -1,8 +1,9 @@
 
+import Link from "next/link";
 import { Button } from "./ui/button";
 
 const navigationItems = [
-  { label: "Учасники" },
+  { label: "Учасники", href: "/authors" },
   { label: "Роботи" },
   { label: "Послуги" },
   { label: "Каталоги" },
@@ -20,14 +21,18 @@ const languageOptions = [
   { code: "EN", active: false },
 ];
 
-export default function Header() {
+interface HeaderProps {
+  isHomePage?: boolean;
+}
+
+export default function Header({ isHomePage = false }: HeaderProps) {
     return (
-    <header className="flex items-center gap-4 md:gap-[30px] p-4 md:p-[30px] bg-transparent flex-wrap lg:flex-nowrap">
-        <div className="inline-flex items-center gap-2 flex-[0_0_auto]">
+    <header className={`flex items-center gap-4 md:gap-[30px] p-4 md:p-[30px] flex-wrap lg:flex-nowrap ${isHomePage ? 'bg-transparent' : 'bg-[#414141]'}`}>
+        <Link href="/" className="inline-flex items-center gap-2 flex-[0_0_auto] group">
           <img className="w-11 h-11" alt="Logos" src="/logos.svg" />
 
           <div className="inline-flex items-start">
-            <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap">
+            <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39]">
               art-ua.info
             </div>
           </div>
@@ -35,7 +40,7 @@ export default function Header() {
           <div className="w-6 h-6 flex items-center justify-center">
             <img className="w-6 h-6" alt="Ui" src="/white_triangle_down.svg" />
           </div>
-        </div>
+        </Link>
 
         <div className="hidden lg:flex h-10 items-center gap-[30px] flex-1">
           <nav className="flex items-center gap-[30px] flex-1">
@@ -43,11 +48,20 @@ export default function Header() {
               <Button
                 key={index}
                 variant="ghost"
-                className="inline-flex items-start p-0 h-auto hover:bg-transparent"
+                className="group inline-flex items-start p-0 h-auto hover:bg-transparent"
+                asChild={Boolean(item.href)}
               >
-                <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap">
-                  {item.label}
-                </div>
+                {item.href ? (
+                  <Link href={item.href} className="inline-flex">
+                    <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39]">
+                      {item.label}
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39]">
+                    {item.label}
+                  </div>
+                )}
               </Button>
             ))}
           </nav>

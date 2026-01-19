@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "../components/ui/button";
 
 const socialIcons = [
@@ -132,17 +133,31 @@ export default function Footer() {
             key={columnIndex}
             className="flex flex-col items-start gap-[30px] p-[30px] flex-1 bg-[#FFFCF5] self-stretch"
           >
-            <h3 className="font-h6 font-bold text-[#414141] text-[20px] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)] [font-style:var(--h6-font-style)]">
-              {column.title}
-            </h3>
+            {column.title === "art-ua.info" ? (
+              <Link
+                href="/"
+                className="block font-h6 font-bold text-[#414141] text-[20px] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)] [font-style:var(--h6-font-style)] transition-colors hover:text-[#FECC39]"
+              >
+                {column.title}
+              </Link>
+            ) : (
+              <h3 className="block font-h6 font-bold text-[#414141] text-[20px] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)] [font-style:var(--h6-font-style)] transition-colors hover:text-[#FECC39]">
+                {column.title}
+              </h3>
+            )}
 
             {column.links.map((link, linkIndex) => (
               <Button
                 key={linkIndex}
                 variant="link"
-                className="h-auto p-0 font-button font-bold text-black text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] hover:no-underline"
+                className="h-auto p-0 font-button font-bold text-[#414141] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] hover:no-underline transition-colors hover:text-[#FECC39]"
+                asChild={link === "Учасники"}
               >
-                {link}
+                {link === "Учасники" ? (
+                  <Link href="/authors">{link}</Link>
+                ) : (
+                  link
+                )}
               </Button>
             ))}
           </nav>

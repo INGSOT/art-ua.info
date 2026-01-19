@@ -1,19 +1,19 @@
 
   const artists = [
     {
-      photo: "/artist-photo-4.png",
+      photo: "/artists/artist-photo-1.png",
       name: "Вадим\nІгнатенко",
     },
     {
-      photo: "/artist-photo-5.png",
+      photo: "/artists/artist-photo-2.png",
       name: "Вадим\nІгнатенко",
     },
     {
-      photo: "/artist-photo-6.png",
+      photo: "/artists/artist-photo-3.png",
       name: "Вадим\nІгнатенко",
     },
     {
-      photo: "/artist-photo-7.png",
+      photo: "/artists/artist-photo-4.png",
       name: "Вадим\nІгнатенко",
     },
   ];
