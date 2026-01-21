@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Card, CardContent } from "../../components/ui/card";
+import { Card, CardContent } from "../../../components/ui/card";
 
 export default function ProjectsSection() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
@@ -17,12 +17,12 @@ export default function ProjectsSection() {
   const hasProjects = projects.length > 0;
 
   return (
-    <section className="w-full bg-[#414141] pt-4 pb-8 px-0 md:px-10 lg:px-20">
+    <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-20">
       {hasProjects ? (
         <>
           {/* Dark gray filter bar */}
           <div className="w-full bg-[#343434] h-[80px] mb-8">
-            <div className="flex items-center h-full px-4">
+            <div className="flex items-center h-full px-4 md:px-[30px]">
               <div className="flex items-center gap-8">
                 <button
                   className={`flex items-center gap-2 text-sm font-bold transition-colors duration-300 ${

@@ -46,7 +46,7 @@ export default function AboutTheAuthor() {
         </p>
 
         {/* Teams */}
-        <div className="flex flex-wrap justify-center gap-4 mb-8">
+        <div className="flex flex-wrap justify-start md:justify-center gap-4 mb-8">
           {teams.map((team, index) => (
             <div
               key={index}
@@ -61,7 +61,7 @@ export default function AboutTheAuthor() {
                   className="object-cover w-full h-full"
                 />
               </div>
-              <span className="text-white text-sm font-bold">{team.name}</span>
+              <span className="text-white text-sm font-bold text-left">{team.name}</span>
             </div>
           ))}
         </div>
@@ -80,7 +80,7 @@ export default function AboutTheAuthor() {
               onMouseLeave={() => setHoveredButton(null)}
             >
               <span
-                className={`flex items-center justify-center px-6 font-bold transition-colors duration-300 whitespace-nowrap ${
+                className={`flex items-center justify-center flex-1 px-6 font-bold transition-colors duration-300 whitespace-nowrap ${
                   hoveredButton === button.id
                     ? "text-[#343434]"
                     : "text-[#FECC39]"
@@ -89,7 +89,7 @@ export default function AboutTheAuthor() {
                 {button.label}
               </span>
               <div
-                className={`flex items-center justify-center w-[60px] transition-colors duration-300 ${
+                className={`flex items-center justify-center w-[60px] flex-shrink-0 transition-colors duration-300 ${
                   hoveredButton === button.id
                     ? "border-l border-[#343434]"
                     : "border-l border-[#FECC39]"

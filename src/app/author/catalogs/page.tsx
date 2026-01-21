@@ -3,15 +3,15 @@
 import Header from "../../../components/Header";
 import AboutTheAuthor from "../AboutTheAuthor";
 import MenuSection from "../MenuSection";
-import ProjectsSection from "./ProjectsSection";
+import ListOfCatalogs from "./ListOfCatalogs";
 
-export default function Projects() {
+export default function Catalogs() {
     return (
         <>
             <Header isHomePage={false} />
             <AboutTheAuthor />
-            <MenuSection activeItem="projects" />
-            <ProjectsSection />
+            <MenuSection activeItem="catalogs" />
+            <ListOfCatalogs />
         </>
     );
 }
