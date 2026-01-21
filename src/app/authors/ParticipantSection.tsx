@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Avatar, AvatarImage } from "../../components/ui/avatar";
 import { Badge } from "../../components/ui/badge";
 import Image from "next/image";
+import Link from "next/link";
 
 interface ParticipantSectionProps {
   artistPhoto: string;
@@ -85,24 +86,26 @@ export default function ParticipantSection({
       <div className="flex flex-col lg:flex-row w-full">
         {/* Section 1: Artist Info */}
         <div className="flex items-center gap-3 p-3 bg-[#343434] border-b lg:border-b-0 lg:border-r border-[#272727]">
-          <Avatar className="w-[60px] h-[60px] border border-solid border-[#272727] flex-shrink-0">
-            <AvatarImage
-              src={artistPhoto}
-              alt={artistName}
-              className="object-cover"
-            />
-          </Avatar>
-          <div className="flex flex-col items-start gap-2">
-            <h3 className="font-h6 font-bold text-white text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)] [font-style:var(--h6-font-style)]">
-              {artistName}
-            </h3>
-            <div className="flex items-center gap-2">
-              <Image src="/coins.svg" alt="Coins" width={20} height={20} />
-              <span className="font-p3 font-[number:var(--p3-font-weight)] text-white text-[length:var(--p3-font-size)] tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
-                {artistType}
-              </span>
+          <Link href="/author/projects" className="flex items-center gap-3">
+            <Avatar className="w-[60px] h-[60px] border border-solid border-[#272727] flex-shrink-0">
+              <AvatarImage
+                src={artistPhoto}
+                alt={artistName}
+                className="object-cover"
+              />
+            </Avatar>
+            <div className="flex flex-col items-start gap-2">
+              <h3 className="font-h6 font-bold text-white text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)] [font-style:var(--h6-font-style)]">
+                {artistName}
+              </h3>
+              <div className="flex items-center gap-2">
+                <Image src="/coins.svg" alt="Coins" width={20} height={20} />
+                <span className="font-p3 font-[number:var(--p3-font-weight)] text-white text-[length:var(--p3-font-size)] tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
+                  {artistType}
+                </span>
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Section 2: Tags */}
