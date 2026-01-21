@@ -14,7 +14,7 @@ export default function MenuSection({ activeItem }: MenuSectionProps) {
     { id: "projects", label: "Проєкти", href: "/author/projects" },
     { id: "catalogs", label: "Каталоги", href: "/author/catalogs" },
     { id: "services", label: "Послуги", href: "#" },
-    { id: "information", label: "Інформація", href: "#" },
+    { id: "info", label: "Інформація", href: "/author/info" },
   ];
 
   return (

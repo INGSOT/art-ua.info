@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Button } from "../components/ui/button";
 
 const socialIcons = [
-  { src: "/youtube_black.svg", alt: "Social" },
-  { src: "/instagram_black.svg", alt: "Social" },
-  { src: "/facebook_black.svg", alt: "Social" },
+  { src: "/socials/youtube_black.svg", alt: "Social" },
+  { src: "/socials/instagram_black.svg", alt: "Social" },
+  { src: "/socials/facebook_black.svg", alt: "Social" },
 ];
 
 const expertiseItems = [
@@ -69,11 +69,11 @@ const navigationData = [
 
   const socialLinks = [
     {
-      icon: "/facebook_black.svg",
+      icon: "/socials/facebook_black.svg",
       text: "ua.id.art",
     },
     {
-      icon: "/youtube_black.svg",
+      icon: "/socials/youtube_black.svg",
       text: "@id_artUA",
     },
   ];

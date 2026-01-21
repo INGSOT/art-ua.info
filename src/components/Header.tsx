@@ -11,9 +11,9 @@ const navigationItems = [
 ];
 
 const socialIcons = [
-  { src: "/instagram_white.svg", alt: "Instagram" },
-  { src: "/facebook_white.svg", alt: "Facebook" },
-  { src: "/youtube_white.svg", alt: "Youtube" },
+  { src: "/socials/instagram_white.svg", alt: "Instagram" },
+  { src: "/socials/facebook_white.svg", alt: "Facebook" },
+  { src: "/socials/youtube_white.svg", alt: "Youtube" },
 ];
 
 const languageOptions = [

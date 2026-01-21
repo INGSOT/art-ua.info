@@ -3,19 +3,19 @@ import { Button } from "../components/ui/button";
 
 const newsItems = [
   {
-    image: "/image-1-1.png",
+    image: "/news/news-image-1.png",
     category: "Новини",
     date: "12.07.2024",
     title: "Довга назва новини. В один або два рядки",
   },
   {
-    image: "/image-1-2.png",
+    image: "/news/news-image-2.png",
     category: "Події",
     date: "12.07.2024",
     title: "Довга назва новини. В один або два рядки",
   },
   {
-    image: "/image-1-3.png",
+    image: "/news/news-image-3.png",
     category: "Події",
     date: "12.07.2024",
     title: "Довга назва новини. В один або два рядки",
