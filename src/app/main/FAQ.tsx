@@ -54,7 +54,7 @@ const faqData = [
   },
 ];
 
-export default function FAQSection() {
+export default function FAQ() {
   return (
     <section className="flex flex-col items-center gap-[30px] px-4 py-10 md:py-20 w-full bg-[#414141] border-b border-solid border-[#343434]">
       <div className="w-full max-w-[1440px] flex flex-col gap-[30px]">

@@ -1,5 +1,5 @@
 import Header from "../../components/Header";
-export default function HeroBannerSection() {
+export default function HeroBanner() {
   return (
     <section className="relative w-full h-[600px] md:h-[750px] lg:h-[900px] [background:url(/hero.png)_50%_50%_/_cover]">
       <Header isHomePage={true} />

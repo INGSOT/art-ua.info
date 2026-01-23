@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 
-type MenuSectionProps = {
+type MenuProps = {
   activeItem?: string;
 };
 
-export default function MenuSection({ activeItem }: MenuSectionProps) {
+export default function Menu({ activeItem }: MenuProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const menuItems = [

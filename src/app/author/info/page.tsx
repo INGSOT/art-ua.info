@@ -2,16 +2,16 @@
 
 import Header from "../../../components/Header";
 import AboutTheAuthor from "../AboutTheAuthor";
-import MenuSection from "../MenuSection";
-import InformationSection from "./InformationSection";
+import Menu from "../Menu";
+import Information from "./Information";
 
-export default function Info() {
+export default function InfoPage() {
     return (
         <>
             <Header isHomePage={false} />
             <AboutTheAuthor />
-            <MenuSection activeItem="info" />
-            <InformationSection />
+            <Menu activeItem="info" />
+            <Information />
         </>
     );
 }

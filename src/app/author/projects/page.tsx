@@ -2,16 +2,16 @@
 
 import Header from "../../../components/Header";
 import AboutTheAuthor from "../AboutTheAuthor";
-import MenuSection from "../MenuSection";
-import ProjectsSection from "./ProjectsSection";
+import Menu from "../Menu";
+import Projects from "./Projects";
 
-export default function Projects() {
+export default function ProjectsPage() {
     return (
         <>
             <Header isHomePage={false} />
             <AboutTheAuthor />
-            <MenuSection activeItem="projects" />
-            <ProjectsSection />
+            <Menu activeItem="projects" />
+            <Projects />
         </>
     );
 }

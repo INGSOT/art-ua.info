@@ -1,4 +1,4 @@
-export default function SupportArtistsSection() {
+export default function SupportArtists() {
   return (
     <section 
       className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-[30px] p-6 md:p-10 lg:p-20 w-full bg-id-7 bg-cover bg-center bg-no-repeat"

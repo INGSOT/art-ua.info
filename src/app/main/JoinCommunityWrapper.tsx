@@ -1,6 +1,6 @@
 import { Button } from "../../components/ui/button";
 
-export default function JoinCommunityWrapperSection() {
+export default function JoinCommunityWrapper() {
     return (
     <section className="w-full justify-center gap-6 md:gap-[60px] p-4 md:p-10 lg:p-20 bg-[#FFFCF5] border-b [border-bottom-style:solid] border-[#343434] flex flex-col items-center">
       <div className="flex flex-col md:flex-row items-start w-full">

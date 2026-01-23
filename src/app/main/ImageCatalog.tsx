@@ -40,7 +40,7 @@ const catalogData = [
   },
 ];
 
-export default function ImageCatalogSection() {
+export default function ImageCatalog() {
     return (
     <section className="flex flex-col items-center gap-[30px] px-0 py-20 w-full bg-[#414141] border-t border-solid border-[#343434]">
       <div className="flex flex-col w-full max-w-[1440px] items-start gap-2.5 px-4">

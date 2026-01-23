@@ -6,7 +6,7 @@ import { Badge } from "../../components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 
-interface ParticipantSectionProps {
+interface ParticipantProps {
   artistPhoto: string;
   artistName: string;
   artistType: string;
@@ -44,13 +44,13 @@ function TagBadge({ label }: { label: string }) {
   );
 }
 
-export default function ParticipantSection({
+export default function Participant({
   artistPhoto,
   artistName,
   artistType,
   tags,
   photos,
-}: ParticipantSectionProps) {
+}: ParticipantProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);

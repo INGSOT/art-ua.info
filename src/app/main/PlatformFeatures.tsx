@@ -1,4 +1,4 @@
-export default function PlatformFeaturesSection() {
+export default function PlatformFeatures() {
   const features = [
     {
       title: "Творче натхнення",

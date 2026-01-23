@@ -22,7 +22,7 @@ const newsItems = [
   },
 ];
 
-export default function LatestNewsSection() {
+export default function LatestNews() {
   return (
     <section className="flex flex-col items-center gap-[30px] px-4 py-10 md:py-20 w-full bg-white">
       <div className="flex flex-col w-full max-w-[1440px] items-start gap-2.5">

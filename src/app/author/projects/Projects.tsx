@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Card, CardContent } from "../../../components/ui/card";
 
-export default function ProjectsSection() {
+export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
 
   const projects = [

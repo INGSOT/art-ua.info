@@ -39,7 +39,7 @@ function TagBadge({ label }: TagBadgeProps) {
   );
 }
 
-export default function FeaturedWorksSection() {
+export default function FeaturedWorks() {
 const scrollRef = useRef<HTMLDivElement>(null);
 
 const tags = [

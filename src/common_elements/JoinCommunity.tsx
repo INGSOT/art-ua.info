@@ -18,7 +18,7 @@
     },
   ];
 
-export default function JoinCommunitySection() {
+export default function JoinCommunity() {
   return (
      <section className="flex flex-col items-center justify-center gap-[30px] px-4 md:px-[60px] py-10 md:py-20 w-full bg-[#FFFCF5]">
       <div className="flex flex-col items-center gap-0">

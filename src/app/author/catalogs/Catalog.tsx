@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 
-interface CatalogSectionProps {
+interface CatalogProps {
   title: string;
 }
 
-export default function CatalogSection({ title }: CatalogSectionProps) {
+export default function Catalog({ title }: CatalogProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (

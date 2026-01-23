@@ -32,7 +32,7 @@ const partnersData = [
   },
 ];
 
-export default function PartnersSection() {
+export default function Partners() {
     return (
     <section className="flex flex-col items-center gap-[30px] px-4 py-10 md:py-20 w-full bg-[#414141]">
       <h2 className="text-white text-[32px] md:text-[48px] lg:text-[60px] font-bold font-[700] leading-[var(--h2-line-height)] tracking-[var(--h2-letter-spacing)]">

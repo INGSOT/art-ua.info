@@ -2,17 +2,15 @@
 
 import Header from "../../../components/Header";
 import AboutTheAuthor from "../AboutTheAuthor";
-import MenuSection from "../MenuSection";
+import Menu from "../Menu";
 import ListOfServices from "./ListOfServices";
 
-
-
-export default function Services() {
+export default function ServicesPage() {
     return (
         <>
             <Header isHomePage={false} />
             <AboutTheAuthor />
-            <MenuSection activeItem="services" />
+            <Menu activeItem="services" />
             <ListOfServices />
         </>
     );

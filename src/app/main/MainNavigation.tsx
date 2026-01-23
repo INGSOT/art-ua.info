@@ -9,7 +9,7 @@ const navigationItems = [
   { id: 4, label: "Література" },
 ];
 
-export default function MainNavigationSection() {
+export default function MainNavigation() {
 
 const [activeItem, setActiveItem] = useState<number | null>(null);
     return (

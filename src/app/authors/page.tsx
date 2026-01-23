@@ -2,18 +2,18 @@
 
 import { useState } from "react";
 import Header from "../../components/Header";
-import LatestNewsSection from "../../common_elements/LatestNewsSection";
-import JoinCommunitySection from "../../common_elements/JoinCommunitySection";
+import LatestNews from "../../common_elements/LatestNews";
+import JoinCommunity from "../../common_elements/JoinCommunity";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/FilterSection";
-import ParticipantSection from "./ParticipantSection";
+import Participant from "./Participant";
 import SortingControls from "./SortingControls";
 import PaginationSection from "../../components/PaginationSection";
 import { participantsData } from "./participantsData";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function Authors() {
+export default function AuthorsPage() {
     const [currentPage, setCurrentPage] = useState(1);
 
     const totalPages = Math.ceil(participantsData.length / ITEMS_PER_PAGE);
@@ -37,7 +37,7 @@ export default function Authors() {
                 <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-8 min-w-0">
                     <SortingControls />
                     {currentParticipants.map((participant) => (
-                        <ParticipantSection
+                        <Participant
                             key={participant.id}
                             artistPhoto={participant.artistPhoto}
                             artistName={participant.artistName}
@@ -53,8 +53,8 @@ export default function Authors() {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
             />
-            <LatestNewsSection />
-            <JoinCommunitySection />
+            <LatestNews />
+            <JoinCommunity />
         </>
     )
 }

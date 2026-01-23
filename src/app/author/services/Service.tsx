@@ -1,18 +1,19 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
-interface ServiceSectionProps {
+interface ServiceProps {
   image: string;
   buttonLabel: string;
   title: string;
 }
 
-export default function ServiceSection({
+export default function Service({
   image,
   buttonLabel,
   title,
-}: ServiceSectionProps) {
+}: ServiceProps) {
   return (
     <div className="flex flex-col bg-[#272727] w-full">
       {/* Image with button overlay */}
@@ -40,7 +41,10 @@ export default function ServiceSection({
       </div>
 
       {/* Order button */}
-      <button className="group flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors w-full">
+      <Link
+        href="/author/services/service"
+        className="group flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors w-full"
+      >
         <span className="flex items-center justify-center flex-1 px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)]">
           Замовити послугу
         </span>
@@ -52,7 +56,7 @@ export default function ServiceSection({
             height={24}
           />
         </div>
-      </button>
+      </Link>
     </div>
   );
 }
