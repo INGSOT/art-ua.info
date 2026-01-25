@@ -6,7 +6,7 @@ const navigationItems = [
   { label: "Учасники", href: "/authors" },
   { label: "Роботи" },
   { label: "Послуги" },
-  { label: "Каталоги" },
+  { label: "Каталоги", href: "/catalogs" },
   { label: "Новини та події" },
 ];
 

@@ -146,20 +146,28 @@ export default function Footer() {
               </h3>
             )}
 
-            {column.links.map((link, linkIndex) => (
-              <Button
-                key={linkIndex}
-                variant="link"
-                className="h-auto p-0 font-button font-bold text-[#414141] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] hover:no-underline transition-colors hover:text-[#FECC39]"
-                asChild={link === "Учасники"}
-              >
-                {link === "Учасники" ? (
-                  <Link href="/authors">{link}</Link>
-                ) : (
-                  link
-                )}
-              </Button>
-            ))}
+            {column.links.map((link, linkIndex) => {
+              const linkMap: Record<string, string> = {
+                "Учасники": "/authors",
+                "Каталоги": "/catalogs",
+              };
+              const href = linkMap[link];
+              
+              return (
+                <Button
+                  key={linkIndex}
+                  variant="link"
+                  className="h-auto p-0 font-button font-bold text-[#414141] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] hover:no-underline transition-colors hover:text-[#FECC39]"
+                  asChild={Boolean(href)}
+                >
+                  {href ? (
+                    <Link href={href}>{link}</Link>
+                  ) : (
+                    link
+                  )}
+                </Button>
+              );
+            })}
           </nav>
         ))}
       </section>

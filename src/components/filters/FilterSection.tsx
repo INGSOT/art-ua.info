@@ -2,97 +2,21 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-
-// Filter data structure
-interface FilterItem {
-    id: string;
-    label: string;
-    type: 'checkbox' | 'checkmark';
-}
-
-interface FilterSubsection {
-    id: string;
-    title: string;
-    items: FilterItem[];
-}
-
-interface FilterSection {
-    id: string;
-    title: string;
-    type: 'simple' | 'nested';
-    items?: FilterItem[];
-    subsections?: FilterSubsection[];
-}
-
-// Filter data collection
-const FILTER_DATA: FilterSection[] = [
-    {
-        id: 'platform-participants',
-        title: 'Учасники платформи',
-        type: 'simple',
-        items: [
-            { id: 'all', label: 'Усі', type: 'checkbox' },
-            { id: 'artists', label: 'Митці', type: 'checkbox' },
-            { id: 'organizations', label: 'Організації', type: 'checkbox' },
-            { id: 'teams', label: 'Команди', type: 'checkbox' },
-        ]
-    },
-    {
-        id: 'art-fields',
-        title: 'Галузі мистецтва',
-        type: 'nested',
-        subsections: [
-            {
-                id: 'stage-art',
-                title: 'Сценічне мистецтво',
-                items: [
-                    { id: 'directing', label: 'Режисура', type: 'checkmark' },
-                    { id: 'acting', label: 'Акторське мистецтво', type: 'checkmark' },
-                    { id: 'music', label: 'Музичне мистецтво', type: 'checkmark' },
-                    { id: 'choreography', label: 'Хореографічне мистецтво', type: 'checkmark' },
-                    { id: 'original-genre', label: 'Оригінальний жанр', type: 'checkmark' },
-                ]
-            },
-            {
-                id: 'visual-art',
-                title: 'Візуальне мистецтво',
-                items: [
-                    { id: 'art-photography', label: 'Художня фотографія', type: 'checkmark' },
-                    { id: 'video-editing', label: 'Відеозйомка та монтаж', type: 'checkmark' },
-                    { id: 'cinema', label: 'Повнометражний кінематограф', type: 'checkmark' },
-                    { id: 'ar', label: 'Доповнена реальність', type: 'checkmark' },
-                ]
-            },
-            {
-                id: 'fine-art',
-                title: 'Образотворче мистецтво',
-                items: [
-                    { id: 'painting', label: 'Живопис', type: 'checkmark' },
-                    { id: 'sculpture', label: 'Скульптура', type: 'checkmark' },
-                    { id: 'graphics', label: 'Графіка', type: 'checkmark' },
-                ]
-            },
-            {
-                id: 'literature',
-                title: 'Література',
-                items: [
-                    { id: 'poetry', label: 'Поезія', type: 'checkmark' },
-                    { id: 'prose', label: 'Проза', type: 'checkmark' },
-                ]
-            }
-        ]
-    }
-];
+import { FilterSection as FilterSectionType, FilterItem } from './filterConfig';
 
 interface FilterSectionProps {
+    filters: FilterSectionType[];
     onFilterChange?: (filters: Record<string, boolean>) => void;
 }
 
-export default function FilterSection({ onFilterChange }: FilterSectionProps) {
-    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-        'platform-participants': true,
-        'art-fields': true,
-    });
+export default function FilterSection({ filters, onFilterChange }: FilterSectionProps) {
+    // Initialize expanded sections - all sections expanded by default
+    const initialExpandedSections = filters.reduce((acc, section) => {
+        acc[section.id] = true;
+        return acc;
+    }, {} as Record<string, boolean>);
+
+    const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(initialExpandedSections);
     const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean>>({});
 
     const toggleSection = (sectionId: string) => {
@@ -112,8 +36,8 @@ export default function FilterSection({ onFilterChange }: FilterSectionProps) {
     };
 
     return (
-        <div className="w-[360px] bg-[#414141] flex flex-col gap-4 px-2 pb-4">
-            {FILTER_DATA.map((section) => (
+        <div className="hidden lg:flex lg:w-[360px] bg-[#414141] flex-col gap-4 px-2 pb-4">
+            {filters.map((section) => (
                 <div key={section.id}>
                     {/* Section Header */}
                     <button

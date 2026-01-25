@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 const PLACEHOLDER_BY_PATH: Record<string, string> = {
     '/authors': 'Пошук авторів',
+    '/catalogs': 'Пошук каталогів',
 };
 
 export default function SearchSection() {

@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Header from "../../components/Header";
 import LatestNews from "../../common_elements/LatestNews";
-import JoinCommunity from "../../common_elements/JoinCommunity";
+import JoinCommunityWrapper from "../../common_elements/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
-import FilterSection from "../../components/FilterSection";
+import FilterSection from "../../components/filters/FilterSection";
+import { authorsFilters } from "../../components/filters/filterConfig";
 import Participant from "./Participant";
 import SortingControls from "./SortingControls";
 import PaginationSection from "../../components/PaginationSection";
@@ -32,7 +33,7 @@ export default function AuthorsPage() {
             <SearchSection />
             <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 bg-[#414141] max-w-full overflow-hidden">
                 <div className="hidden lg:block">
-                    <FilterSection />
+                    <FilterSection filters={authorsFilters} />
                 </div>
                 <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-8 min-w-0">
                     <SortingControls />
@@ -54,7 +55,7 @@ export default function AuthorsPage() {
                 onPageChange={handlePageChange}
             />
             <LatestNews />
-            <JoinCommunity />
+            <JoinCommunityWrapper />
         </>
     )
 }
