@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent } from "../../../components/ui/card";
 
 export default function Projects() {
@@ -52,32 +53,31 @@ export default function Projects() {
           <div className="px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projects.map((project) => (
-                <Card
-                  key={project.id}
-                  className="bg-transparent border-0 outline-none shadow-none rounded-none"
-                >
-                  <CardContent className="p-0 flex flex-col gap-3">
-                    {/* Project image with likes overlay */}
-                    <div className="relative w-full aspect-[460/316] bg-cover bg-center">
-                      <Image
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        className="object-cover"
-                      />
-                      <div className="absolute right-3 bottom-3 flex items-center gap-2">
-                        <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
-                          {project.likes}
-                        </span>
-                        <Image src="/like.svg" alt="Like" width={32} height={32} />
+                <Link key={project.id} href="/author/projects/project" className="block group">
+                  <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
+                    <CardContent className="p-0 flex flex-col gap-3">
+                      {/* Project image with likes overlay */}
+                      <div className="relative w-full aspect-[460/316] bg-cover bg-center">
+                        <Image
+                          src={project.image}
+                          alt={project.title}
+                          fill
+                          className="object-cover"
+                        />
+                        <div className="absolute right-3 bottom-3 flex items-center gap-2">
+                          <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
+                            {project.likes}
+                          </span>
+                          <Image src="/like.svg" alt="Like" width={32} height={32} />
+                        </div>
                       </div>
-                    </div>
-                    {/* Project title */}
-                    <h3 className="font-h6 font-bold text-white text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
-                      {project.title}
-                    </h3>
-                  </CardContent>
-                </Card>
+                      {/* Project title */}
+                      <h3 className="font-h6 font-bold text-white text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
+                        {project.title}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>

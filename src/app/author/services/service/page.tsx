@@ -5,7 +5,7 @@ import Photo from "./Photo";
 import ServiceDescription from "./ServiceDescription";
 import OrderForm from "./OrderForm";
 
-export default function Service() {
+export default function ServicePage() {
     return (
         <>
             <Header isHomePage={false} />

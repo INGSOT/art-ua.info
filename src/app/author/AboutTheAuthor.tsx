@@ -7,6 +7,12 @@ import { Button } from "../../components/ui/button";
 export default function AboutTheAuthor() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
 
+  const aboutAuthor = {
+    name: "Ім'я Прізвище",
+    description: "Художник, скульптор, архітектор, режисер, співак",
+    avatar: "/image-13.png",
+  };
+
   const teams = [
     { name: "Назва Команди", icon: "/teams/team-photo-1.png" },
     { name: "Назва Команди", icon: "/teams/team-photo-2.png" },
@@ -26,7 +32,7 @@ export default function AboutTheAuthor() {
         <div className="relative mb-6">
           <div className="w-[160px] h-[160px] rounded-full overflow-hidden border-4 border-yellow-500">
             <Image
-              src="/image-13.png"
+              src={aboutAuthor.avatar}
               alt="Author Avatar"
               width={160}
               height={160}
@@ -37,12 +43,12 @@ export default function AboutTheAuthor() {
 
         {/* Name */}
         <h2 className="text-white text-3xl font-bold mb-4 text-center">
-          Ім'я Прізвище
+          {aboutAuthor.name}
         </h2>
 
         {/* Description */}
         <p className="text-gray-400 text-center mb-8">
-          Художник, скульптор, архітектор, режисер, співак
+          {aboutAuthor.description}
         </p>
 
         {/* Teams */}

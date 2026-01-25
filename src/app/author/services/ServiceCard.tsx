@@ -3,17 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 
-interface ServiceProps {
+interface ServiceCardProps {
   image: string;
   buttonLabel: string;
   title: string;
 }
 
-export default function Service({
+export default function ServiceCard({
   image,
   buttonLabel,
   title,
-}: ServiceProps) {
+}: ServiceCardProps) {
   return (
     <div className="flex flex-col bg-[#272727] w-full">
       {/* Image with button overlay */}
