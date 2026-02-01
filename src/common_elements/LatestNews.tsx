@@ -43,9 +43,17 @@ export default function LatestNews() {
           >
             <CardContent className="flex flex-col w-full items-start gap-2.5 p-0">
               <div
-                className="w-full h-[400px] bg-cover bg-center bg-no-repeat"
+                className="relative w-full h-[400px] bg-cover bg-center bg-no-repeat group cursor-pointer overflow-hidden"
                 style={{ backgroundImage: `url(${item.image})` }}
-              />
+              >
+                {/* Darkening overlay on hover */}
+                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+                
+                {/* Centered arrow on hover */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                  <img src="/arrow-chevron-right-white.svg" alt="View" className="w-12 h-12" />
+                </div>
+              </div>
 
               <div className="flex items-start gap-2.5 w-full">
                 <p className="flex-1 mt-[-1.00px] font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">

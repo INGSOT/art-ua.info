@@ -63,10 +63,18 @@ export default function ImageCatalog() {
               >
                 <CardContent className="p-0 flex flex-col gap-2.5">
                   <div
-                    className="relative h-[365px] w-full bg-cover bg-center bg-no-repeat rounded-none"
+                    className="relative h-[365px] w-full bg-cover bg-center bg-no-repeat rounded-none group cursor-pointer overflow-hidden"
                     style={{ backgroundImage: `url(${catalog.image})` }}
                   >
-                    <div className="absolute right-3 bottom-3 inline-flex items-center justify-end gap-2">
+                    {/* Darkening overlay on hover */}
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+                    
+                    {/* Centered arrow on hover */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                      <img src="/arrow-chevron-right-white.svg" alt="View" className="w-12 h-12" />
+                    </div>
+                    
+                    <div className="absolute right-3 bottom-3 inline-flex items-center justify-end gap-2 z-10">
                       {catalog.count && (
                         <span className="font-button font-[number:var(--button-font-weight)] text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)]">
                           {catalog.count}

@@ -57,14 +57,22 @@ export default function Projects() {
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
                     <CardContent className="p-0 flex flex-col gap-3">
                       {/* Project image with likes overlay */}
-                      <div className="relative w-full aspect-[460/316] bg-cover bg-center">
+                      <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
                         <Image
                           src={project.image}
                           alt={project.title}
                           fill
                           className="object-cover"
                         />
-                        <div className="absolute right-3 bottom-3 flex items-center gap-2">
+                        {/* Darkening overlay on hover */}
+                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+                        
+                        {/* Centered arrow on hover */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                          <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
+                        </div>
+                        
+                        <div className="absolute right-3 bottom-3 flex items-center gap-2 z-10">
                           <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
                             {project.likes}
                           </span>

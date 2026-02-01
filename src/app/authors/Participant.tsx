@@ -222,13 +222,21 @@ export default function Participant({
           {photos.map((photo, index) => (
             <div
               key={index}
-              className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[365px] h-[210px] sm:h-[240px] lg:h-[274px] bg-cover bg-center bg-no-repeat relative"
+              className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[365px] h-[210px] sm:h-[240px] lg:h-[274px] bg-cover bg-center bg-no-repeat relative group cursor-pointer overflow-hidden"
               style={{
                 backgroundImage: `url(${photo})`,
                 userSelect: "none",
               }}
             >
-              <div className="absolute right-3 bottom-3 inline-flex items-center justify-end gap-2">
+              {/* Darkening overlay on hover */}
+              <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+              
+              {/* Centered arrow on hover */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
+              </div>
+              
+              <div className="absolute right-3 bottom-3 inline-flex items-center justify-end gap-2 z-10">
                 <span className="font-button font-[number:var(--button-font-weight)] text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)]">
                   17
                 </span>

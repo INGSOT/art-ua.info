@@ -92,7 +92,6 @@ export default function NewsEventsPage() {
                 onPageChange={handlePageChange}
             />
             <JoinCommunityWrapper />
-            <Footer />
         </>
     );
 }
