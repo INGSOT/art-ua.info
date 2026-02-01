@@ -7,6 +7,7 @@ const PLACEHOLDER_BY_PATH: Record<string, string> = {
     '/authors': 'Пошук авторів',
     '/catalogs': 'Пошук каталогів',
     '/projects': 'Пошук проєктів',
+    '/news_events': 'Пошук новин та подій',
 };
 
 export default function SearchSection() {

@@ -7,7 +7,7 @@ const navigationItems = [
   { label: "Роботи", href: "/projects" },
   { label: "Послуги" },
   { label: "Каталоги", href: "/catalogs" },
-  { label: "Новини та події" },
+  { label: "Новини та події", href: "/news_events" },
 ];
 
 const socialIcons = [
