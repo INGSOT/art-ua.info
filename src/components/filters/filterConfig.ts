@@ -187,3 +187,20 @@ export const projectsFilters: FilterSection[] = [
         ]
     }
 ];
+
+// FAQ page filters
+export const faqFilters: FilterSection[] = [
+    {
+        id: 'sections',
+        title: 'Розділи',
+        type: 'simple',
+        items: [
+            { id: 'all', label: 'Усі', type: 'checkbox' },
+            { id: 'section-1', label: 'Назва розділу', type: 'checkbox' },
+            { id: 'section-2', label: 'Назва розділу', type: 'checkbox' },
+            { id: 'section-3', label: 'Назва розділу', type: 'checkbox' },
+            { id: 'section-4', label: 'Назва розділу', type: 'checkbox' },
+            { id: 'section-5', label: 'Назва розділу', type: 'checkbox' },
+        ]
+    }
+];

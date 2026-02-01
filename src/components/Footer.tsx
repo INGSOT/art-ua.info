@@ -152,6 +152,7 @@ export default function Footer() {
                 "Каталоги": "/catalogs",
                 "Проєкти": "/projects",
                 "Новини та події": "/news_events",
+                "Часті питання": "/faq",
               };
               const href = linkMap[link];
               
