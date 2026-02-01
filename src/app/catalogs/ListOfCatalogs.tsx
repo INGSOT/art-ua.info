@@ -49,7 +49,7 @@ export default function ListOfCatalogs({ currentPage, itemsPerPage }: ListOfCata
         >
           <CardContent className="p-0 flex flex-col gap-2 md:gap-3">
             {/* Catalog image with likes overlay */}
-            <div className="relative w-full aspect-[460/316] bg-cover bg-center rounded-sm overflow-hidden">
+            <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
               <Image
                 src={catalog.image}
                 alt={catalog.title}

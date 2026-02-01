@@ -90,7 +90,7 @@ export default function FilterSection({ filters, onFilterChange }: FilterSection
     );
 }
 
-// Checkbox component for "Учасники платформи"
+// Checkbox component
 function FilterItemCheckbox({ item, isSelected, onToggle }: {
     item: FilterItem;
     isSelected: boolean;
@@ -126,7 +126,7 @@ function FilterItemCheckbox({ item, isSelected, onToggle }: {
     );
 }
 
-// Checkmark component for "Галузі мистецтва"
+// Checkmark component
 function FilterItemCheckmark({ item, isSelected, onToggle }: {
     item: FilterItem;
     isSelected: boolean;

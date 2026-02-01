@@ -150,6 +150,7 @@ export default function Footer() {
               const linkMap: Record<string, string> = {
                 "Учасники": "/authors",
                 "Каталоги": "/catalogs",
+                "Проєкти": "/projects",
               };
               const href = linkMap[link];
               

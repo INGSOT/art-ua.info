@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 
 const navigationItems = [
   { label: "Учасники", href: "/authors" },
-  { label: "Роботи" },
+  { label: "Роботи", href: "/projects" },
   { label: "Послуги" },
   { label: "Каталоги", href: "/catalogs" },
   { label: "Новини та події" },
