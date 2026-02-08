@@ -148,7 +148,7 @@ function FilterItemCheckmark({ item, isSelected, onToggle }: {
                 }`}
             >
                 <Image
-                    src={isHovered && !isSelected ? '/yellow_check.svg.svg' : '/grey_check.svg.svg'}
+                    src={isHovered && !isSelected ? '/yellow_check.svg' : '/grey_check.svg'}
                     alt="check"
                     width={12}
                     height={12}

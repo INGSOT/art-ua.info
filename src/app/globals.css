@@ -24,3 +24,29 @@ body {
   color: var(--foreground);
   font-family: var(--font-unbounded), sans-serif;
 }
+
+/* Range slider styles for dual range */
+input[type="range"].range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"].range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  cursor: pointer;
+  border: none;
+}
+
+input[type="range"].range-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  cursor: pointer;
+  border: none;
+}

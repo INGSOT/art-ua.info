@@ -31,7 +31,7 @@ export default function OrderForm() {
                         }`}
                     >
                         <Image
-                            src={isHovered1 && !option1 ? '/yellow_check.svg.svg' : '/grey_check.svg.svg'}
+                            src={isHovered1 && !option1 ? '/yellow_check.svg' : '/grey_check.svg'}
                             alt="check"
                             width={12}
                             height={12}
@@ -60,7 +60,7 @@ export default function OrderForm() {
                         }`}
                     >
                         <Image
-                            src={isHovered2 && !option2 ? '/yellow_check.svg.svg' : '/grey_check.svg.svg'}
+                            src={isHovered2 && !option2 ? '/yellow_check.svg' : '/grey_check.svg'}
                             alt="check"
                             width={12}
                             height={12}

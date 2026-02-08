@@ -151,6 +151,7 @@ export default function Footer() {
                 "Учасники": "/authors",
                 "Каталоги": "/catalogs",
                 "Проєкти": "/projects",
+                "Послуги": "/services",
                 "Новини та події": "/news_events",
                 "Часті питання": "/faq",
               };

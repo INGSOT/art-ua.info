@@ -182,7 +182,7 @@ export default function ProjectDescription() {
           {/* Tags */}
           <div className="flex flex-wrap gap-2 md:gap-3">
             {tags.map((tag, index) => (
-              <div key={index} className="bg-white border border-gray-300 px-4 md:px-6 py-2 md:py-3 rounded">
+              <div key={index} className="bg-white border border-gray-300 px-4 md:px-6 py-2 md:py-3">
                 <span className="text-black font-bold text-sm md:text-base">{tag}</span>
               </div>
             ))}

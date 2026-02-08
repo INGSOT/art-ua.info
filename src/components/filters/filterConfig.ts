@@ -204,3 +204,62 @@ export const faqFilters: FilterSection[] = [
         ]
     }
 ];
+
+// Services page filters
+export const servicesFilters: FilterSection[] = [
+    {
+        id: 'performer',
+        title: 'Виконавець',
+        type: 'simple',
+        items: [
+            { id: 'all', label: 'Усі', type: 'checkbox' },
+            { id: 'artists', label: 'Митці', type: 'checkbox' },
+            { id: 'teams', label: 'Команди', type: 'checkbox' },
+        ]
+    },
+    {
+        id: 'art-fields',
+        title: 'Галузі мистецтва',
+        type: 'nested',
+        subsections: [
+            {
+                id: 'stage-art',
+                title: 'Сценічне мистецтво',
+                items: [
+                    { id: 'directing', label: 'Режисура', type: 'checkmark' },
+                    { id: 'acting', label: 'Акторське мистецтво', type: 'checkmark' },
+                    { id: 'music', label: 'Музичне мистецтво', type: 'checkmark' },
+                    { id: 'choreography', label: 'Хореографічне мистецтво', type: 'checkmark' },
+                    { id: 'original-genre', label: 'Оригінальний жанр', type: 'checkmark' },
+                ]
+            },
+            {
+                id: 'visual-art',
+                title: 'Візуальне мистецтво',
+                items: [
+                    { id: 'art-photography', label: 'Художня фотографія', type: 'checkmark' },
+                    { id: 'video-editing', label: 'Відеозйомка та монтаж', type: 'checkmark' },
+                    { id: 'cinema', label: 'Повнометражний кінематограф', type: 'checkmark' },
+                    { id: 'ar', label: 'Доповнена реальність', type: 'checkmark' },
+                ]
+            },
+            {
+                id: 'fine-art',
+                title: 'Образотворче мистецтво',
+                items: [
+                    { id: 'painting', label: 'Живопис', type: 'checkmark' },
+                    { id: 'sculpture', label: 'Скульптура', type: 'checkmark' },
+                    { id: 'graphics', label: 'Графіка', type: 'checkmark' },
+                ]
+            },
+            {
+                id: 'literature',
+                title: 'Література',
+                items: [
+                    { id: 'poetry', label: 'Поезія', type: 'checkmark' },
+                    { id: 'prose', label: 'Проза', type: 'checkmark' },
+                ]
+            }
+        ]
+    }
+];
