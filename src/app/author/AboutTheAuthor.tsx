@@ -3,27 +3,10 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
+import { aboutAuthorData } from "../../data/authorData";
 
 export default function AboutTheAuthor() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
-
-  const aboutAuthor = {
-    name: "Ім'я Прізвище",
-    description: "Художник, скульптор, архітектор, режисер, співак",
-    avatar: "/image-13.png",
-  };
-
-  const teams = [
-    { name: "Назва Команди", icon: "/teams/team-photo-1.png" },
-    { name: "Назва Команди", icon: "/teams/team-photo-2.png" },
-    { name: "Довга назва команди на декілька слів", icon: "/teams/team-photo-3.png" },
-    { name: "Довга назва команди", icon: "/teams/team-photo-4.png" },
-  ];
-
-  const buttons = [
-    { id: "save-art", label: "save-art.in.ua/username" },
-    { id: "art-ua", label: "art-ua.info/username" },
-  ];
 
   return (
     <section className="w-full bg-[#414141] py-16 px-4">
@@ -32,7 +15,7 @@ export default function AboutTheAuthor() {
         <div className="relative mb-6">
           <div className="w-[160px] h-[160px] rounded-full overflow-hidden border-4 border-yellow-500">
             <Image
-              src={aboutAuthor.avatar}
+              src={aboutAuthorData.avatar}
               alt="Author Avatar"
               width={160}
               height={160}
@@ -43,17 +26,17 @@ export default function AboutTheAuthor() {
 
         {/* Name */}
         <h2 className="text-white text-3xl font-bold mb-4 text-center">
-          {aboutAuthor.name}
+          {aboutAuthorData.name}
         </h2>
 
         {/* Description */}
         <p className="text-gray-400 text-center mb-8">
-          {aboutAuthor.description}
+          {aboutAuthorData.description}
         </p>
 
         {/* Teams */}
         <div className="flex flex-wrap justify-start md:justify-center gap-4 mb-8">
-          {teams.map((team, index) => (
+          {aboutAuthorData.teams.map((team, index) => (
             <div
               key={index}
               className="flex items-center gap-3 bg-[#414141] px-4 py-2 rounded-full"
@@ -74,7 +57,7 @@ export default function AboutTheAuthor() {
 
         {/* Buttons */}
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          {buttons.map((button) => (
+          {aboutAuthorData.buttons.map((button) => (
             <Button
               key={button.id}
               className={`h-[60px] flex items-stretch transition-all duration-300 rounded-none p-0 w-full md:w-auto ${

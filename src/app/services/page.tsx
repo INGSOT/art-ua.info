@@ -5,7 +5,8 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import SearchSection from '../../components/SearchSection';
 import ServicesFilterSection from './ServicesFilterSection';
-import ListOfServices, { servicesData } from './ListOfServices';
+import ListOfServices from './ListOfServices';
+import { servicesData } from '../../data/servicesData';
 import PaginationSection from '../../components/PaginationSection';
 import JoinCommunityWrapper from '../../common_elements/JoinCommunityWrapper';
 

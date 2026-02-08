@@ -2,17 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-
-export interface ServiceCardData {
-    id: number;
-    authorName: string;
-    authorAvatar: string;
-    serviceImage: string;
-    title: string;
-    description: string;
-    price?: number;
-    priceNegotiable: boolean;
-}
+import { ServiceCardData } from '../../data/servicesData';
 
 interface ServiceCardProps {
     service: ServiceCardData;

@@ -1,0 +1,242 @@
+export interface PhotoData {
+  image: string;
+  likes: number;
+}
+
+export interface ParticipantData {
+  id: number;
+  artistPhoto: string;
+  artistName: string;
+  artistType: string;
+  tags: string[];
+  photos: PhotoData[];
+  catalogButtonText: string;
+}
+
+export const participantsData: ParticipantData[] = [
+  {
+    id: 1,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/turquoise-blue_painting.png", likes: 17 },
+      { image: "/gallery/autumn.png", likes: 23 },
+      { image: "/gallery/big_lebovski.png", likes: 15 },
+      { image: "/gallery/pulp_fiction.png", likes: 31 },
+      { image: "/gallery/ship.png", likes: 19 },
+    ],
+  },
+  {
+    id: 2,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Постмодернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/autumn.png", likes: 25 },
+      { image: "/gallery/ship.png", likes: 18 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 22 },
+      { image: "/gallery/big_lebovski.png", likes: 14 },
+      { image: "/gallery/pulp_fiction.png", likes: 29 },
+    ],
+  },
+  {
+    id: 3,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/big_lebovski.png", likes: 20 },
+      { image: "/gallery/pulp_fiction.png", likes: 27 },
+      { image: "/gallery/autumn.png", likes: 16 },
+      { image: "/gallery/ship.png", likes: 21 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 24 },
+    ],
+  },
+  {
+    id: 4,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/pulp_fiction.png", likes: 30 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 19 },
+      { image: "/gallery/ship.png", likes: 26 },
+      { image: "/gallery/autumn.png", likes: 17 },
+      { image: "/gallery/big_lebovski.png", likes: 22 },
+    ],
+  },
+  {
+    id: 5,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/ship.png", likes: 18 },
+      { image: "/gallery/big_lebovski.png", likes: 28 },
+      { image: "/gallery/pulp_fiction.png", likes: 15 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 23 },
+      { image: "/gallery/autumn.png", likes: 20 },
+    ],
+  },
+  {
+    id: 6,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/autumn.png", likes: 21 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 16 },
+      { image: "/gallery/big_lebovski.png", likes: 25 },
+      { image: "/gallery/ship.png", likes: 19 },
+      { image: "/gallery/pulp_fiction.png", likes: 32 },
+    ],
+  },
+  {
+    id: 7,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/big_lebovski.png", likes: 24 },
+      { image: "/gallery/ship.png", likes: 17 },
+      { image: "/gallery/autumn.png", likes: 29 },
+      { image: "/gallery/pulp_fiction.png", likes: 18 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 26 },
+    ],
+  },
+  {
+    id: 8,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/pulp_fiction.png", likes: 22 },
+      { image: "/gallery/autumn.png", likes: 27 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 14 },
+      { image: "/gallery/big_lebovski.png", likes: 30 },
+      { image: "/gallery/ship.png", likes: 16 },
+    ],
+  },
+  {
+    id: 9,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/ship.png", likes: 20 },
+      { image: "/gallery/pulp_fiction.png", likes: 25 },
+      { image: "/gallery/big_lebovski.png", likes: 19 },
+      { image: "/gallery/autumn.png", likes: 31 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 17 },
+    ],
+  },
+  {
+    id: 10,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/turquoise-blue_painting.png", likes: 23 },
+      { image: "/gallery/big_lebovski.png", likes: 18 },
+      { image: "/gallery/ship.png", likes: 28 },
+      { image: "/gallery/pulp_fiction.png", likes: 15 },
+      { image: "/gallery/autumn.png", likes: 24 },
+    ],
+  },
+  {
+    id: 11,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/autumn.png", likes: 26 },
+      { image: "/gallery/ship.png", likes: 21 },
+      { image: "/gallery/pulp_fiction.png", likes: 16 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 29 },
+      { image: "/gallery/big_lebovski.png", likes: 20 },
+    ],
+  },
+  {
+    id: 12,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/big_lebovski.png", likes: 17 },
+      { image: "/gallery/autumn.png", likes: 22 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 27 },
+      { image: "/gallery/ship.png", likes: 14 },
+      { image: "/gallery/pulp_fiction.png", likes: 33 },
+    ],
+  },
+  {
+    id: 13,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/ship.png", likes: 19 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 24 },
+      { image: "/gallery/big_lebovski.png", likes: 16 },
+      { image: "/gallery/autumn.png", likes: 28 },
+      { image: "/gallery/pulp_fiction.png", likes: 21 },
+    ],
+  },
+  {
+    id: 14,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/pulp_fiction.png", likes: 25 },
+      { image: "/gallery/big_lebovski.png", likes: 20 },
+      { image: "/gallery/autumn.png", likes: 15 },
+      { image: "/gallery/ship.png", likes: 30 },
+      { image: "/gallery/turquoise-blue_painting.png", likes: 18 },
+    ],
+  },
+  {
+    id: 15,
+    artistPhoto: "/artists/artist-photo-3.png",
+    artistName: "Вадим Ігнатенко",
+    artistType: "Скульптор · Художник",
+    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/turquoise-blue_painting.png", likes: 22 },
+      { image: "/gallery/ship.png", likes: 17 },
+      { image: "/gallery/pulp_fiction.png", likes: 26 },
+      { image: "/gallery/big_lebovski.png", likes: 19 },
+      { image: "/gallery/autumn.png", likes: 23 },
+    ],
+  },
+];

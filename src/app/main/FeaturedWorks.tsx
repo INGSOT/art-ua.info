@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {Button} from "../../components/ui/button";
 import {Badge} from "../../components/ui/badge";
+import { featuredWorksData } from "../../data/mainData";
 
 interface TagBadgeProps {
   label: string;
@@ -42,27 +43,8 @@ function TagBadge({ label }: TagBadgeProps) {
 export default function FeaturedWorks() {
 const scrollRef = useRef<HTMLDivElement>(null);
 
-const tags = [
-  { label: "Скульптури" },
-  { label: "Картини" },
-  { label: "Тег" },
-  { label: "Тег" },
-  { label: "Показуємо до 5 тегів" },
-];
-
-const artworks = [
-  { image: "/gallery/autumn.png", likes: 17 },
-  { image: "/gallery/big_lebovski.png", likes: 17 },
-  { image: "/gallery/pulp_fiction.png", likes: 17 },
-  { image: "/gallery/ship.png", likes: 17 },
-  { image: "/gallery/mountain_landscape.png", likes: 17 },
-  { image: "/gallery/whale.png", likes: 17 },
-  { image: "/gallery/rain.png", likes: 17 },
-  { image: "/gallery/abstractionism.png", likes: 17 },
-];
-
 // Дублируем массив для бесконечной прокрутки
-const duplicatedArtworks = [...artworks, ...artworks, ...artworks];
+const duplicatedArtworks = [...featuredWorksData.artworks, ...featuredWorksData.artworks, ...featuredWorksData.artworks];
 
 useEffect(() => {
   const scrollContainer = scrollRef.current;
@@ -71,7 +53,7 @@ useEffect(() => {
   let scrollPosition = 0;
   const scrollSpeed = 1; // пикселей за кадр
   const itemWidth = 400.5; // 400px ширина + 0.5px gap
-  const totalWidth = artworks.length * itemWidth;
+  const totalWidth = featuredWorksData.artworks.length * itemWidth;
 
   const scroll = () => {
     scrollPosition += scrollSpeed;
@@ -89,25 +71,25 @@ useEffect(() => {
   const animationId = requestAnimationFrame(scroll);
 
   return () => cancelAnimationFrame(animationId);
-}, [artworks.length]);
+}, []);
 
     return (
     <section className="flex flex-col items-center gap-[30px] px-0 py-10 md:py-20 w-full" style={{ backgroundColor: "#414141" }}>
       <div className="flex flex-col w-full max-w-[1440px] items-start gap-2.5 px-4">
         <p className="font-p1 font-[number:var(--p1-font-weight)] text-[length:var(--p1-font-size)] tracking-[var(--p1-letter-spacing)] leading-[var(--p1-line-height)] [font-style:var(--p1-font-style)]" style={{ color: "#FECC39" }}>
-          Роботи
+          {featuredWorksData.tagline}
         </p>
 
         <h4
           className="font-[number:var(--h4-font-weight)] text-[length:var(--h4-font-size)] leading-[var(--h4-line-height)] font-h4 tracking-[var(--h4-letter-spacing)] [font-style:var(--h4-font-style)] text-white lg:whitespace-nowrap"
           style={{ maxWidth: "600px", fontSize: "clamp(24px, 5vw, 40px)", fontWeight: 700 }}
         >
-          Найкращі роботи наших митців
+          {featuredWorksData.title}
         </h4>
       </div>
 
       <div className="flex w-full max-w-[1440px] items-start gap-2 px-4 flex-wrap">
-        {tags.map((tag, index) => (
+        {featuredWorksData.tags.map((tag, index) => (
           <TagBadge key={index} label={tag.label} />
         ))}
       </div>
@@ -151,7 +133,7 @@ useEffect(() => {
           e.currentTarget.style.backgroundColor = "#FECC39";
         }}
       >
-        Усі роботи
+        {featuredWorksData.buttonText}
       </Button>
     </section>
     )

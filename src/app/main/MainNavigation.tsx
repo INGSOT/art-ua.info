@@ -1,13 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-const navigationItems = [
-  { id: 1, label: "Сценічне мистецтво" },
-  { id: 2, label: "Візуальне мистецтво" },
-  { id: 3, label: "Образотворче мистецтво" },
-  { id: 4, label: "Література" },
-];
+import { navigationItems } from "../../data/mainData";
 
 export default function MainNavigation() {
 

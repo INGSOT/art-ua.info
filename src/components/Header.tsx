@@ -1,25 +1,6 @@
-
 import Link from "next/link";
 import { Button } from "./ui/button";
-
-const navigationItems = [
-  { label: "Учасники", href: "/authors" },
-  { label: "Роботи", href: "/projects" },
-  { label: "Послуги", href: "/services" },
-  { label: "Каталоги", href: "/catalogs" },
-  { label: "Новини та події", href: "/news_events" },
-];
-
-const socialIcons = [
-  { src: "/socials/instagram_white.svg", alt: "Instagram" },
-  { src: "/socials/facebook_white.svg", alt: "Facebook" },
-  { src: "/socials/youtube_white.svg", alt: "Youtube" },
-];
-
-const languageOptions = [
-  { code: "UA", active: true },
-  { code: "EN", active: false },
-];
+import { navigationItems, socialIcons, languageOptions } from "../data/headerData";
 
 interface HeaderProps {
   isHomePage?: boolean;

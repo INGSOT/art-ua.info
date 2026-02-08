@@ -7,7 +7,8 @@ import JoinCommunityWrapper from "../../common_elements/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
 import { catalogsFilters } from "../../components/filters/filterConfig";
-import ListOfCatalogs, { catalogsData } from "./ListOfCatalogs";
+import ListOfCatalogs from "./ListOfCatalogs";
+import { catalogsData } from "../../data/catalogsData";
 import PaginationSection from "../../components/PaginationSection";
 import Image from "next/image";
 

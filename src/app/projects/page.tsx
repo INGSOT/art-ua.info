@@ -7,9 +7,10 @@ import JoinCommunityWrapper from "../../common_elements/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
 import { projectsFilters } from "../../components/filters/filterConfig";
-import ListOfProjects, { projectsData } from "./ListOfProjects";
+import ListOfProjects from "./ListOfProjects";
 import PaginationSection from "../../components/PaginationSection";
 import Image from "next/image";
+import { projectsData } from "../../data/projectsData";
 
 const ITEMS_PER_PAGE = 12;
 

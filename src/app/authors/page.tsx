@@ -10,7 +10,7 @@ import { authorsFilters } from "../../components/filters/filterConfig";
 import Participant from "./Participant";
 import SortingControls from "./SortingControls";
 import PaginationSection from "../../components/PaginationSection";
-import { participantsData } from "./participantsData";
+import { participantsData } from "../../data/participantsData";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -45,6 +45,7 @@ export default function AuthorsPage() {
                             artistType={participant.artistType}
                             tags={participant.tags}
                             photos={participant.photos}
+                            catalogButtonText={participant.catalogButtonText}
                         />
                     ))}
                 </div>

@@ -2,32 +2,18 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { projectDetails } from "../../../../data/authorData";
 
 export default function ProjectInfo() {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [likes, setLikes] = useState(1257);
-
-  const slides = [
-    "/gallery/big_lebovski.png",
-    "/gallery/pulp_fiction.png",
-    "/gallery/autumn.png",
-    "/gallery/rain.png",
-  ];
-
-  const projectCharacteristics = [
-    { name: "Тривалість", description: "До 20 хв." },
-    { name: "Жанр", description: "Комедія" },
-    { name: "Режисер", description: "Я" },
-    { name: "Сценарій", description: "Теж я" },
-    { name: "Актори", description: "Один – я" },
-  ];
+  const [likes, setLikes] = useState(projectDetails.initialLikes);
 
   const handlePrevSlide = () => {
-    setActiveSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+    setActiveSlide((prev) => (prev === 0 ? projectDetails.slides.length - 1 : prev - 1));
   };
 
   const handleNextSlide = () => {
-    setActiveSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+    setActiveSlide((prev) => (prev === projectDetails.slides.length - 1 ? 0 : prev + 1));
   };
 
   return (
@@ -35,18 +21,17 @@ export default function ProjectInfo() {
       <div className="max-w-4xl mx-auto flex flex-col items-center">
         {/* Title */}
         <h1 className="text-white text-2xl md:text-3xl font-bold mb-6 text-center max-w-[600px] whitespace-normal md:whitespace-nowrap">
-          Художній фільм "Назва Фільму"
+          {projectDetails.title}
         </h1>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-4 mb-8 justify-center">
-          <div className="bg-[#343434] px-4 md:px-6 py-3 rounded">
-            <span className="text-white font-bold text-sm md:text-base">Повнометражний кінематограф</span>
-          </div>
-          <div className="bg-[#343434] px-4 md:px-6 py-3 rounded flex items-center gap-2">
-            <Image src="/coins.svg" alt="Coins" width={24} height={24} />
-            <span className="text-[#FECC39] font-bold text-sm md:text-base">Проєкт проданий</span>
-          </div>
+          {projectDetails.tags.map((tag, index) => (
+            <div key={index} className={`bg-[#343434] px-4 md:px-6 py-3 rounded ${tag.hasIcon ? 'flex items-center gap-2' : ''}`}>
+              {tag.hasIcon && <Image src="/coins.svg" alt="Coins" width={24} height={24} />}
+              <span className={`font-bold text-sm md:text-base ${tag.hasIcon ? 'text-[#FECC39]' : 'text-white'}`}>{tag.text}</span>
+            </div>
+          ))}
         </div>
 
         {/* Image Slider */}
@@ -54,7 +39,7 @@ export default function ProjectInfo() {
           {/* Main Image */}
           <div className="relative w-full aspect-video bg-[#2a2a2a] mb-4">
             <Image
-              src={slides[activeSlide]}
+              src={projectDetails.slides[activeSlide]}
               alt={`Slide ${activeSlide + 1}`}
               fill
               className="object-cover"
@@ -63,7 +48,7 @@ export default function ProjectInfo() {
 
           {/* Thumbnails */}
           <div className="flex gap-2 md:gap-4 mb-6 justify-center overflow-x-auto">
-            {slides.map((slide, index) => (
+            {projectDetails.slides.map((slide, index) => (
               <button
                 key={index}
                 onClick={() => setActiveSlide(index)}
@@ -93,7 +78,7 @@ export default function ProjectInfo() {
             </button>
 
             <div className="flex gap-2">
-              {slides.map((_, index) => (
+              {projectDetails.slides.map((_, index) => (
                 <Image
                   key={index}
                   src={
@@ -122,10 +107,10 @@ export default function ProjectInfo() {
         {/* Project Links */}
         <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-6 items-center">
           <p className="text-white font-bold text-sm md:text-[length:var(--h6-font-size)] text-center">
-            Проєкт на save-art.in.ua
+            {projectDetails.links.saveArt}
           </p>
           <p className="text-white font-bold text-sm md:text-[length:var(--h6-font-size)] text-center">
-            Проєкт на art-ua.com
+            {projectDetails.links.artUa}
           </p>
         </div>
 
@@ -143,7 +128,7 @@ export default function ProjectInfo() {
         {/* Project Characteristics */}
         <div className="w-full mb-6">
           <h2 className="text-white font-bold text-xl mb-6">
-            Характеристики проєкту:
+            {projectDetails.characteristicsTitle}
           </h2>
 
           {/* Characteristics Table */}
@@ -151,15 +136,15 @@ export default function ProjectInfo() {
             {/* Table Headers */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-white font-bold">Назва</span>
+                <span className="text-white font-bold">{projectDetails.tableHeaders.name}</span>
               </div>
               <div>
-                <span className="text-white font-bold">Опис</span>
+                <span className="text-white font-bold">{projectDetails.tableHeaders.description}</span>
               </div>
             </div>
 
             {/* Table Rows */}
-            {projectCharacteristics.map((item, index) => (
+            {projectDetails.characteristics.map((item, index) => (
               <div key={index} className="grid grid-cols-2 gap-2 md:gap-4">
                 <div className="bg-[#343434] px-3 md:px-6 py-3 md:py-4">
                   <span className="text-white font-bold text-sm md:text-base">{item.name}</span>

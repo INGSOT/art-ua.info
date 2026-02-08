@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { serviceDetailsData } from "../../../../data/authorData";
 
 export default function Photo() {
     return (
@@ -8,8 +9,8 @@ export default function Photo() {
             {/* Photo */}
             <div className="relative w-full aspect-[512/512]">
                 <Image
-                    src="/gallery/autumn.png"
-                    alt="Autumn"
+                    src={serviceDetailsData.photo}
+                    alt="Service"
                     fill
                     className="object-cover"
                 />

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { articleData } from "../../../data/articleData";
 
 export default function Photo() {
   return (
@@ -6,7 +7,7 @@ export default function Photo() {
       {/* Square photo section */}
       <div className="relative aspect-square w-full">
         <Image
-          src="/news/news-image-4.png"
+          src={articleData.mainImage}
           alt="News article"
           fill
           className="object-cover"

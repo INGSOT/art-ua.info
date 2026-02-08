@@ -5,7 +5,8 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import JoinCommunityWrapper from "../../common_elements/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
-import ListOfNews, { newsData } from "./ListOfNews";
+import ListOfNews from "./ListOfNews";
+import { newsData } from "../../data/newsData";
 import PaginationSection from "../../components/PaginationSection";
 import Image from "next/image";
 

@@ -6,12 +6,15 @@ import { Badge } from "../../components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 
+import { PhotoData } from "../../data/participantsData";
+
 interface ParticipantProps {
   artistPhoto: string;
   artistName: string;
   artistType: string;
   tags: string[];
-  photos: string[];
+  photos: PhotoData[];
+  catalogButtonText: string;
 }
 
 function TagBadge({ label }: { label: string }) {
@@ -50,6 +53,7 @@ export default function Participant({
   artistType,
   tags,
   photos,
+  catalogButtonText,
 }: ParticipantProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
@@ -121,7 +125,7 @@ export default function Participant({
             className="group flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors rounded-none overflow-hidden flex-1 lg:w-auto"
           >
             <span className="flex items-center justify-center flex-1 px-4 sm:px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] whitespace-nowrap">
-              До каталогу робіт
+              {catalogButtonText}
             </span>
             <div className="flex items-center justify-center w-[60px] border-l border-[#343434]">
               <Image
@@ -224,7 +228,7 @@ export default function Participant({
               key={index}
               className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[365px] h-[210px] sm:h-[240px] lg:h-[274px] bg-cover bg-center bg-no-repeat relative group cursor-pointer overflow-hidden"
               style={{
-                backgroundImage: `url(${photo})`,
+                backgroundImage: `url(${photo.image})`,
                 userSelect: "none",
               }}
             >
@@ -238,7 +242,7 @@ export default function Participant({
               
               <div className="absolute right-3 bottom-3 inline-flex items-center justify-end gap-2 z-10">
                 <span className="font-button font-[number:var(--button-font-weight)] text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)]">
-                  17
+                  {photo.likes}
                 </span>
                 <Image src="/like.svg" alt="Like" width={32} height={32} />
               </div>

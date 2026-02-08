@@ -3,31 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
-
-interface News {
-  id: number;
-  image: string;
-  title: string;
-  date: string;
-}
-
-const newsData: News[] = [
-  { id: 1, image: "/news/news-image-1.png", title: "Назва новини або події в дві стрічки максимум", date: "12 січня 2026" },
-  { id: 2, image: "/news/news-image-2.png", title: "Назва новини або події в дві стрічки максимум", date: "11 січня 2026" },
-  { id: 3, image: "/news/news-image-3.png", title: "Назва новини або події в дві стрічки максимум", date: "10 січня 2026" },
-  { id: 4, image: "/news/news-image-4.png", title: "Назва новини або події в дві стрічки максимум", date: "9 січня 2026" },
-  { id: 5, image: "/news/news-image-5.jpg", title: "Назва новини або події в дві стрічки максимум", date: "8 січня 2026" },
-  { id: 6, image: "/news/news-image-6.png", title: "Назва новини або події в дві стрічки максимум", date: "7 січня 2026" },
-  { id: 7, image: "/news/news-image-7.png", title: "Назва новини або події в дві стрічки максимум", date: "6 січня 2026" },
-  { id: 8, image: "/news/news-image-8.png", title: "Назва новини або події в дві стрічки максимум", date: "5 січня 2026" },
-  { id: 9, image: "/news/news-image-9.png", title: "Назва новини або події в дві стрічки максимум", date: "4 січня 2026" },
-  { id: 10, image: "/news/news-image-1.png", title: "Назва новини або події в дві стрічки максимум", date: "3 січня 2026" },
-  { id: 11, image: "/news/news-image-2.png", title: "Назва новини або події в дві стрічки максимум", date: "2 січня 2026" },
-  { id: 12, image: "/news/news-image-3.png", title: "Назва новини або події в дві стрічки максимум", date: "1 січня 2026" },
-  { id: 13, image: "/news/news-image-4.png", title: "Назва новини або події в дві стрічки максимум", date: "31 грудня 2025" },
-  { id: 14, image: "/news/news-image-5.jpg", title: "Назва новини або події в дві стрічки максимум", date: "30 грудня 2025" },
-  { id: 15, image: "/news/news-image-6.png", title: "Назва новини або події в дві стрічки максимум", date: "29 грудня 2025" },
-];
+import { newsData } from "../../data/newsData";
 
 interface ListOfNewsProps {
   currentPage: number;
@@ -79,5 +55,3 @@ export default function ListOfNews({ currentPage, itemsPerPage }: ListOfNewsProp
     </div>
   );
 }
-
-export { newsData };

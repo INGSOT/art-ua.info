@@ -1,47 +1,17 @@
 import { Card, CardContent } from "../../components/ui/card";
 import { ScrollArea, ScrollBar } from "../../components/ui/scroll-area";
-
-const partnersData = [
-  {
-    id: 1,
-    logo: "/idua.svg",
-    logoClassName: "w-[100px] h-[100px]",
-    title: "ID_Art_UA",
-    description: "Пара слів хто це",
-  },
-  {
-    id: 2,
-    logo: "/ingsot.svg",
-    logoClassName: "w-[323.53px] h-[100px]",
-    title: "ingsot.com",
-    description: "Пара слів хто це",
-  },
-  {
-    id: 3,
-    logo: "/image-13.png",
-    logoClassName: "w-[100px] h-[100px] rounded-[50px] object-cover",
-    title: "Костянтин Костянтинопольський",
-    description: "Пара слів хто це",
-  },
-  {
-    id: 4,
-    logo: "/image-13.png",
-    logoClassName: "w-[100px] h-[100px] rounded-[50px] object-cover",
-    title: "Костянтин Костянтинопольський",
-    description: "Пара слів хто це",
-  },
-];
+import { partnersData } from "../../data/mainData";
 
 export default function Partners() {
     return (
     <section className="flex flex-col items-center gap-[30px] px-4 py-10 md:py-20 w-full bg-[#414141]">
       <h2 className="text-white text-[32px] md:text-[48px] lg:text-[60px] font-bold font-[700] leading-[var(--h2-line-height)] tracking-[var(--h2-letter-spacing)]">
-        Партнери
+        {partnersData.title}
       </h2>
 
       <ScrollArea className="w-full max-w-[1440px]">
         <div className="flex items-start gap-10 pb-6">
-          {partnersData.map((partner) => (
+          {partnersData.partners.map((partner) => (
             <Card
               key={partner.id}
               className="flex-shrink-0 w-[400px] h-[400px] bg-[#343434] border-0 rounded-none"
