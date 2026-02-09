@@ -144,7 +144,7 @@ export default function ServicesFilterSection() {
                                         const num = value ? parseInt(value) : 0;
                                         setMinPrice(Math.min(num, maxPrice));
                                     }}
-                                    className="w-full h-10 bg-[#343434] text-white px-3 outline-none"
+                                    className="w-full h-10 bg-[#343434] text-white px-3"
                                 />
                             </div>
                             <div className="flex-1">
@@ -157,7 +157,7 @@ export default function ServicesFilterSection() {
                                         const num = value ? parseInt(value) : 0;
                                         setMaxPrice(Math.max(num, minPrice));
                                     }}
-                                    className="w-full h-10 bg-[#343434] text-white px-3 outline-none"
+                                    className="w-full h-10 bg-[#343434] text-white px-3"
                                 />
                             </div>
                         </div>
@@ -279,7 +279,7 @@ export default function ServicesFilterSection() {
                                 placeholder="Пошук"
                                 value={locationSearch}
                                 onChange={(e) => setLocationSearch(e.target.value)}
-                                className="w-full h-full bg-[#343434] text-white placeholder-gray-400 px-4 pr-12 rounded-none outline-none"
+                                className="w-full h-full bg-[#343434] text-white placeholder-gray-400 px-4 pr-12 rounded-none"
                             />
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                 <Image

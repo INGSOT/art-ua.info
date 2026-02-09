@@ -21,7 +21,7 @@ export default function SearchSection() {
                 <input
                     type="text"
                     placeholder={placeholder}
-                    className="w-full h-full bg-[#343434] text-white placeholder-gray-400 px-6 pr-16 rounded-none outline-none"
+                    className="w-full h-full bg-[#343434] text-white placeholder-gray-400 px-6 pr-16 rounded-none"
                 />
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                     <Image

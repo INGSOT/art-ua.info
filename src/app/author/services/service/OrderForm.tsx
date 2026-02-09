@@ -70,13 +70,13 @@ export default function OrderForm() {
                             <textarea
                                 placeholder={field.placeholder}
                                 rows={field.rows || 5}
-                                className="w-full bg-[#343434] text-white px-4 py-3 placeholder:text-[#4a4a4a] focus:outline-none focus:ring-2 focus:ring-[#FFD700] resize-none"
+                                className="w-full bg-[#343434] text-white px-4 py-3 placeholder:text-[#4a4a4a] resize-none"
                             />
                         ) : (
                             <input
                                 type={field.type}
                                 placeholder={field.placeholder}
-                                className="w-full h-[50px] bg-[#343434] text-white px-4 placeholder:text-[#4a4a4a] focus:outline-none focus:ring-2 focus:ring-[#FFD700]"
+                                className="w-full h-[50px] bg-[#343434] text-white px-4 placeholder:text-[#4a4a4a]"
                             />
                         )}
                     </div>

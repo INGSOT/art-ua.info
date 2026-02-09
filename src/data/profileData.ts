@@ -1,0 +1,69 @@
+// About Me
+export interface Team {
+  name: string;
+  icon: string;
+}
+
+export interface AboutMeButton {
+  id: string;
+  label: string;
+}
+
+export interface AboutMeData {
+  name: string;
+  description: string;
+  avatar: string;
+  teams: Team[];
+  buttons: AboutMeButton[];
+}
+
+export const aboutMeData: AboutMeData = {
+  name: "Ім'я Прізвище",
+  description: "Художник, скульптор, архітектор, режисер, співак",
+  avatar: "/image-13.png",
+  teams: [
+    { name: "Назва Команди", icon: "/teams/team-photo-1.png" },
+    { name: "Назва Команди", icon: "/teams/team-photo-2.png" },
+    { name: "Довга назва команди", icon: "/teams/team-photo-3.png" },
+    { name: "Назва Команди", icon: "/teams/team-photo-4.png" },
+  ],
+  buttons: [
+    { id: "save-art", label: "save-art.in.ua/username" },
+    { id: "art-ua", label: "art-ua.info/username" },
+  ],
+};
+
+// Author Projects
+export interface AuthorProject {
+  id: number;
+  image: string;
+  title: string;
+  likes: number;
+}
+
+export interface ProjectFilterButton {
+  id: string;
+  text: string;
+}
+
+export const authorProjects: AuthorProject[] = [
+  // { id: 1, image: "/projects/project-photo-1.png", title: "Назва роботи", likes: 17 },
+  // { id: 2, image: "/projects/project-photo-2.png", title: "Назва роботи", likes: 17 },
+  // { id: 3, image: "/projects/project-photo-3.png", title: "Назва роботи", likes: 35 },
+  // { id: 4, image: "/projects/project-photo-4.png", title: "Назва роботи", likes: 17 },
+];
+
+export const projectFilterButtons: ProjectFilterButton[] = [
+  { id: "all", text: "Усі категорії" },
+  { id: "newest", text: "Новіші" },
+];
+
+export const projectEmptyState = {
+  message: "Тут ще нічого немає",
+  subMessage: "Додайте свою першу роботу.",
+  createButtonText: "Створити",
+};
+
+export const profileTexts = {
+  editProfileButton: "Редагувати профіль",
+};
