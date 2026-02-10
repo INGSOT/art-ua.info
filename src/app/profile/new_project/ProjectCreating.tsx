@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { languageButtons, newProjectTexts } from "../../../data/newProjectData";
+import { newProjectTexts } from "../../../data/newProjectData";
 import { aboutMeData } from "../../../data/profileData";
 
 interface Characteristic {
@@ -12,11 +12,12 @@ interface Characteristic {
 }
 
 export default function ProjectCreating() {
-  const [selectedLanguage, setSelectedLanguage] = useState("ua");
   const [selectedOwner, setSelectedOwner] = useState<string | null>(null);
   const [hoveredOwner, setHoveredOwner] = useState<string | null>(null);
-  const [projectName, setProjectName] = useState("");
-  const [tags, setTags] = useState("");
+  const [projectNameUa, setProjectNameUa] = useState("");
+  const [projectNameEn, setProjectNameEn] = useState("");
+  const [tagsUa, setTagsUa] = useState("");
+  const [tagsEn, setTagsEn] = useState("");
   const [characteristics, setCharacteristics] = useState<Characteristic[]>([
     { id: "1", name: "", description: "" },
   ]);
@@ -85,23 +86,6 @@ export default function ProjectCreating() {
         {newProjectTexts.title}
       </h1>
 
-      {/* Language Buttons */}
-      <div className="flex gap-4">
-        {languageButtons.map((lang) => (
-          <button
-            key={lang.id}
-            type="button"
-            onClick={() => setSelectedLanguage(lang.id)}
-            className={`flex items-center gap-2 px-6 py-3 bg-[#343434] transition-all ${
-              selectedLanguage === lang.id ? "border-b-4 border-[#FECC39]" : ""
-            }`}
-          >
-            <Image src={lang.icon} alt={lang.label} width={24} height={24} />
-            <span className="text-white">{lang.label}</span>
-          </button>
-        ))}
-      </div>
-
       {/* Owner Selection */}
       <div className="w-full max-w-[1000px] flex flex-col gap-4">
         <h2 className="text-white text-[20px] font-semibold text-center">
@@ -156,13 +140,30 @@ export default function ProjectCreating() {
       {/* Project Name Input */}
       <div className="w-full max-w-[1000px] flex flex-col gap-2">
         <label className="text-white text-sm">Назва проекту</label>
-        <input
-          type="text"
-          value={projectName}
-          onChange={(e) => setProjectName(e.target.value)}
-          placeholder={newProjectTexts.projectNamePlaceholder}
-          className="w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
-        />
+        <div className="relative">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">
+            <Image src="/ua.svg" alt="UA" width={24} height={24} />
+          </div>
+          <input
+            type="text"
+            value={projectNameUa}
+            onChange={(e) => setProjectNameUa(e.target.value)}
+            placeholder={newProjectTexts.projectNamePlaceholder}
+            className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+          />
+        </div>
+        <div className="relative">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">
+            <Image src="/en.svg" alt="EN" width={24} height={24} />
+          </div>
+          <input
+            type="text"
+            value={projectNameEn}
+            onChange={(e) => setProjectNameEn(e.target.value)}
+            placeholder={newProjectTexts.projectNamePlaceholderEn}
+            className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+          />
+        </div>
       </div>
 
       {/* Art Field Button */}
@@ -205,13 +206,30 @@ export default function ProjectCreating() {
       {/* Tags Input */}
       <div className="w-full max-w-[1000px] flex flex-col gap-2">
         <label className="text-white text-sm">{newProjectTexts.tagsLabel}</label>
-        <input
-          type="text"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          placeholder={newProjectTexts.tagsPlaceholder}
-          className="w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
-        />
+        <div className="relative">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">
+            <Image src="/ua.svg" alt="UA" width={24} height={24} />
+          </div>
+          <input
+            type="text"
+            value={tagsUa}
+            onChange={(e) => setTagsUa(e.target.value)}
+            placeholder={newProjectTexts.tagsPlaceholder}
+            className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+          />
+        </div>
+        <div className="relative">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2">
+            <Image src="/en.svg" alt="EN" width={24} height={24} />
+          </div>
+          <input
+            type="text"
+            value={tagsEn}
+            onChange={(e) => setTagsEn(e.target.value)}
+            placeholder={newProjectTexts.tagsPlaceholderEn}
+            className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+          />
+        </div>
         <p className="text-white text-sm text-right">
           {newProjectTexts.tagsHint}
         </p>
@@ -228,53 +246,91 @@ export default function ProjectCreating() {
 
         {/* Labels - shown only once */}
         {characteristics.length > 0 && (
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="text-white text-sm">
-                {newProjectTexts.characteristicNameLabel}
-              </label>
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="text-white text-sm">
+                  {newProjectTexts.characteristicNameLabel}
+                </label>
+              </div>
+              <div className="flex-1">
+                <label className="text-white text-sm">
+                  {newProjectTexts.characteristicDescLabel}
+                </label>
+              </div>
+              {characteristics.length > 1 && <div className="w-[160px]" />}
             </div>
-            <div className="flex-1">
-              <label className="text-white text-sm">
-                {newProjectTexts.characteristicDescLabel}
-              </label>
-            </div>
-            {characteristics.length > 1 && <div className="w-[160px]" />}
           </div>
         )}
 
         {/* Characteristics Inputs */}
         {characteristics.map((char, index) => (
-          <div key={char.id} className="flex flex-col md:flex-row gap-4 items-start">
-            <div className="flex-1">
-              <input
-                type="text"
-                value={char.name}
-                onChange={(e) =>
-                  updateCharacteristic(char.id, "name", e.target.value)
-                }
-                placeholder={newProjectTexts.characteristicNamePlaceholder}
-                className="w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
-              />
+          <div key={char.id} className="flex gap-4">
+            {/* Input fields container */}
+            <div className="flex-1 flex flex-col gap-4">
+              {/* Ukrainian inputs */}
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                    <Image src="/ua.svg" alt="UA" width={24} height={24} />
+                  </div>
+                  <input
+                    type="text"
+                    value={char.name}
+                    onChange={(e) =>
+                      updateCharacteristic(char.id, "name", e.target.value)
+                    }
+                    placeholder={newProjectTexts.characteristicNamePlaceholder}
+                    className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+                  />
+                </div>
+                <div className="flex-1 relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                    <Image src="/ua.svg" alt="UA" width={24} height={24} />
+                  </div>
+                  <input
+                    type="text"
+                    value={char.description}
+                    onChange={(e) =>
+                      updateCharacteristic(char.id, "description", e.target.value)
+                    }
+                    placeholder={newProjectTexts.characteristicDescPlaceholder}
+                    className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+                  />
+                </div>
+              </div>
+              {/* English inputs */}
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                    <Image src="/en.svg" alt="EN" width={24} height={24} />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder={newProjectTexts.characteristicNamePlaceholderEn}
+                    className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+                  />
+                </div>
+                <div className="flex-1 relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                    <Image src="/en.svg" alt="EN" width={24} height={24} />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder={newProjectTexts.characteristicDescPlaceholderEn}
+                    className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="flex-1">
-              <input
-                type="text"
-                value={char.description}
-                onChange={(e) =>
-                  updateCharacteristic(char.id, "description", e.target.value)
-                }
-                placeholder={newProjectTexts.characteristicDescPlaceholder}
-                className="w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
-              />
-            </div>
+            {/* Control buttons - vertical layout */}
             {characteristics.length > 1 && (
-              <div className="flex gap-2 bg-[#343434] px-3 h-[60px]">
+              <div className="flex flex-col gap-2 bg-[#343434] px-2 py-1">
                 <button
                   type="button"
                   onClick={() => moveCharacteristic(char.id, "up")}
                   disabled={index === 0}
-                  className="flex-1 flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-[40px] h-[40px] flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <Image
                     src="/yellow_triangle_up.svg"
@@ -287,7 +343,7 @@ export default function ProjectCreating() {
                   type="button"
                   onClick={() => moveCharacteristic(char.id, "down")}
                   disabled={index === characteristics.length - 1}
-                  className="flex-1 flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-[40px] h-[40px] flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <Image
                     src="/yellow_triangle_down.svg"
@@ -299,7 +355,7 @@ export default function ProjectCreating() {
                 <button
                   type="button"
                   onClick={() => deleteCharacteristic(char.id)}
-                  className="flex-1 flex items-center justify-center hover:bg-[#414141] transition-colors"
+                  className="w-[40px] h-[40px] flex items-center justify-center hover:bg-[#414141] transition-colors"
                 >
                   <Image
                     src="/yellow_cross.svg"
