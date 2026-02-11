@@ -4,12 +4,47 @@ import { useState } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../data/newProjectData";
 import { aboutMeData } from "../../../data/profileData";
+import AddProjectCover from "./AddProjectCover";
+import AddWork from "./AddWork";
+import SelectArtForm from "./SelectArtForm";
+import AddBlock from "./AddBlock";
+import AddTitle from "./AddTitle";
+import AddParagraph from "./AddParagraph";
+import AddLink from "./AddLink";
 
 interface Characteristic {
   id: string;
   name: string;
   description: string;
 }
+
+interface TitleBlock {
+  id: string;
+  titleUa: string;
+  titleEn: string;
+}
+
+interface ParagraphBlock {
+  id: string;
+  paragraphUa: string;
+  paragraphEn: string;
+}
+
+interface ImageBlock {
+  id: string;
+  imageUrl: string;
+}
+
+interface LinkBlock {
+  id: string;
+  url: string;
+}
+
+type ContentBlock = 
+  | { type: 'title'; data: TitleBlock }
+  | { type: 'paragraph'; data: ParagraphBlock }
+  | { type: 'image'; data: ImageBlock }
+  | { type: 'link'; data: LinkBlock };
 
 export default function ProjectCreating() {
   const [selectedOwner, setSelectedOwner] = useState<string | null>(null);
@@ -21,6 +56,24 @@ export default function ProjectCreating() {
   const [characteristics, setCharacteristics] = useState<Characteristic[]>([
     { id: "1", name: "", description: "" },
   ]);
+  const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
+  const [projectCover, setProjectCover] = useState<string | null>(null);
+  const [workImage, setWorkImage] = useState<string | null>(null);
+  const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
+  const [isWorkImageModalOpen, setIsWorkImageModalOpen] = useState(false);
+  const [isArtFormModalOpen, setIsArtFormModalOpen] = useState(false);
+  const [selectedArtField, setSelectedArtField] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
+  const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
+  const [isTitleModalOpen, setIsTitleModalOpen] = useState(false);
+  const [isParagraphModalOpen, setIsParagraphModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [currentImageBlockId, setCurrentImageBlockId] = useState<string | null>(null);
+  const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
+  const [blockModalNoAnimation, setBlockModalNoAnimation] = useState(false);
 
   const addCharacteristic = () => {
     const newId = (characteristics.length + 1).toString();
@@ -64,6 +117,121 @@ export default function ProjectCreating() {
     }
   };
 
+  const addTitleBlock = (titleUa: string, titleEn: string) => {
+    const newId = (contentBlocks.length + 1).toString();
+    const newBlock: ContentBlock = {
+      type: 'title',
+      data: { id: newId, titleUa, titleEn }
+    };
+    setContentBlocks([...contentBlocks, newBlock]);
+  };
+
+  const addParagraphBlock = (paragraphUa: string, paragraphEn: string) => {
+    const newId = (contentBlocks.length + 1).toString();
+    const newBlock: ContentBlock = {
+      type: 'paragraph',
+      data: { id: newId, paragraphUa, paragraphEn }
+    };
+    setContentBlocks([...contentBlocks, newBlock]);
+  };
+
+  const addImageBlock = (imageUrl: string) => {
+    const newId = (contentBlocks.length + 1).toString();
+    const newBlock: ContentBlock = {
+      type: 'image',
+      data: { id: newId, imageUrl }
+    };
+    setContentBlocks([...contentBlocks, newBlock]);
+    setCurrentImageBlockId(newId);
+  };
+
+  const addLinkBlock = (url: string) => {
+    const newId = (contentBlocks.length + 1).toString();
+    const newBlock: ContentBlock = {
+      type: 'link',
+      data: { id: newId, url }
+    };
+    setContentBlocks([...contentBlocks, newBlock]);
+  };
+
+  const deleteContentBlock = (id: string) => {
+    // If deleting the current image block, clear the modal state
+    if (currentImageBlockId === id) {
+      setCurrentImageBlockId(null);
+    }
+    setContentBlocks(contentBlocks.filter((block) => block.data.id !== id));
+  };
+
+  const moveContentBlock = (id: string, direction: "up" | "down") => {
+    const index = contentBlocks.findIndex((block) => block.data.id === id);
+    if (
+      (direction === "up" && index > 0) ||
+      (direction === "down" && index < contentBlocks.length - 1)
+    ) {
+      const newBlocks = [...contentBlocks];
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      [newBlocks[index], newBlocks[targetIndex]] = [
+        newBlocks[targetIndex],
+        newBlocks[index],
+      ];
+      setContentBlocks(newBlocks);
+    }
+  };
+
+  const handleTitleClick = () => {
+    setIsBlockModalOpen(false);
+    setIsTitleModalOpen(true);
+  };
+
+  const handleParagraphClick = () => {
+    setIsBlockModalOpen(false);
+    setIsParagraphModalOpen(true);
+  };
+
+  const handleImageClick = () => {
+    setIsBlockModalOpen(false);
+    setIsImageModalOpen(true);
+  };
+
+  const handleLinkClick = () => {
+    setIsBlockModalOpen(false);
+    setIsLinkModalOpen(true);
+  };
+
+  const handleTitleBack = () => {
+    setIsTitleModalOpen(false);
+    setBlockModalNoAnimation(true);
+    setIsBlockModalOpen(true);
+  };
+
+  const handleParagraphBack = () => {
+    setIsParagraphModalOpen(false);
+    setBlockModalNoAnimation(true);
+    setIsBlockModalOpen(true);
+  };
+
+  const handleImageBack = () => {
+    setIsImageModalOpen(false);
+    setBlockModalNoAnimation(true);
+    setIsBlockModalOpen(true);
+  };
+
+  const handleLinkBack = () => {
+    setIsLinkModalOpen(false);
+    setBlockModalNoAnimation(true);
+    setIsBlockModalOpen(true);
+  };
+
+  const handleWorkImageClick = () => {
+    setIsWorkModalOpen(false);
+    setIsWorkImageModalOpen(true);
+  };
+
+  const handleBlockModalClose = () => {
+    setIsBlockModalOpen(false);
+    setBlockModalNoAnimation(false);
+  };
+
   const owners = [
     {
       id: "author",
@@ -80,7 +248,7 @@ export default function ProjectCreating() {
   ];
 
   return (
-    <form className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-20 bg-[#414141] min-h-screen">
+    <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-20 bg-[#414141] min-h-screen">
       {/* Title */}
       <h1 className="text-[#A0A0A0] text-[32px] md:text-[40px] font-bold text-center">
         {newProjectTexts.title}
@@ -139,7 +307,7 @@ export default function ProjectCreating() {
 
       {/* Project Name Input */}
       <div className="w-full max-w-[1000px] flex flex-col gap-2">
-        <label className="text-white text-sm">Назва проекту</label>
+        <label className="text-white text-sm">{newProjectTexts.projectNameLabel}</label>
         <div className="relative">
           <div className="absolute left-4 top-1/2 -translate-y-1/2">
             <Image src="/ua.svg" alt="UA" width={24} height={24} />
@@ -170,9 +338,12 @@ export default function ProjectCreating() {
       <div className="w-full max-w-[1000px] flex justify-center">
         <button
           type="button"
-          className="flex items-center justify-between gap-4 px-6 py-4 bg-[#343434] text-white"
+          onClick={() => setIsArtFormModalOpen(true)}
+          className="flex items-center justify-between gap-4 px-6 py-4 bg-[#343434] text-white hover:bg-[#3a3a3a] transition-colors"
         >
-          <span>{newProjectTexts.artFieldButton}</span>
+          <span>
+            {selectedArtField ? selectedArtField.label : newProjectTexts.artFieldButton}
+          </span>
           <Image
             src="/white_triangle_left.svg"
             alt="arrow"
@@ -184,23 +355,80 @@ export default function ProjectCreating() {
 
       {/* Cover Upload */}
       <div className="w-full max-w-[1000px] flex justify-center">
-        <div className="flex flex-col items-center justify-center gap-4 w-[400px] h-[300px] bg-[#343434] cursor-pointer hover:bg-[#3a3a3a] transition-colors">
-          <Image src="/upload.svg" alt="upload" width={48} height={48} />
-          <div className="text-white text-center">
-            <p>Додайте обкладинку</p>
-            <p>(Необов'язково)</p>
-          </div>
+        <div
+          onClick={() => !projectCover && setIsCoverModalOpen(true)}
+          className={`relative flex flex-col items-center justify-center gap-4 w-[400px] h-[300px] bg-[#343434] transition-colors ${!projectCover ? 'cursor-pointer hover:bg-[#3a3a3a]' : ''}`}
+        >
+          {projectCover ? (
+            <>
+              <Image
+                src={projectCover}
+                alt="Project cover"
+                fill
+                className="object-cover"
+              />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsCoverModalOpen(true);
+                }}
+                className="absolute top-4 right-4 w-12 h-12 bg-[#343434] flex items-center justify-center hover:bg-[#414141] transition-colors z-10"
+              >
+                <Image
+                  src="/yellow_cross.svg"
+                  alt="Edit"
+                  width={24}
+                  height={24}
+                />
+              </button>
+            </>
+          ) : (
+            <>
+              <Image src="/upload.svg" alt="upload" width={48} height={48} />
+              <div className="text-white text-center">
+                <p>{newProjectTexts.addCoverText}</p>
+                <p>{newProjectTexts.addCoverOptional}</p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
       {/* Work Upload */}
       <div className="w-full max-w-[1000px] flex justify-center">
-        <div className="flex flex-col items-center justify-center gap-4 w-[400px] h-[300px] bg-[#343434] cursor-pointer hover:bg-[#3a3a3a] transition-colors">
-          <Image src="/upload.svg" alt="upload" width={48} height={48} />
-          <p className="text-white text-center">
-            {newProjectTexts.workUploadText}
-          </p>
-        </div>
+        {workImage ? (
+          <div className="relative w-full aspect-[4/3] bg-[#343434]">
+            <Image
+              src={workImage}
+              alt="Work image"
+              fill
+              className="object-cover"
+            />
+            {/* Delete Button */}
+            <button
+              onClick={() => setIsWorkImageModalOpen(true)}
+              className="absolute top-2 right-2 w-10 h-10 bg-[#343434] hover:bg-[#FECC39] flex items-center justify-center transition-colors group"
+            >
+              <Image
+                src="/yellow_cross.svg"
+                alt="Remove"
+                width={24}
+                height={24}
+                className="group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[0.2] transition-all"
+              />
+            </button>
+          </div>
+        ) : (
+          <div 
+            onClick={() => setIsWorkModalOpen(true)}
+            className="flex flex-col items-center justify-center gap-4 w-[400px] h-[300px] bg-[#343434] cursor-pointer hover:bg-[#3a3a3a] transition-colors"
+          >
+            <Image src="/upload.svg" alt="upload" width={48} height={48} />
+            <p className="text-white text-center">
+              {newProjectTexts.workUploadText}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Tags Input */}
@@ -325,12 +553,12 @@ export default function ProjectCreating() {
             </div>
             {/* Control buttons - vertical layout */}
             {characteristics.length > 1 && (
-              <div className="flex flex-col gap-2 bg-[#343434] px-2 py-1">
+              <div className="flex flex-col justify-center gap-1 bg-[#343434] px-2 h-full">
                 <button
                   type="button"
                   onClick={() => moveCharacteristic(char.id, "up")}
                   disabled={index === 0}
-                  className="w-[40px] h-[40px] flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-[40px] h-[36px] flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <Image
                     src="/yellow_triangle_up.svg"
@@ -343,7 +571,7 @@ export default function ProjectCreating() {
                   type="button"
                   onClick={() => moveCharacteristic(char.id, "down")}
                   disabled={index === characteristics.length - 1}
-                  className="w-[40px] h-[40px] flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-[40px] h-[36px] flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <Image
                     src="/yellow_triangle_down.svg"
@@ -355,7 +583,7 @@ export default function ProjectCreating() {
                 <button
                   type="button"
                   onClick={() => deleteCharacteristic(char.id)}
-                  className="w-[40px] h-[40px] flex items-center justify-center hover:bg-[#414141] transition-colors"
+                  className="w-[40px] h-[36px] flex items-center justify-center hover:bg-[#414141] transition-colors"
                 >
                   <Image
                     src="/yellow_cross.svg"
@@ -381,10 +609,114 @@ export default function ProjectCreating() {
         </div>
       </div>
 
+      {/* Content Blocks */}
+      {contentBlocks.map((block, index) => (
+        <div key={block.data.id} className="w-full max-w-[1000px] flex gap-4">
+          {/* Content Fields */}
+          <div className="flex-1 flex flex-col gap-4">
+            {block.type === 'title' ? (
+              <>
+                {/* Ukrainian Title */}
+                <div className="flex items-center gap-4 px-6 py-4 bg-[#343434]">
+                  <Image src="/ua.svg" alt="UA" width={24} height={24} />
+                  <span className="text-white flex-1">{block.data.titleUa}</span>
+                </div>
+                {/* English Title */}
+                <div className="flex items-center gap-4 px-6 py-4 bg-[#343434]">
+                  <Image src="/en.svg" alt="EN" width={24} height={24} />
+                  <span className="text-white flex-1">{block.data.titleEn}</span>
+                </div>
+              </>
+            ) : block.type === 'paragraph' ? (
+              <>
+                {/* Ukrainian Paragraph */}
+                <div className="flex items-center gap-4 px-6 py-4 bg-[#343434]">
+                  <Image src="/ua.svg" alt="UA" width={24} height={24} />
+                  <span className="text-white flex-1">{block.data.paragraphUa}</span>
+                </div>
+                {/* English Paragraph */}
+                <div className="flex items-center gap-4 px-6 py-4 bg-[#343434]">
+                  <Image src="/en.svg" alt="EN" width={24} height={24} />
+                  <span className="text-white flex-1">{block.data.paragraphEn}</span>
+                </div>
+              </>
+            ) : block.type === 'image' ? (
+              <>
+                {/* Image Block */}
+                <div className="relative w-full aspect-[4/3] bg-[#343434]">
+                  <Image
+                    src={block.data.imageUrl}
+                    alt="Content image"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Link Block */}
+                <div className="flex items-center px-6 py-7 bg-[#343434] min-h-[130px]">
+                  <a 
+                    href={block.data.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[#FECC39] hover:underline break-all"
+                  >
+                    {block.data.url}
+                  </a>
+                </div>
+              </>
+            )}
+          </div>
+          {/* Control buttons - vertical layout */}
+          <div className={`flex flex-col justify-center gap-1 bg-[#343434] px-2 ${block.type === 'paragraph' ? 'h-[120px]' : block.type === 'link' ? 'h-full' : block.type === 'image' ? 'h-[120px]' : 'h-full'}`}>
+            <button
+              type="button"
+              onClick={() => moveContentBlock(block.data.id, "up")}
+              disabled={index === 0}
+              className="w-[40px] h-[36px] flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <Image
+                src="/yellow_triangle_up.svg"
+                alt="Move up"
+                width={20}
+                height={20}
+              />
+            </button>
+            <button
+              type="button"
+              onClick={() => moveContentBlock(block.data.id, "down")}
+              disabled={index === contentBlocks.length - 1}
+              className="w-[40px] h-[36px] flex items-center justify-center hover:bg-[#414141] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <Image
+                src="/yellow_triangle_down.svg"
+                alt="Move down"
+                width={20}
+                height={20}
+              />
+            </button>
+            <button
+              type="button"
+              onClick={() => deleteContentBlock(block.data.id)}
+              className="w-[40px] h-[36px] flex items-center justify-center hover:bg-[#414141] transition-colors"
+            >
+              <Image
+                src="/yellow_cross.svg"
+                alt="Delete"
+                width={20}
+                height={20}
+              />
+            </button>
+          </div>
+        </div>
+      ))}
+
       {/* Add Block Button */}
       <div className="w-full max-w-[1000px] flex justify-center">
         <button
           type="button"
+          onClick={() => setIsBlockModalOpen(true)}
           className="h-[60px] flex items-stretch transition-all duration-300 bg-white hover:bg-gray-100 w-full md:w-[320px]"
         >
           <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">
@@ -400,6 +732,112 @@ export default function ProjectCreating() {
           </div>
         </button>
       </div>
-    </form>
+
+      {/* Add Project Cover Modal */}
+      <AddProjectCover
+        isOpen={isCoverModalOpen}
+        onClose={() => setIsCoverModalOpen(false)}
+        onImageSelect={(imageUrl) => setProjectCover(imageUrl)}
+        onImageRemove={() => setProjectCover(null)}
+        currentImage={projectCover}
+      />
+
+      {/* Add Work Modal */}
+      <AddWork
+        isOpen={isWorkModalOpen}
+        onClose={() => setIsWorkModalOpen(false)}
+        onImageClick={handleWorkImageClick}
+      />
+
+      {/* Add Work Image Modal */}
+      <AddProjectCover
+        isOpen={isWorkImageModalOpen}
+        onClose={() => setIsWorkImageModalOpen(false)}
+        onImageSelect={(imageUrl) => {
+          setWorkImage(imageUrl);
+          setIsWorkImageModalOpen(false);
+        }}
+        onImageRemove={() => setWorkImage(null)}
+        currentImage={workImage}
+        customTitle={newProjectTexts.addImageModalTitle}
+        noAnimation={true}
+        onBack={() => {
+          setIsWorkImageModalOpen(false);
+          setIsWorkModalOpen(true);
+        }}
+      />
+
+      {/* Select Art Form Modal */}
+      <SelectArtForm
+        isOpen={isArtFormModalOpen}
+        onClose={() => setIsArtFormModalOpen(false)}
+        onSelect={(id, label) => setSelectedArtField({ id, label })}
+        selectedSubcategory={selectedArtField?.id || null}
+      />
+
+      {/* Add Block Modal */}
+      <AddBlock
+        isOpen={isBlockModalOpen}
+        onClose={handleBlockModalClose}
+        onTitleClick={handleTitleClick}
+        onParagraphClick={handleParagraphClick}
+        onImageClick={handleImageClick}
+        onLinkClick={handleLinkClick}
+        noAnimation={blockModalNoAnimation}
+      />
+
+      {/* Add Title Modal */}
+      <AddTitle
+        isOpen={isTitleModalOpen}
+        onClose={() => setIsTitleModalOpen(false)}
+        onBack={handleTitleBack}
+        onAdd={addTitleBlock}
+      />
+
+      {/* Add Paragraph Modal */}
+      <AddParagraph
+        isOpen={isParagraphModalOpen}
+        onClose={() => setIsParagraphModalOpen(false)}
+        onBack={handleParagraphBack}
+        onAdd={addParagraphBlock}
+      />
+
+      {/* Add Image Modal */}
+      <AddProjectCover
+        isOpen={isImageModalOpen}
+        onClose={() => setIsImageModalOpen(false)}
+        onImageSelect={(imageUrl) => {
+          addImageBlock(imageUrl);
+          setIsImageModalOpen(false);
+        }}
+        onImageRemove={() => {
+          if (currentImageBlockId) {
+            deleteContentBlock(currentImageBlockId);
+          }
+        }}
+        currentImage={
+          currentImageBlockId
+            ? contentBlocks.find(
+                (block) => block.type === 'image' && block.data.id === currentImageBlockId
+              )?.type === 'image'
+              ? (contentBlocks.find(
+                  (block) => block.type === 'image' && block.data.id === currentImageBlockId
+                ) as { type: 'image'; data: ImageBlock })?.data.imageUrl
+              : null
+            : null
+        }
+        customTitle={newProjectTexts.addImageModalTitle}
+        noAnimation={true}
+        onBack={handleImageBack}
+      />
+
+      {/* Add Link Modal */}
+      <AddLink
+        isOpen={isLinkModalOpen}
+        onClose={() => setIsLinkModalOpen(false)}
+        onBack={handleLinkBack}
+        onAdd={addLinkBlock}
+      />
+    </div>
   );
 }

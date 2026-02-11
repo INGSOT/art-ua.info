@@ -63,3 +63,17 @@ textarea:focus {
   border-left: 4px solid #FECC39 !important;
   outline: none !important;
 }
+
+/* Slide-in animation for modal */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}

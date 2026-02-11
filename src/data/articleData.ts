@@ -43,9 +43,9 @@ export const articleData: ArticleContent = {
 
 export const socialLinks: SocialLink[] = [
   {
-    name: "Copy link",
+    name: "DeviantArt",
     url: "",
-    icon: "/chain.svg",
+    icon: "/socials/deviantart_yellow.svg",
   },
   {
     name: "Facebook",
