@@ -137,4 +137,9 @@ export const newProjectTexts = {
   projectNameLabel: 'Назва проекту',
   addCoverText: 'Додайте обкладинку',
   addCoverOptional: '(Необов\'язково)',
+  addImageGalleryTitle: 'Додайте галерею зображень',
+  addImageGallerySubtitle: 'Добре будуть виглядати зображення зі співвідношенням 4x3',
+  addImageGalleryUploadButton: 'Завантажте зображення',
+  addImageGalleryHint: 'До 10 зображень. Формати .jpg, .jpeg, .png та .webp до 15 мб кожна.',
+  addImageGalleryAddButton: 'Додати',
 };

@@ -35,7 +35,7 @@ export default function SelectArtForm({
       />
 
       {/* Slide-in Panel */}
-      <div className="fixed right-0 top-0 h-full w-full md:w-[600px] bg-[#414141] z-50 flex flex-col animate-slide-in overflow-y-auto">
+      <div className="fixed right-0 top-0 h-full w-full md:w-[600px] bg-[#414141] z-50 flex flex-col animate-slide-in">
         {/* Header */}
         <div className="flex items-center justify-between p-6">
           <h2 className="text-white text-[18px] font-bold">
@@ -55,7 +55,7 @@ export default function SelectArtForm({
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-6 flex flex-col gap-6">
+        <div className="flex-1 px-6 pb-6 flex flex-col gap-6 overflow-y-auto scrollbar-hide">
           {artCategories.map((category) => (
             <div key={category.id} className="flex flex-col gap-4">
               {/* Category Title */}
@@ -71,7 +71,7 @@ export default function SelectArtForm({
                     onClick={() => handleSubcategoryClick(subcategory.id, subcategory.label)}
                     onMouseEnter={() => setHoveredSubcategory(subcategory.id)}
                     onMouseLeave={() => setHoveredSubcategory(null)}
-                    className="flex items-center gap-4 px-6 py-4 bg-[#343434] transition-colors border-b border-[#414141] last:border-b-0"
+                    className="flex items-center gap-4 px-4 py-4 bg-[#343434] transition-colors border-b border-[#414141] last:border-b-0"
                   >
                     {/* Checkbox */}
                     <div

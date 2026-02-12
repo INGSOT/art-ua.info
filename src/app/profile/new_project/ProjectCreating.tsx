@@ -11,6 +11,8 @@ import AddBlock from "./AddBlock";
 import AddTitle from "./AddTitle";
 import AddParagraph from "./AddParagraph";
 import AddLink from "./AddLink";
+import AddImageGallery from "./AddImageGallery";
+import ImageGallerySlider from "./ImageGallerySlider";
 
 interface Characteristic {
   id: string;
@@ -61,6 +63,8 @@ export default function ProjectCreating() {
   const [workImage, setWorkImage] = useState<string | null>(null);
   const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
   const [isWorkImageModalOpen, setIsWorkImageModalOpen] = useState(false);
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
   const [isArtFormModalOpen, setIsArtFormModalOpen] = useState(false);
   const [selectedArtField, setSelectedArtField] = useState<{
     id: string;
@@ -225,6 +229,11 @@ export default function ProjectCreating() {
   const handleWorkImageClick = () => {
     setIsWorkModalOpen(false);
     setIsWorkImageModalOpen(true);
+  };
+
+  const handleWorkGalleryClick = () => {
+    setIsWorkModalOpen(false);
+    setIsGalleryModalOpen(true);
   };
 
   const handleBlockModalClose = () => {
@@ -396,7 +405,12 @@ export default function ProjectCreating() {
 
       {/* Work Upload */}
       <div className="w-full max-w-[1000px] flex justify-center">
-        {workImage ? (
+        {galleryImages.length > 0 ? (
+          <ImageGallerySlider
+            images={galleryImages}
+            onEditClick={() => setIsGalleryModalOpen(true)}
+          />
+        ) : workImage ? (
           <div className="relative w-full aspect-[4/3] bg-[#343434]">
             <Image
               src={workImage}
@@ -747,6 +761,7 @@ export default function ProjectCreating() {
         isOpen={isWorkModalOpen}
         onClose={() => setIsWorkModalOpen(false)}
         onImageClick={handleWorkImageClick}
+        onGalleryClick={handleWorkGalleryClick}
       />
 
       {/* Add Work Image Modal */}
@@ -837,6 +852,25 @@ export default function ProjectCreating() {
         onClose={() => setIsLinkModalOpen(false)}
         onBack={handleLinkBack}
         onAdd={addLinkBlock}
+      />
+
+      {/* Add Image Gallery Modal */}
+      <AddImageGallery
+        isOpen={isGalleryModalOpen}
+        onClose={() => setIsGalleryModalOpen(false)}
+        onImagesSelect={(images) => {
+          setGalleryImages(images);
+          setIsGalleryModalOpen(false);
+        }}
+        onImagesUpdate={(images) => {
+          setGalleryImages(images);
+        }}
+        currentImages={galleryImages}
+        noAnimation={true}
+        onBack={() => {
+          setIsGalleryModalOpen(false);
+          setIsWorkModalOpen(true);
+        }}
       />
     </div>
   );

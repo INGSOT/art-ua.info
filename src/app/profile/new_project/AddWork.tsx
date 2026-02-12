@@ -7,9 +7,10 @@ interface AddWorkProps {
   isOpen: boolean;
   onClose: () => void;
   onImageClick: () => void;
+  onGalleryClick: () => void;
 }
 
-export default function AddWork({ isOpen, onClose, onImageClick }: AddWorkProps) {
+export default function AddWork({ isOpen, onClose, onImageClick, onGalleryClick }: AddWorkProps) {
   if (!isOpen) return null;
 
   const handleImageClick = () => {
@@ -17,8 +18,7 @@ export default function AddWork({ isOpen, onClose, onImageClick }: AddWorkProps)
   };
 
   const handleGalleryClick = () => {
-    // TODO: Implement gallery upload
-    console.log("Gallery upload clicked");
+    onGalleryClick();
   };
 
   const handleLinkClick = () => {
