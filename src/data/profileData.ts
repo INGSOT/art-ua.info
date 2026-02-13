@@ -33,8 +33,8 @@ export const aboutMeData: AboutMeData = {
   ],
 };
 
-// Author Projects
-export interface AuthorProject {
+// My Projects
+export interface MyProject {
   id: number;
   image: string;
   title: string;
@@ -46,7 +46,7 @@ export interface ProjectFilterButton {
   text: string;
 }
 
-export const authorProjects: AuthorProject[] = [
+export const myProjects: MyProject[] = [
   // { id: 1, image: "/projects/project-photo-1.png", title: "Назва роботи", likes: 17 },
   // { id: 2, image: "/projects/project-photo-2.png", title: "Назва роботи", likes: 17 },
   // { id: 3, image: "/projects/project-photo-3.png", title: "Назва роботи", likes: 35 },
@@ -66,4 +66,34 @@ export const projectEmptyState = {
 
 export const profileTexts = {
   editProfileButton: "Редагувати профіль",
+};
+
+// My Catalogs
+export interface MyCatalog {
+  id: number;
+  image: string;
+  title: string;
+  likes: number;
+}
+
+export const myCatalogs: MyCatalog[] = [
+  { id: 1, image: "/gallery/abstractionism.png", title: "Абстракціонізм", likes: 17 },
+  { id: 2, image: "/gallery/autumn.png", title: "Осінь", likes: 24 },
+  { id: 3, image: "/gallery/big_lebovski.png", title: "Великий Лебовскі", likes: 35 },
+];
+
+export interface CatalogsTexts {
+  addCatalogButton: string;
+  addCatalogButtonIconAlt: string;
+  tooltip: string;
+  deleteIconAlt: string;
+  likeIconAlt: string;
+}
+
+export const catalogsTexts: CatalogsTexts = {
+  addCatalogButton: "Додати каталог",
+  addCatalogButtonIconAlt: "Plus",
+  tooltip: "Зробити основним (для відображення на головній та сторінці митців).",
+  deleteIconAlt: "Delete",
+  likeIconAlt: "Like",
 };

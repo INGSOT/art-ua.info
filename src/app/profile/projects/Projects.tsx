@@ -4,12 +4,12 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../../components/ui/card";
-import { authorProjects, projectFilterButtons, projectEmptyState } from "../../../data/profileData";
+import { myProjects, projectFilterButtons, projectEmptyState } from "../../../data/profileData";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
 
-  const hasProjects = authorProjects.length > 0;
+  const hasProjects = myProjects.length > 0;
 
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-20">
@@ -39,7 +39,7 @@ export default function Projects() {
           {/* Projects grid */}
           <div className="px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {authorProjects.map((project) => (
+              {myProjects.map((project) => (
                 <Link key={project.id} href="#" className="block group">
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
                     <CardContent className="p-0 flex flex-col gap-3">

@@ -13,7 +13,7 @@ export default function Menu({ activeItem }: MenuProps) {
   const menuItems = [
     { id: "projects", label: "Проєкти", href: "/profile/projects" },
     { id: "drafts", label: "Чернетки", href: "#" },
-    { id: "catalogs", label: "Каталоги", href: "#" },
+    { id: "catalogs", label: "Каталоги", href: "/profile/catalogs" },
     { id: "services", label: "Послуги", href: "#" },
     { id: "team", label: "Команда", href: "#" },
     { id: "info", label: "Інформація", href: "#" },
