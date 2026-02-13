@@ -3,10 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import { catalogsTexts, myCatalogs } from "../../../data/profileData";
+import DeleteCatalog from "./DeleteCatalog";
+import AddCatalog from "./AddCatalog";
 
 export default function Catalogs() {
   const [selectedCatalogs, setSelectedCatalogs] = useState<number[]>([]);
   const [hoveredCheckbox, setHoveredCheckbox] = useState<number | null>(null);
+  const [catalogs, setCatalogs] = useState(myCatalogs);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [catalogToDelete, setCatalogToDelete] = useState<number | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const toggleCatalogSelection = (catalogId: number) => {
     setSelectedCatalogs((prev) =>
@@ -16,18 +22,52 @@ export default function Catalogs() {
     );
   };
 
-  const handleDelete = (catalogId: number, e: React.MouseEvent) => {
+  const handleDeleteClick = (catalogId: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Delete catalog:", catalogId);
-    // TODO: Implement delete functionality
+    setCatalogToDelete(catalogId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (catalogToDelete !== null) {
+      setCatalogs(catalogs.filter((catalog) => catalog.id !== catalogToDelete));
+      setSelectedCatalogs(selectedCatalogs.filter((id) => id !== catalogToDelete));
+      setCatalogToDelete(null);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setCatalogToDelete(null);
+  };
+
+  const handleAddClick = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const handleAddCatalog = (imageUrl: string, catalogFile: File, catalogFileName: string) => {
+    const newCatalog = {
+      id: Math.max(...catalogs.map(c => c.id), 0) + 1,
+      image: imageUrl,
+      title: catalogFileName.replace(/\.pdf$/i, ""),
+      likes: 0,
+    };
+    setCatalogs([...catalogs, newCatalog]);
+  };
+
+  const handleAddCancel = () => {
+    setIsAddModalOpen(false);
   };
 
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-20">
       {/* Add Catalog Button */}
       <div className="mb-8 flex justify-center">
-        <button className="h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-white w-full md:w-[320px]">
+        <button
+          onClick={handleAddClick}
+          className="h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-white w-full md:w-[320px]"
+        >
           <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">
             {catalogsTexts.addCatalogButton}
           </span>
@@ -39,7 +79,7 @@ export default function Catalogs() {
 
       {/* Catalogs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {myCatalogs.map((catalog) => (
+        {catalogs.map((catalog) => (
           <div key={catalog.id} className="relative group">
             {/* Catalog Card */}
             <div className="relative w-full aspect-[4/3] bg-cover bg-center">
@@ -102,7 +142,7 @@ export default function Catalogs() {
               {/* Delete button in top-right corner */}
               <div className="absolute top-3 right-3 z-20">
                 <button
-                  onClick={(e) => handleDelete(catalog.id, e)}
+                  onClick={(e) => handleDeleteClick(catalog.id, e)}
                   className="bg-[#343434] p-2 hover:bg-[#272727] transition-colors"
                 >
                   <Image
@@ -130,6 +170,20 @@ export default function Catalogs() {
           </div>
         ))}
       </div>
+
+      {/* Delete Modal */}
+      <DeleteCatalog
+        isOpen={isDeleteModalOpen}
+        onClose={handleDeleteCancel}
+        onDelete={handleDeleteConfirm}
+      />
+
+      {/* Add Catalog Modal */}
+      <AddCatalog
+        isOpen={isAddModalOpen}
+        onClose={handleAddCancel}
+        onAdd={handleAddCatalog}
+      />
     </section>
   );
 }

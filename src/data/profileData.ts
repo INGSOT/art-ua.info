@@ -97,3 +97,43 @@ export const catalogsTexts: CatalogsTexts = {
   deleteIconAlt: "Delete",
   likeIconAlt: "Like",
 };
+
+// Add Catalog Modal
+export interface AddCatalogTexts {
+  title: string;
+  closeAlt: string;
+  imageUploadText: string;
+  imageRemoveAlt: string;
+  catalogUploadText: string;
+  catalogRemoveAlt: string;
+  uploadIconAlt: string;
+  addButton: string;
+}
+
+export const addCatalogTexts: AddCatalogTexts = {
+  title: "Новий каталог",
+  closeAlt: "Close",
+  imageUploadText: "Додайте обкладинку.\nДобре будуть виглядати зображення зі співвідношенням 4х3.",
+  imageRemoveAlt: "Remove",
+  catalogUploadText: "Завантажте каталог",
+  catalogRemoveAlt: "Remove catalog",
+  uploadIconAlt: "Upload",
+  addButton: "Додати",
+};
+
+// Delete Catalog Modal
+export interface DeleteCatalogTexts {
+  title: string;
+  closeAlt: string;
+  description: string;
+  deleteButton: string;
+  cancelButton: string;
+}
+
+export const deleteCatalogTexts: DeleteCatalogTexts = {
+  title: "Ви видаляєте каталог",
+  closeAlt: "Close",
+  description: "Ви впевнені, що хочете видалити цей каталог?\nЦю дію неможливо буде відмінити.",
+  deleteButton: "Так, видалити",
+  cancelButton: "Ні, залишити",
+};
