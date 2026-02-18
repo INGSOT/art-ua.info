@@ -137,3 +137,42 @@ export const deleteCatalogTexts: DeleteCatalogTexts = {
   deleteButton: "Так, видалити",
   cancelButton: "Ні, залишити",
 };
+
+// My Services
+export interface MyService {
+  id: number;
+  image: string;
+  buttonLabel: string;
+  title: string;
+}
+
+export const myServices: MyService[] = [
+  {
+    id: 1,
+    image: "/gallery/autumn.png",
+    buttonLabel: "Від 100 000 ₴",
+    title: "Назва послуги на декілька слів. Не більше ніж на два рядки. Кра...",
+  },
+  {
+    id: 2,
+    image: "/gallery/rain.png",
+    buttonLabel: "Ціна договірна",
+    title: "Назва послуги на декілька слів. Не більше ніж на два рядки. Кра...",
+  },
+  {
+    id: 3,
+    image: "/gallery/ship.png",
+    buttonLabel: "Від ₴ 100 000 000",
+    title: "Назва послуги на декілька слів. Не більше ніж на два рядки. Кра...",
+  },
+];
+
+export interface ServicesTexts {
+  addServiceButton: string;
+  editServiceButton: string;
+}
+
+export const servicesTexts: ServicesTexts = {
+  addServiceButton: "Додати послуги",
+  editServiceButton: "Редагувати послугу",
+};
