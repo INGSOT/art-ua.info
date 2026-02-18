@@ -8,9 +8,10 @@ interface AddWorkProps {
   onClose: () => void;
   onImageClick: () => void;
   onGalleryClick: () => void;
+  onLinkClick: () => void;
 }
 
-export default function AddWork({ isOpen, onClose, onImageClick, onGalleryClick }: AddWorkProps) {
+export default function AddWork({ isOpen, onClose, onImageClick, onGalleryClick, onLinkClick }: AddWorkProps) {
   if (!isOpen) return null;
 
   const handleImageClick = () => {
@@ -22,8 +23,7 @@ export default function AddWork({ isOpen, onClose, onImageClick, onGalleryClick 
   };
 
   const handleLinkClick = () => {
-    // TODO: Implement link input
-    console.log("Link input clicked");
+    onLinkClick();
   };
 
   return (

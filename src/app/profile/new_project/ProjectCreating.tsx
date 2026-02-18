@@ -13,6 +13,7 @@ import AddParagraph from "./AddParagraph";
 import AddLink from "./AddLink";
 import AddImageGallery from "./AddImageGallery";
 import ImageGallerySlider from "./ImageGallerySlider";
+import { getVideoInfo } from "../../../utils/videoUtils";
 
 interface Characteristic {
   id: string;
@@ -61,7 +62,9 @@ export default function ProjectCreating() {
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
   const [projectCover, setProjectCover] = useState<string | null>(null);
   const [workImage, setWorkImage] = useState<string | null>(null);
+  const [workVideoUrl, setWorkVideoUrl] = useState<string | null>(null);
   const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
+  const [isWorkLinkModalOpen, setIsWorkLinkModalOpen] = useState(false);
   const [isWorkImageModalOpen, setIsWorkImageModalOpen] = useState(false);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
@@ -234,6 +237,22 @@ export default function ProjectCreating() {
   const handleWorkGalleryClick = () => {
     setIsWorkModalOpen(false);
     setIsGalleryModalOpen(true);
+  };
+
+  const handleWorkLinkClick = () => {
+    setIsWorkModalOpen(false);
+    setIsWorkLinkModalOpen(true);
+  };
+
+  const handleWorkLinkBack = () => {
+    setIsWorkLinkModalOpen(false);
+    setIsWorkModalOpen(true);
+  };
+
+  const handleAddWorkLink = (url: string) => {
+    setWorkVideoUrl(url);
+    setWorkImage(null);
+    setGalleryImages([]);
   };
 
   const handleBlockModalClose = () => {
@@ -410,6 +429,34 @@ export default function ProjectCreating() {
             images={galleryImages}
             onEditClick={() => setIsGalleryModalOpen(true)}
           />
+        ) : workVideoUrl ? (
+          (() => {
+            const videoInfo = getVideoInfo(workVideoUrl);
+            return videoInfo ? (
+              <div className="relative w-full aspect-[4/3] bg-[#343434]">
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoInfo.videoId}`}
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="w-full h-full"
+                />
+                {/* Delete Button */}
+                <button
+                  onClick={() => setWorkVideoUrl(null)}
+                  className="absolute top-2 right-2 w-10 h-10 bg-[#343434] hover:bg-[#FECC39] flex items-center justify-center transition-colors group z-10"
+                >
+                  <Image
+                    src="/yellow_cross.svg"
+                    alt="Remove"
+                    width={24}
+                    height={24}
+                    className="group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[0.2] transition-all"
+                  />
+                </button>
+              </div>
+            ) : null;
+          })()
         ) : workImage ? (
           <div className="relative w-full aspect-[4/3] bg-[#343434]">
             <Image
@@ -421,7 +468,7 @@ export default function ProjectCreating() {
             {/* Delete Button */}
             <button
               onClick={() => setIsWorkImageModalOpen(true)}
-              className="absolute top-2 right-2 w-10 h-10 bg-[#343434] hover:bg-[#FECC39] flex items-center justify-center transition-colors group"
+              className="absolute top-2 right-2 w-10 h-10 bg-[#343434] hover:bg-[#FECC39] flex items-center justify-center transition-colors group z-10"
             >
               <Image
                 src="/yellow_cross.svg"
@@ -668,17 +715,32 @@ export default function ProjectCreating() {
               </>
             ) : (
               <>
-                {/* Link Block */}
-                <div className="flex items-center px-6 py-7 bg-[#343434] min-h-[130px]">
-                  <a 
-                    href={block.data.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-[#FECC39] hover:underline break-all"
-                  >
-                    {block.data.url}
-                  </a>
-                </div>
+                {/* Link Block - Display as YouTube player if YouTube */}
+                {(() => {
+                  const videoInfo = getVideoInfo(block.data.url);
+                  return videoInfo ? (
+                    <div className="relative w-full aspect-[4/3] bg-[#343434]">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${videoInfo.videoId}`}
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="w-full h-full"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center px-6 py-7 bg-[#343434] min-h-[130px]">
+                      <a 
+                        href={block.data.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-[#FECC39] hover:underline break-all"
+                      >
+                        {block.data.url}
+                      </a>
+                    </div>
+                  );
+                })()}
               </>
             )}
           </div>
@@ -762,6 +824,7 @@ export default function ProjectCreating() {
         onClose={() => setIsWorkModalOpen(false)}
         onImageClick={handleWorkImageClick}
         onGalleryClick={handleWorkGalleryClick}
+        onLinkClick={handleWorkLinkClick}
       />
 
       {/* Add Work Image Modal */}
@@ -871,6 +934,14 @@ export default function ProjectCreating() {
           setIsGalleryModalOpen(false);
           setIsWorkModalOpen(true);
         }}
+      />
+
+      {/* Add Work Link Modal */}
+      <AddLink
+        isOpen={isWorkLinkModalOpen}
+        onClose={() => setIsWorkLinkModalOpen(false)}
+        onBack={handleWorkLinkBack}
+        onAdd={handleAddWorkLink}
       />
     </div>
   );
