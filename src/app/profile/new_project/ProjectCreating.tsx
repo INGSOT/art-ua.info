@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../data/newProjectData";
 import { aboutMeData } from "../../../data/profileData";
@@ -81,6 +81,50 @@ export default function ProjectCreating() {
   const [currentImageBlockId, setCurrentImageBlockId] = useState<string | null>(null);
   const [contentBlocks, setContentBlocks] = useState<ContentBlock[]>([]);
   const [blockModalNoAnimation, setBlockModalNoAnimation] = useState(false);
+
+  // Save project data to localStorage whenever it changes
+  useEffect(() => {
+    const projectData = {
+      selectedOwner,
+      projectNameUa,
+      projectNameEn,
+      tagsUa,
+      tagsEn,
+      selectedArtField,
+      projectCover,
+      workImage,
+      workVideoUrl,
+      galleryImages,
+      contentBlocks,
+      characteristics,
+    };
+    localStorage.setItem('projectData', JSON.stringify(projectData));
+  }, [selectedOwner, projectNameUa, projectNameEn, tagsUa, tagsEn, selectedArtField, projectCover, workImage, workVideoUrl, galleryImages, contentBlocks, characteristics]);
+
+  // Check if projectData was deleted from localStorage (after successful submit) and clear form
+  useEffect(() => {
+    const checkIfCleared = setInterval(() => {
+      const projectData = localStorage.getItem('projectData');
+      if (!projectData) {
+        // Clear all form fields
+        setSelectedOwner(null);
+        setProjectNameUa("");
+        setProjectNameEn("");
+        setTagsUa("");
+        setTagsEn("");
+        setSelectedArtField(null);
+        setProjectCover(null);
+        setWorkImage(null);
+        setWorkVideoUrl(null);
+        setGalleryImages([]);
+        setContentBlocks([]);
+        setCharacteristics([{ id: "1", name: "", description: "" }]);
+        clearInterval(checkIfCleared);
+      }
+    }, 500);
+    
+    return () => clearInterval(checkIfCleared);
+  }, []);
 
   const addCharacteristic = () => {
     const newId = (characteristics.length + 1).toString();
@@ -277,6 +321,7 @@ export default function ProjectCreating() {
 
   return (
     <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-20 bg-[#414141] min-h-screen">
+      <form className="flex flex-col items-center gap-8 w-full">
       {/* Title */}
       <h1 className="text-[#A0A0A0] text-[32px] md:text-[40px] font-bold text-center">
         {newProjectTexts.title}
@@ -943,6 +988,7 @@ export default function ProjectCreating() {
         onBack={handleWorkLinkBack}
         onAdd={handleAddWorkLink}
       />
+      </form>
     </div>
   );
 }

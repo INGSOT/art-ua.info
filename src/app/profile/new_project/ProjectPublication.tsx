@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../data/newProjectData";
+import Message from "../../../components/Message";
 
 export default function ProjectPublication() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -10,9 +11,103 @@ export default function ProjectPublication() {
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
   const [isDraftHovered, setIsDraftHovered] = useState(false);
   const [isPublishHovered, setIsPublishHovered] = useState(false);
+  const [notification, setNotification] = useState<{ type: "error" | "success"; text: string } | null>(null);
+
+  const handlePublish = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Reset previous notification
+    setNotification(null);
+
+    // Get project data from localStorage (populated by ProjectCreating)
+    const projectDataStr = typeof window !== 'undefined' ? localStorage.getItem('projectData') : null;
+    
+    if (!projectDataStr) {
+      setNotification({ type: "error", text: "Помилка: дані проекту не знайдені" });
+      return;
+    }
+
+    try {
+      const projectData = JSON.parse(projectDataStr);
+
+      // Validation 1: Check if owner is selected
+      if (!projectData.selectedOwner) {
+        setNotification({ type: "error", text: "Оберіть власника проекту" });
+        return;
+      }
+
+      // Validation 2: Check if project name is filled in both languages
+      if (!projectData.projectNameUa?.trim() || !projectData.projectNameEn?.trim()) {
+        setNotification({ type: "error", text: "Введіть назву проекту" });
+        return;
+      }
+
+      // Validation 3: Check if both Ukrainian and English names are filled
+      if (!projectData.projectNameUa?.trim() && projectData.projectNameEn?.trim()) {
+        setNotification({ type: "error", text: "Заповніть назву українською" });
+        return;
+      }
+
+      if (projectData.projectNameUa?.trim() && !projectData.projectNameEn?.trim()) {
+        setNotification({ type: "error", text: "Заповніть назву англійською" });
+        return;
+      }
+
+      // Validation 4: Check if art field (genre) is selected
+      if (!projectData.selectedArtField) {
+        setNotification({ type: "error", text: "Оберіть жанр проекту" });
+        return;
+      }
+
+      // Validation 5: Check if at least one work element is added
+      const hasWorkContent = projectData.workImage || projectData.workVideoUrl || (projectData.galleryImages && projectData.galleryImages.length > 0);
+      if (!hasWorkContent) {
+        setNotification({ type: "error", text: "Додайте роботу" });
+        return;
+      }
+
+      // Validation 6: Check if terms are accepted
+      if (!acceptedTerms) {
+        setNotification({ type: "error", text: "Прийміть умови публікації" });
+        return;
+      }
+
+      // All validations passed, submit form to server
+      // В fetch нужно ввести URL, который будет обрабатывать запрос формы на сервере
+      const response = await fetch('', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectData),
+      });
+
+      if (response.ok) {
+        setNotification({ type: "success", text: "Проект відправлено на модерацію" });
+        // Clear localStorage and reset form
+        localStorage.removeItem('projectData');
+        setAcceptedTerms(false);
+        console.log("Project submitted successfully");
+      } else {
+        setNotification({ type: "error", text: "Помилка при надіслані проекту" });
+        console.error("Project submission failed with status:", response.status);
+      }
+    } catch (error) {
+      setNotification({ type: "error", text: "Помилка при надіслані проекту" });
+      console.error("Project submission error:", error);
+    }
+  };
 
   return (
     <section className="w-full bg-[#FFFCF5] flex flex-col items-center py-10 px-4 md:px-10 lg:px-20 border-b border-black">
+      {notification && (
+        <Message
+          type={notification.type}
+          message={notification.text}
+          onClose={() => setNotification(null)}
+        />
+      )}
+      <form onSubmit={handlePublish} className="flex flex-col items-center w-full">
       {/* Accept Terms Checkbox */}
       <button
         type="button"
@@ -114,11 +209,11 @@ export default function ProjectPublication() {
 
         {/* Publish Button */}
         <button
-          type="button"
+          type="submit"
           onMouseEnter={() => setIsPublishHovered(true)}
           onMouseLeave={() => setIsPublishHovered(false)}
           className={`h-[60px] flex items-stretch transition-all duration-300 w-full md:flex-1 ${
-            isPublishHovered ? "bg-white" : "bg-[#FECC39]"
+            isPublishHovered ? 'bg-white' : 'bg-[#FECC39]'
           }`}
         >
           <span className="flex items-center justify-center flex-1 px-6 font-bold text-[#343434] whitespace-nowrap">
@@ -134,6 +229,7 @@ export default function ProjectPublication() {
           </div>
         </button>
       </div>
+      </form>
     </section>
   );
 }

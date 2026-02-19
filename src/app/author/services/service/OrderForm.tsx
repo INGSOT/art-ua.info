@@ -3,11 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import { serviceDetailsData } from "../../../../data/authorData";
+import Message from "../../../../components/Message";
 
 export default function OrderForm() {
     const [selectedOptions, setSelectedOptions] = useState<Record<string, boolean>>({});
     const [hoveredOptions, setHoveredOptions] = useState<Record<string, boolean>>({});
     const [isButtonHovered, setIsButtonHovered] = useState(false);
+    const [formValues, setFormValues] = useState<Record<string, string>>({});
+    const [notification, setNotification] = useState<{ type: "error" | "success"; text: string } | null>(null);
 
     const toggleOption = (id: string) => {
         setSelectedOptions(prev => ({ ...prev, [id]: !prev[id] }));
@@ -17,8 +20,92 @@ export default function OrderForm() {
         setHoveredOptions(prev => ({ ...prev, [id]: hovered }));
     };
 
+    const handleInputChange = (id: string, value: string) => {
+        setFormValues(prev => ({ ...prev, [id]: value }));
+    };
+
+    const validateForm = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Reset previous notification
+        setNotification(null);
+
+        // Check if at least one option is selected
+        const hasSelectedOption = Object.values(selectedOptions).some(value => value);
+        if (!hasSelectedOption) {
+            setNotification({ type: "error", text: "Оберіть опцію" });
+            return;
+        }
+
+        // Check if all fields are filled
+        const allFieldsFilled = serviceDetailsData.formFields.every(
+            field => formValues[field.id]?.trim()
+        );
+        if (!allFieldsFilled) {
+            setNotification({ type: "error", text: "Заповніть всі поля форми" });
+            return;
+        }
+
+        // Validate name field (no digits)
+        const nameField = formValues["name"];
+        if (nameField && /\d/.test(nameField)) {
+            setNotification({ type: "error", text: "Ім'я не має містити цифр" });
+            return;
+        }
+
+        // Validate email field (must contain @)
+        const emailField = formValues["email"];
+        if (emailField && !emailField.includes("@")) {
+            setNotification({ type: "error", text: "Електронна пошта повинна містити символ @" });
+            return;
+        }
+
+        // Validate phone field (only digits)
+        const phoneField = formValues["phone"];
+        if (phoneField && !/^\d+$/.test(phoneField)) {
+            setNotification({ type: "error", text: "Телефон повинен містити тільки цифри" });
+            return;
+        }
+
+        // If all validations pass, submit form to server
+        try {
+            // В fetch нужно ввести URL, который будет обрабатывать запрос формы на сервере
+            const response = await fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    selectedOptions,
+                    formValues,
+                }),
+            });
+
+            if (response.ok) {
+                setNotification({ type: "success", text: "Запит надіслано" });
+                setSelectedOptions({});
+                setFormValues({});
+                console.log("Form submitted successfully");
+            } else {
+                setNotification({ type: "error", text: "Помилка при надіслані запиту" });
+                console.error("Form submission failed with status:", response.status);
+            }
+        } catch (error) {
+            setNotification({ type: "error", text: "Помилка при надіслані запиту" });
+            console.error("Form submission error:", error);
+        }
+    };
+
     return (
         <div className="w-full bg-[#414141] p-8 lg:p-12">
+            {notification && (
+                <Message
+                    type={notification.type}
+                    message={notification.text}
+                    onClose={() => setNotification(null)}
+                />
+            )}
+            <form onSubmit={validateForm}>
             {/* Title */}
             <h2 className="text-white font-bold text-2xl mb-6">Замовлення</h2>
 
@@ -31,6 +118,7 @@ export default function OrderForm() {
                     return (
                         <button
                             key={option.id}
+                            type="button"
                             onClick={() => toggleOption(option.id)}
                             onMouseEnter={() => setHovered(option.id, true)}
                             onMouseLeave={() => setHovered(option.id, false)}
@@ -70,12 +158,16 @@ export default function OrderForm() {
                             <textarea
                                 placeholder={field.placeholder}
                                 rows={field.rows || 5}
+                                value={formValues[field.id] || ""}
+                                onChange={(e) => handleInputChange(field.id, e.target.value)}
                                 className="w-full bg-[#343434] text-white px-4 py-3 placeholder:text-[#4a4a4a] resize-none"
                             />
                         ) : (
                             <input
                                 type={field.type}
                                 placeholder={field.placeholder}
+                                value={formValues[field.id] || ""}
+                                onChange={(e) => handleInputChange(field.id, e.target.value)}
                                 className="w-full h-[50px] bg-[#343434] text-white px-4 placeholder:text-[#4a4a4a]"
                             />
                         )}
@@ -84,6 +176,7 @@ export default function OrderForm() {
 
                 {/* Submit Button */}
                 <button
+                    type="submit"
                     onMouseEnter={() => setIsButtonHovered(true)}
                     onMouseLeave={() => setIsButtonHovered(false)}
                     className={`w-full h-[60px] flex items-stretch transition-colors overflow-hidden ${
@@ -103,6 +196,7 @@ export default function OrderForm() {
                     </div>
                 </button>
             </div>
+            </form>
         </div>
     );
 }
