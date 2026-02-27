@@ -75,7 +75,7 @@ export default function AddLink({
         <div className="flex-1 p-6 flex flex-col gap-6">
           {/* Link Input */}
           <div className="flex flex-col gap-2">
-            <label className="text-white text-sm">
+            <label className="font-wix text-white text-sm">
               {newProjectTexts.addLinkLabel}
             </label>
             <input
@@ -83,7 +83,7 @@ export default function AddLink({
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder={newProjectTexts.addLinkPlaceholder}
-              className="w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+              className="font-wix w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
             />
           </div>
         </div>

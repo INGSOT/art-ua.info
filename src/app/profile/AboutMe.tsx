@@ -30,7 +30,7 @@ export default function AboutMe() {
         </h2>
 
         {/* Description */}
-        <p className="text-gray-400 text-center mb-8">
+        <p className="text-white text-center mb-8">
           {aboutMeData.description}
         </p>
 

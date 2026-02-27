@@ -60,7 +60,7 @@ export default function ListOfProjects({ currentPage, itemsPerPage }: ListOfProj
                   className="object-cover"
                 />
               </div>
-              <span className="text-white text-xs md:text-sm font-bold">{project.authorName}</span>
+              <span className="font-wix text-white text-xs md:text-sm font-bold">{project.authorName}</span>
             </div>
           </CardContent>
         </Card>

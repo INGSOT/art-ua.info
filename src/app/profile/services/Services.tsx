@@ -1,11 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { myServices, servicesTexts } from "../../../data/profileData";
 
 export default function Services() {
+  const router = useRouter();
+
   const handleAddClick = () => {
-    // Placeholder for add service functionality
+    router.push("/profile/services/new");
   };
 
   const handleEditClick = () => {

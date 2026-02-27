@@ -60,7 +60,7 @@ export default function ListOfCatalogs({ currentPage, itemsPerPage }: ListOfCata
                   className="object-cover"
                 />
               </div>
-              <span className="text-white text-xs md:text-sm font-bold">{catalog.authorName}</span>
+              <span className="font-wix text-white text-xs md:text-sm font-bold">{catalog.authorName}</span>
             </div>
           </CardContent>
         </Card>

@@ -41,8 +41,8 @@ export default function ListOfNews({ currentPage, itemsPerPage }: ListOfNewsProp
               </div>
               {/* Category and Date */}
               <div className="flex items-center justify-between text-xs md:text-sm">
-                <span className="text-white">Новини</span>
-                <span className="text-white">{news.date}</span>
+                <span className="font-wix text-white">Новини</span>
+                <span className="font-wix text-white">{news.date}</span>
               </div>
               {/* News title */}
               <h3 className="font-h6 font-bold text-white text-lg md:text-xl lg:text-2xl tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">

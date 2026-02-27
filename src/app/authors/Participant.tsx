@@ -32,7 +32,7 @@ function TagBadge({ label }: { label: string }) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <span
-        className="font-p3 font-[number:var(--p3-font-weight)] text-[length:var(--p3-font-size)] text-center tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)] transition-colors"
+        className="font-wix font-p3 font-[number:var(--p3-font-weight)] text-[length:var(--p3-font-size)] text-center tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)] transition-colors"
         style={{ color: isHovered ? "#272727" : "white" }}
       >
         {label}
@@ -104,7 +104,7 @@ export default function Participant({
               </h3>
               <div className="flex items-center gap-2">
                 <Image src="/coins.svg" alt="Coins" width={20} height={20} />
-                <span className="font-p3 font-[number:var(--p3-font-weight)] text-white text-[length:var(--p3-font-size)] tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
+                <span className="font-wix font-p3 font-[number:var(--p3-font-weight)] text-white text-[length:var(--p3-font-size)] tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
                   {artistType}
                 </span>
               </div>

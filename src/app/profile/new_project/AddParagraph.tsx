@@ -77,7 +77,7 @@ export default function AddParagraph({
         <div className="flex-1 p-6 flex flex-col gap-6">
           {/* Ukrainian Input */}
           <div className="flex flex-col gap-2">
-            <label className="text-white text-sm">
+            <label className="font-wix text-white text-sm">
               {newProjectTexts.addParagraphLabelUa}
             </label>
             <textarea
@@ -85,13 +85,13 @@ export default function AddParagraph({
               onChange={(e) => setParagraphUa(e.target.value)}
               placeholder={newProjectTexts.addParagraphPlaceholderUa}
               rows={6}
-              className="w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none"
+              className="font-wix w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none"
             />
           </div>
 
           {/* English Input */}
           <div className="flex flex-col gap-2">
-            <label className="text-white text-sm">
+            <label className="font-wix text-white text-sm">
               {newProjectTexts.addParagraphLabelEn}
             </label>
             <textarea
@@ -99,7 +99,7 @@ export default function AddParagraph({
               onChange={(e) => setParagraphEn(e.target.value)}
               placeholder={newProjectTexts.addParagraphPlaceholderEn}
               rows={6}
-              className="w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none"
+              className="font-wix w-full px-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none"
             />
           </div>
         </div>

@@ -4,7 +4,7 @@ export default function PlatformDescription() {
   return (
     <section className="flex flex-col items-center gap-[30px] p-4 md:p-10 lg:p-20 w-full bg-white">
       <header className="flex flex-col items-start gap-2.5 w-full">
-        <div className="self-stretch text-[#FECC39] font-[family-name:var(--font-unbounded)]">
+        <div className="self-stretch text-[#FECC39] font-wix">
           {platformDescriptionData.tagline}
         </div>
 

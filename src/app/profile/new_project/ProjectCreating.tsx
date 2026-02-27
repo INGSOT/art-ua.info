@@ -329,9 +329,9 @@ export default function ProjectCreating() {
 
       {/* Owner Selection */}
       <div className="w-full max-w-[1000px] flex flex-col gap-4">
-        <h2 className="text-white text-[20px] font-semibold text-center">
+        <p className="font-wix text-white text-[18px] font-semibold text-center">
           {newProjectTexts.ownerQuestion}
-        </h2>
+        </p>
         <div className="flex flex-col md:flex-row md:flex-wrap gap-4">
           {owners.map((owner) => (
             <button
@@ -354,7 +354,7 @@ export default function ProjectCreating() {
               </div>
 
               {/* Name */}
-              <span className="text-white flex-1">{owner.name}</span>
+              <span className="font-wix text-white flex-1">{owner.name}</span>
 
               {/* Checkmark */}
               <div
@@ -380,7 +380,7 @@ export default function ProjectCreating() {
 
       {/* Project Name Input */}
       <div className="w-full max-w-[1000px] flex flex-col gap-2">
-        <label className="text-white text-sm">{newProjectTexts.projectNameLabel}</label>
+        <label className="font-wix text-white text-sm">{newProjectTexts.projectNameLabel}</label>
         <div className="relative">
           <div className="absolute left-4 top-1/2 -translate-y-1/2">
             <Image src="/ua.svg" alt="UA" width={24} height={24} />
@@ -390,7 +390,7 @@ export default function ProjectCreating() {
             value={projectNameUa}
             onChange={(e) => setProjectNameUa(e.target.value)}
             placeholder={newProjectTexts.projectNamePlaceholder}
-            className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+            className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
           />
         </div>
         <div className="relative">
@@ -402,7 +402,7 @@ export default function ProjectCreating() {
             value={projectNameEn}
             onChange={(e) => setProjectNameEn(e.target.value)}
             placeholder={newProjectTexts.projectNamePlaceholderEn}
-            className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+            className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
           />
         </div>
       </div>
@@ -412,7 +412,7 @@ export default function ProjectCreating() {
         <button
           type="button"
           onClick={() => setIsArtFormModalOpen(true)}
-          className="flex items-center justify-between gap-4 px-6 py-4 bg-[#343434] text-white hover:bg-[#3a3a3a] transition-colors"
+          className="font-wix flex items-center justify-between gap-4 px-6 py-4 bg-[#343434] text-white hover:bg-[#3a3a3a] transition-colors"
         >
           <span>
             {selectedArtField ? selectedArtField.label : newProjectTexts.artFieldButton}
@@ -539,7 +539,7 @@ export default function ProjectCreating() {
 
       {/* Tags Input */}
       <div className="w-full max-w-[1000px] flex flex-col gap-2">
-        <label className="text-white text-sm">{newProjectTexts.tagsLabel}</label>
+        <label className="font-wix text-white text-sm">{newProjectTexts.tagsLabel}</label>
         <div className="relative">
           <div className="absolute left-4 top-1/2 -translate-y-1/2">
             <Image src="/ua.svg" alt="UA" width={24} height={24} />
@@ -549,7 +549,7 @@ export default function ProjectCreating() {
             value={tagsUa}
             onChange={(e) => setTagsUa(e.target.value)}
             placeholder={newProjectTexts.tagsPlaceholder}
-            className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+            className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
           />
         </div>
         <div className="relative">
@@ -561,7 +561,7 @@ export default function ProjectCreating() {
             value={tagsEn}
             onChange={(e) => setTagsEn(e.target.value)}
             placeholder={newProjectTexts.tagsPlaceholderEn}
-            className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+            className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
           />
         </div>
         <p className="text-white text-sm text-right">
@@ -583,12 +583,12 @@ export default function ProjectCreating() {
           <div className="flex flex-col gap-2">
             <div className="flex gap-4">
               <div className="flex-1">
-                <label className="text-white text-sm">
+                <label className="font-wix text-white text-sm">
                   {newProjectTexts.characteristicNameLabel}
                 </label>
               </div>
               <div className="flex-1">
-                <label className="text-white text-sm">
+                <label className="font-wix text-white text-sm">
                   {newProjectTexts.characteristicDescLabel}
                 </label>
               </div>
@@ -615,7 +615,7 @@ export default function ProjectCreating() {
                       updateCharacteristic(char.id, "name", e.target.value)
                     }
                     placeholder={newProjectTexts.characteristicNamePlaceholder}
-                    className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+                    className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
                   />
                 </div>
                 <div className="flex-1 relative">
@@ -629,7 +629,7 @@ export default function ProjectCreating() {
                       updateCharacteristic(char.id, "description", e.target.value)
                     }
                     placeholder={newProjectTexts.characteristicDescPlaceholder}
-                    className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+                    className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
                   />
                 </div>
               </div>
@@ -642,7 +642,7 @@ export default function ProjectCreating() {
                   <input
                     type="text"
                     placeholder={newProjectTexts.characteristicNamePlaceholderEn}
-                    className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+                    className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
                   />
                 </div>
                 <div className="flex-1 relative">
@@ -652,7 +652,7 @@ export default function ProjectCreating() {
                   <input
                     type="text"
                     placeholder={newProjectTexts.characteristicDescPlaceholderEn}
-                    className="w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
+                    className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
                   />
                 </div>
               </div>

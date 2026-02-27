@@ -40,7 +40,7 @@ export default function NewsEventsPage() {
             <section className="w-full bg-[#414141] py-8 px-4 sm:px-6 md:px-10 lg:px-20">
                 {/* Title Section */}
                 <div className="mb-6 md:mb-8">
-                    <p className="text-[#FECC39] text-sm font-bold mb-2">Новини та події</p>
+                    <p className="font-wix text-[#FECC39]  font-bold mb-2">Новини та події</p>
                     <h1 className="text-white font-bold text-2xl sm:text-3xl md:text-[40px] leading-tight max-w-[600px] whitespace-normal md:whitespace-nowrap" style={{ fontWeight: 600 }}>
                         Актуальні новини та події у спільноті
                     </h1>

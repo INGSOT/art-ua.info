@@ -14,7 +14,7 @@ const [activeItem, setActiveItem] = useState<number | null>(null);
           onClick={() => setActiveItem(item.id)}
           className="inline-flex items-center justify-center cursor-pointer transition-opacity hover:opacity-80"
         >
-          <span className="font-bold text-white font-[family-name:var(--font-unbounded)] text-center text-sm md:text-base">
+          <span className="font-bold text-white text-center text-sm md:text-base">
             {item.label}
           </span>
         </button>

@@ -33,8 +33,8 @@ export default function Information() {
       <div className="w-full max-w-[960px] bg-[#343434] h-[80px] mb-6 mx-auto">
         <div className="flex items-center h-full px-4 md:px-[30px] gap-4">
           <Image src="/earth.svg" alt="Location" width={24} height={24} />
-          <span className="text-white text-sm font-bold">{authorInfo.location.country}</span>
-          <span className="text-white text-sm font-bold">{authorInfo.location.city}</span>
+          <span className=" font-wix text-white text-sm font-bold">{authorInfo.location.country}</span>
+          <span className=" font-wix text-white text-sm font-bold">{authorInfo.location.city}</span>
         </div>
       </div>
 

@@ -6,8 +6,8 @@ export default function ArticleText() {
     <div className="bg-[#FFFCF5] p-8 md:p-12 h-full">
       {/* Header with category and date */}
       <div className="flex justify-between items-start mb-6">
-        <span className="text-xs text-gray-600">{articleData.category}</span>
-        <span className="text-xs text-gray-600">{articleData.date}</span>
+        <span className="font-wix text-xs ">{articleData.category}</span>
+        <span className="font-wix text-xs ">{articleData.date}</span>
       </div>
 
       {/* Title */}

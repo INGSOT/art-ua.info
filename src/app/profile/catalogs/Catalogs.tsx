@@ -121,7 +121,7 @@ export default function Catalogs() {
                         className="bg-[#272727] w-[200px] h-[104px] flex items-center justify-center px-4"
                         style={{ transform: "translateX(calc(50% - 6px))" }}
                       >
-                        <p className="text-white text-sm text-center leading-tight">
+                        <p className="text-white text-sm text-left leading-tight">
                           {catalogsTexts.tooltip}
                         </p>
                       </div>

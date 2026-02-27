@@ -77,7 +77,7 @@ export default function ServicesFilterSection() {
 
                             {section.type === 'nested' && section.subsections?.map((subsection: any) => (
                                 <div key={subsection.id} className="flex flex-col gap-2">
-                                    <div className="text-[#FFD700] font-bold text-base px-4 py-1 text-left">
+                                    <div className="font-wix text-[#FFD700] font-bold text-base px-4 py-1 text-left">
                                         {subsection.title}
                                     </div>
                                     {subsection.items.map((item: FilterItem) => (
@@ -135,7 +135,7 @@ export default function ServicesFilterSection() {
                         {/* Price inputs */}
                         <div className="flex gap-4">
                             <div className="flex-1">
-                                <label className="text-white text-sm mb-1 block">Від</label>
+                                <label className="font-wix text-white text-sm mb-1 block">Від</label>
                                 <input
                                     type="text"
                                     value={minPrice.toLocaleString()}
@@ -144,11 +144,11 @@ export default function ServicesFilterSection() {
                                         const num = value ? parseInt(value) : 0;
                                         setMinPrice(Math.min(num, maxPrice));
                                     }}
-                                    className="w-full h-10 bg-[#343434] text-white px-3"
+                                    className="font-wix w-full h-10 bg-[#343434] text-white px-3"
                                 />
                             </div>
                             <div className="flex-1">
-                                <label className="text-white text-sm mb-1 block">До</label>
+                                <label className="font-wix text-white text-sm mb-1 block">До</label>
                                 <input
                                     type="text"
                                     value={maxPrice.toLocaleString()}
@@ -157,7 +157,7 @@ export default function ServicesFilterSection() {
                                         const num = value ? parseInt(value) : 0;
                                         setMaxPrice(Math.max(num, minPrice));
                                     }}
-                                    className="w-full h-10 bg-[#343434] text-white px-3"
+                                    className="font-wix w-full h-10 bg-[#343434] text-white px-3"
                                 />
                             </div>
                         </div>
@@ -279,7 +279,7 @@ export default function ServicesFilterSection() {
                                 placeholder="Пошук"
                                 value={locationSearch}
                                 onChange={(e) => setLocationSearch(e.target.value)}
-                                className="w-full h-full bg-[#343434] text-white placeholder-gray-400 px-4 pr-12 rounded-none"
+                                className="font-wix w-full h-full bg-[#343434] text-white placeholder-gray-400 px-4 pr-12 rounded-none"
                             />
                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                 <Image

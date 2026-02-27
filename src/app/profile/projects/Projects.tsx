@@ -80,10 +80,10 @@ export default function Projects() {
       ) : (
         <div className="flex flex-col items-center justify-center min-h-[400px] py-16 px-4">
           <Image src="/megaphone.svg" alt="Megaphone" width={420} height={420} className="w-[200px] h-[200px] md:w-[420px] md:h-[420px]" />
-          <p className="mt-8 text-white text-xl md:text-3xl font-bold text-center max-w-[600px]">
+          <h2 className="mt-8 text-white text-xl md:text-3xl font-bold text-center max-w-[600px]">
             {projectEmptyState.message}
-          </p>
-          <p className="mt-6 text-white text-base md:text-lg text-center">
+          </h2>
+          <p className="font-wix mt-6 text-white text-base md:text-lg text-center">
             {projectEmptyState.subMessage}
           </p>
           <Link href="/profile/new_project" className="mt-8 h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-[#FECC39] w-full md:w-[320px]">

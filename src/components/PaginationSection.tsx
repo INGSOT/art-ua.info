@@ -70,7 +70,7 @@ export default function PaginationSection({
     <div className="bg-[#343434] px-8 py-6">
       <div className="flex justify-between items-center max-w-full">
         {/* Left side - Page counter */}
-        <div className="text-white text-base">
+        <div className="font-wix text-white text-base">
           {currentPage} з {totalPages}
         </div>
 
@@ -99,7 +99,7 @@ export default function PaginationSection({
                 key={index}
                 onClick={() => handlePageClick(page)}
                 disabled={page === "..."}
-                className={`min-w-[32px] h-8 flex items-center justify-center text-base transition-colors ${
+                className={`font-wix min-w-[32px] h-8 flex items-center justify-center text-base transition-colors ${
                   page === currentPage
                     ? "text-[#F0C419] font-semibold"
                     : page === "..."

@@ -47,9 +47,9 @@ export default function Footer() {
                   />
                 </div>
 
-                <p className="self-stretch font-bold text-black text-[length:var(--button-font-size)] leading-[var(--button-line-height)] font-button text-center tracking-[var(--button-letter-spacing)] [font-style:var(--button-font-style)]">
+                <h2 className="self-stretch font-bold text-black text-[length:var(--h6-font-size)] leading-[var(--h6-line-height)] font-h6 text-center tracking-[var(--h6-letter-spacing)] [font-style:var(--h6-font-style)]">
                   {item.text}
-                </p>
+                </h2>
               </div>
             ))}
           </div>
@@ -109,7 +109,7 @@ export default function Footer() {
           {contactInfo.map((info, index) => (
             <div
               key={index}
-              className="font-p2 font-[number:var(--p2-font-weight)] text-black text-[length:var(--p2-font-size)] tracking-[var(--p2-letter-spacing)] leading-[var(--p2-line-height)] [font-style:var(--p2-font-style)]"
+              className="font-wix font-p2 font-[number:var(--p2-font-weight)] text-black text-[length:var(--p2-font-size)] tracking-[var(--p2-letter-spacing)] leading-[var(--p2-line-height)] [font-style:var(--p2-font-style)]"
             >
               {info.text}
             </div>
@@ -118,7 +118,7 @@ export default function Footer() {
           {socialLinks.map((link, index) => (
             <div key={index} className="flex items-center gap-2">
               <img className="w-5 h-5" alt="Social" src={link.icon} />
-              <div className="font-link-header font-[number:var(--link-header-font-weight)] text-black text-[length:var(--link-header-font-size)] text-center tracking-[var(--link-header-letter-spacing)] leading-[var(--link-header-line-height)] [font-style:var(--link-header-font-style)]">
+              <div className="font-wix-semibold text-black text-[length:var(--link-header-font-size)] text-center tracking-[var(--link-header-letter-spacing)] leading-[var(--link-header-line-height)] [font-style:var(--link-header-font-style)]">
                 {link.text}
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function Footer() {
         <div className="inline-flex items-center justify-center gap-0.5 relative flex-[0_0_auto]">
           <img className="relative w-6 h-6" alt="Copy" src="/copy.svg" />
 
-          <div className="relative w-fit mt-[-1.00px] font-p1 font-[number:var(--p1-font-weight)] text-black text-[length:var(--p1-font-size)] text-center tracking-[var(--p1-letter-spacing)] leading-[var(--p1-line-height)] whitespace-nowrap [font-style:var(--p1-font-style)]">
+          <div className="relative w-fit mt-[-1.00px] font-wix font-p1 font-[number:var(--p1-font-weight)] text-black text-[length:var(--p1-font-size)] text-center tracking-[var(--p1-letter-spacing)] leading-[var(--p1-line-height)] whitespace-nowrap [font-style:var(--p1-font-style)]">
             {footerContent.copyrightYear}
           </div>
         </div>

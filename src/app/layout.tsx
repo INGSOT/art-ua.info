@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Unbounded } from "next/font/google";
+import { Geist, Geist_Mono, Unbounded, Wix_Madefor_Display } from "next/font/google";
 import "./globals.css";
 import Footer from "../components/Footer";
 
@@ -18,6 +18,11 @@ const unbounded = Unbounded({
   subsets: ["latin", "cyrillic"],
 });
 
+const wixMadeforDisplay = Wix_Madefor_Display({
+  variable: "--font-wix-madefor-display",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "art-ua.info",
   description: "The art of helping — the most modern of the arts",
@@ -31,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${unbounded.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${unbounded.variable} ${wixMadeforDisplay.variable} antialiased`}
         suppressHydrationWarning
       >
         {children}

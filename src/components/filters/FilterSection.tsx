@@ -69,7 +69,7 @@ export default function FilterSection({ filters, onFilterChange }: FilterSection
 
                             {section.type === 'nested' && section.subsections?.map((subsection) => (
                                 <div key={subsection.id} className="flex flex-col gap-2">
-                                    <div className="text-[#FFD700] font-bold text-base px-4 py-1 text-left">
+                                    <div className="font-wix text-[#FFD700] font-bold text-base px-4 py-1 text-left">
                                         {subsection.title}
                                     </div>
                                     {subsection.items.map((item) => (

@@ -55,7 +55,7 @@ export default function ImageCatalog() {
                   </h3>
 
                   <div className="flex items-center gap-2">
-                    <Avatar className="w-[30px] h-[30px] border border-solid border-[#272727]">
+                  <Avatar className="w-[30px] h-[30px] border border-solid border-[#272727]">
                       <AvatarImage
                         src={catalog.artistPhoto}
                         alt="Artist photo"
@@ -63,7 +63,7 @@ export default function ImageCatalog() {
                       />
                     </Avatar>
 
-                    <span className="font-p3 font-[number:var(--p3-font-weight)] text-white text-[length:var(--p3-font-size)] tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
+                    <span className="font-wix font-p3 font-[number:var(--p3-font-weight)] text-white text-[length:var(--p3-font-size)] tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
                       {catalog.artistName}
                     </span>
                   </div>

@@ -33,7 +33,7 @@ export default function JoinCommunity() {
           {joinCommunityData.artists.map((artist, index) => (
             <div
               key={`name-${index}`}
-              className="w-[90px] font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] text-center tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]"
+              className="w-[90px] font-wix font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] text-center tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]"
             >
               {artist.name.split("\n").map((line, i) => (
                 <span key={i}>
@@ -44,7 +44,7 @@ export default function JoinCommunity() {
             </div>
           ))}
 
-          <div className="w-[90px] font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] text-center tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
+          <div className="w-[90px] font-wix font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] text-center tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
             {joinCommunityData.joinText.split("\n").map((line, i) => (
               <span key={i}>
                 {line}
@@ -65,7 +65,7 @@ export default function JoinCommunity() {
                 alt="Artist photo"
                 src={artist.photo}
               />
-              <div className="font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] text-left tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
+              <div className="font-wix font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] text-left tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
                 {artist.name.split("\n").map((line, i) => (
                   <span key={i}>
                     {line}
@@ -80,7 +80,7 @@ export default function JoinCommunity() {
             <div className="w-[90px] h-[90px] bg-[#FECC39] rounded-[50px] flex items-center justify-center cursor-pointer hover:opacity-90 transition-opacity">
               <img src="/plus.svg" alt="Plus" className="w-6 h-6" />
             </div>
-            <div className="font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] text-left tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
+            <div className="font-wix font-p3 font-[number:var(--p3-font-weight)] text-black text-[length:var(--p3-font-size)] text-left tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)]">
               {joinCommunityData.joinText.split("\n").map((line, i) => (
                 <span key={i}>
                   {line}

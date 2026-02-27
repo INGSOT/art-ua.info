@@ -25,6 +25,26 @@ body {
   font-family: var(--font-unbounded), sans-serif;
 }
 
+p {
+  font-family: var(--font-wix-madefor-display), system-ui, sans-serif;
+}
+
+p1 {
+  font-family: var(--font-wix-madefor-display), system-ui, sans-serif;
+}
+
+.font-wix {
+  font-family: var(--font-wix-madefor-display), system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.font-wix-semibold {
+  font-family: var(--font-wix-madefor-display), system-ui, sans-serif;
+  font-weight: 600;
+}
+
+
+
 /* Range slider styles for dual range */
 input[type="range"].range-slider {
   -webkit-appearance: none;

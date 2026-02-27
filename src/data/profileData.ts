@@ -173,6 +173,6 @@ export interface ServicesTexts {
 }
 
 export const servicesTexts: ServicesTexts = {
-  addServiceButton: "Додати послуги",
+  addServiceButton: "Додати послугу",
   editServiceButton: "Редагувати послугу",
 };

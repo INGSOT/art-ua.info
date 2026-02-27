@@ -28,7 +28,7 @@ export default function Partners() {
                     {partner.title}
                   </h6>
 
-                  <div className="font-p2 font-[number:var(--p2-font-weight)] text-white text-[length:var(--p2-font-size)] tracking-[var(--p2-letter-spacing)] leading-[var(--p2-line-height)] [font-style:var(--p2-font-style)]">
+                  <div className="font-wix font-p2 font-[number:var(--p2-font-weight)] text-white text-[length:var(--p2-font-size)] tracking-[var(--p2-letter-spacing)] leading-[var(--p2-line-height)] [font-style:var(--p2-font-style)]">
                     {partner.description}
                   </div>
                 </div>

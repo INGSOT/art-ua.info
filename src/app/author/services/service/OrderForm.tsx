@@ -153,14 +153,14 @@ export default function OrderForm() {
             <div className="flex flex-col gap-6">
                 {serviceDetailsData.formFields.map((field) => (
                     <div key={field.id} className="flex flex-col gap-2">
-                        <label className="text-white text-sm">{field.label}</label>
+                        <label className="font-wix text-white text-sm">{field.label}</label>
                         {field.type === "textarea" ? (
                             <textarea
                                 placeholder={field.placeholder}
                                 rows={field.rows || 5}
                                 value={formValues[field.id] || ""}
                                 onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                className="w-full bg-[#343434] text-white px-4 py-3 placeholder:text-[#4a4a4a] resize-none"
+                                className="font-wix w-full bg-[#343434] text-white px-4 py-3 placeholder:text-[#4a4a4a] resize-none"
                             />
                         ) : (
                             <input
@@ -168,7 +168,7 @@ export default function OrderForm() {
                                 placeholder={field.placeholder}
                                 value={formValues[field.id] || ""}
                                 onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                className="w-full h-[50px] bg-[#343434] text-white px-4 placeholder:text-[#4a4a4a]"
+                                className="font-wix w-full h-[50px] bg-[#343434] text-white px-4 placeholder:text-[#4a4a4a]"
                             />
                         )}
                     </div>
