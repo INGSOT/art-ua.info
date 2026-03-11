@@ -79,10 +79,16 @@ export default function Projects() {
         </>
       ) : (
         <div className="flex flex-col items-center justify-center min-h-[400px] py-16 px-4">
-          <Image src="/megaphone.svg" alt="Megaphone" width={420} height={420} className="w-[200px] h-[200px] md:w-[420px] md:h-[420px]" />
-          <p className="mt-6 text-white text-xl md:text-3xl font-bold text-center max-w-[600px]">
+          <Image
+            src="/megaphone.svg"
+            alt="Megaphone"
+            width={420}
+            height={420}
+            className="w-[200px] h-[200px] md:w-[420px] md:h-[420px]"
+          />
+          <h2 className="mt-8 text-white text-xl md:text-3xl font-bold text-center max-w-[600px]">
             {projectEmptyState.message}
-          </p>
+          </h2>
         </div>
       )}
     </section>

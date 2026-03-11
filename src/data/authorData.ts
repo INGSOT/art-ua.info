@@ -52,10 +52,10 @@ export interface ProjectFilterButton {
 }
 
 export const authorProjects: AuthorProject[] = [
-  { id: 1, image: "/projects/project-photo-1.png", title: "Назва роботи", likes: 17 },
-  { id: 2, image: "/projects/project-photo-2.png", title: "Назва роботи", likes: 17 },
-  { id: 3, image: "/projects/project-photo-3.png", title: "Назва роботи", likes: 35 },
-  { id: 4, image: "/projects/project-photo-4.png", title: "Назва роботи", likes: 17 },
+  // { id: 1, image: "/projects/project-photo-1.png", title: "Назва роботи", likes: 17 },
+  // { id: 2, image: "/projects/project-photo-2.png", title: "Назва роботи", likes: 17 },
+  // { id: 3, image: "/projects/project-photo-3.png", title: "Назва роботи", likes: 35 },
+  // { id: 4, image: "/projects/project-photo-4.png", title: "Назва роботи", likes: 17 },
 ];
 
 export const projectFilterButtons: ProjectFilterButton[] = [

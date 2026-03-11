@@ -7,9 +7,10 @@ import { FilterSection as FilterSectionType, FilterItem } from './filterConfig';
 interface FilterSectionProps {
     filters: FilterSectionType[];
     onFilterChange?: (filters: Record<string, boolean>) => void;
+    initialSelectedFilters?: Record<string, boolean>;
 }
 
-export default function FilterSection({ filters, onFilterChange }: FilterSectionProps) {
+export default function FilterSection({ filters, onFilterChange, initialSelectedFilters }: FilterSectionProps) {
     // Initialize expanded sections - all sections expanded by default
     const initialExpandedSections = filters.reduce((acc, section) => {
         acc[section.id] = true;
@@ -17,7 +18,7 @@ export default function FilterSection({ filters, onFilterChange }: FilterSection
     }, {} as Record<string, boolean>);
 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(initialExpandedSections);
-    const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean>>({});
+    const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean>>(initialSelectedFilters || {});
 
     const toggleSection = (sectionId: string) => {
         setExpandedSections(prev => ({
@@ -26,11 +27,23 @@ export default function FilterSection({ filters, onFilterChange }: FilterSection
         }));
     };
 
-    const toggleFilter = (filterId: string) => {
-        const newFilters = {
+    const toggleFilter = (filterId: string, section?: FilterSectionType) => {
+        const isSelected = !!selectedFilters[filterId];
+        const newFilters: Record<string, boolean> = {
             ...selectedFilters,
-            [filterId]: !selectedFilters[filterId]
         };
+
+        // Для секций с простыми чекбоксами делаем выбор взаимоисключающим
+        if (section && section.type === 'simple') {
+            section.items?.forEach((item) => {
+                if (item.type === 'checkbox') {
+                    newFilters[item.id] = false;
+                }
+            });
+        }
+
+        newFilters[filterId] = !isSelected;
+
         setSelectedFilters(newFilters);
         onFilterChange?.(newFilters);
     };
@@ -63,7 +76,7 @@ export default function FilterSection({ filters, onFilterChange }: FilterSection
                                     key={item.id}
                                     item={item}
                                     isSelected={selectedFilters[item.id] || false}
-                                    onToggle={() => toggleFilter(item.id)}
+                                    onToggle={() => toggleFilter(item.id, section)}
                                 />
                             ))}
 

@@ -15,6 +15,8 @@ interface ParticipantProps {
   tags: string[];
   photos: PhotoData[];
   catalogButtonText: string;
+  isTeam?: boolean;
+  memberAvatars?: string[];
 }
 
 function TagBadge({ label }: { label: string }) {
@@ -54,6 +56,8 @@ export default function Participant({
   tags,
   photos,
   catalogButtonText,
+  isTeam = false,
+  memberAvatars = [],
 }: ParticipantProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
@@ -119,58 +123,109 @@ export default function Participant({
           ))}
         </div>
 
-        {/* Section 3 & 4: Combined on Mobile/Tablet, Separate on Desktop */}
-        <div className="flex items-center gap-0 p-3 bg-[#343434] border-b lg:border-b-0 lg:border-r border-[#272727] flex-1 lg:flex-initial lg:p-3">
-          <button
-            className="group flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors rounded-none overflow-hidden flex-1 lg:w-auto"
-          >
-            <span className="flex items-center justify-center flex-1 px-4 sm:px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] whitespace-nowrap">
-              {catalogButtonText}
-            </span>
-            <div className="flex items-center justify-center w-[60px] border-l border-[#343434]">
-              <Image
-                src="/grey_triangle_right.svg"
-                alt="Arrow"
-                width={24}
-                height={24}
-              />
+        {/* Section 3 & 4: Catalog button / Team members on Mobile/Tablet */}
+        {!isTeam ? (
+          <div className="flex items-center gap-0 p-3 bg-[#343434] border-b lg:border-b-0 lg:border-r border-[#272727] flex-1 lg:flex-initial lg:p-3">
+            <button
+              className="group flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors rounded-none overflow-hidden flex-1 lg:w-auto"
+            >
+              <span className="flex items-center justify-center flex-1 px-4 sm:px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] whitespace-nowrap">
+                {catalogButtonText}
+              </span>
+              <div className="flex items-center justify-center w-[60px] border-l border-[#343434]">
+                <Image
+                  src="/grey_triangle_right.svg"
+                  alt="Arrow"
+                  width={24}
+                  height={24}
+                />
+              </div>
+            </button>
+
+            {/* Toggle Button - Right of Catalog Button on Mobile/Tablet */}
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className={`group w-[60px] h-[60px] flex items-center justify-center transition-colors lg:hidden ml-3 ${
+                isExpanded ? "bg-[#FECC39]" : "bg-transparent hover:bg-[#FECC39]"
+              }`}
+            >
+              {isExpanded ? (
+                <Image
+                  src="/grey_triangle_down.svg"
+                  alt="Collapse"
+                  width={24}
+                  height={24}
+                />
+              ) : (
+                <>
+                  <Image
+                    className="block group-hover:hidden"
+                    src="/yellow_triangle_up.svg"
+                    alt="Expand"
+                    width={24}
+                    height={24}
+                  />
+                  <Image
+                    className="hidden group-hover:block"
+                    src="/grey_triangle_up.svg"
+                    alt="Expand hover"
+                    width={24}
+                    height={24}
+                  />
+                </>
+              )}
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 p-3 bg-[#343434] border-b lg:border-b-0 lg:border-r border-[#272727] flex-1 lg:flex-initial lg:p-3">
+            <div className="flex items-center">
+              {memberAvatars.slice(0, 10).map((avatar, index) => (
+                <Avatar
+                  key={`${avatar}-${index}`}
+                  className={`w-[40px] h-[40px] border-2 border-[#414141] flex-shrink-0 ${
+                    index === 0 ? "" : "-ml-3"
+                  }`}
+                >
+                  <AvatarImage src={avatar} alt={`Учасник ${index + 1}`} className="object-cover" />
+                </Avatar>
+              ))}
             </div>
-          </button>
-          
-          {/* Toggle Button - Right of Catalog Button on Mobile/Tablet */}
-          <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className={`group w-[60px] h-[60px] flex items-center justify-center transition-colors lg:hidden ml-3 ${
-              isExpanded ? "bg-[#FECC39]" : "bg-transparent hover:bg-[#FECC39]"
-            }`}
-          >
-            {isExpanded ? (
-              <Image
-                src="/grey_triangle_down.svg"
-                alt="Collapse"
-                width={24}
-                height={24}
-              />
-            ) : (
-              <>
+
+            {/* Toggle Button - Right of avatars on Mobile/Tablet */}
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className={`group w-[60px] h-[60px] flex items-center justify-center transition-colors lg:hidden ml-auto ${
+                isExpanded ? "bg-[#FECC39]" : "bg-transparent hover:bg-[#FECC39]"
+              }`}
+            >
+              {isExpanded ? (
                 <Image
-                  className="block group-hover:hidden"
-                  src="/yellow_triangle_up.svg"
-                  alt="Expand"
+                  src="/grey_triangle_down.svg"
+                  alt="Collapse"
                   width={24}
                   height={24}
                 />
-                <Image
-                  className="hidden group-hover:block"
-                  src="/grey_triangle_up.svg"
-                  alt="Expand hover"
-                  width={24}
-                  height={24}
-                />
-              </>
-            )}
-          </button>
-        </div>
+              ) : (
+                <>
+                  <Image
+                    className="block group-hover:hidden"
+                    src="/yellow_triangle_up.svg"
+                    alt="Expand"
+                    width={24}
+                    height={24}
+                  />
+                  <Image
+                    className="hidden group-hover:block"
+                    src="/grey_triangle_up.svg"
+                    alt="Expand hover"
+                    width={24}
+                    height={24}
+                  />
+                </>
+              )}
+            </button>
+          </div>
+        )}
 
         {/* Section 4: Toggle Button - Desktop Only */}
         <div className="hidden lg:flex items-center justify-center p-3 bg-[#343434]">
