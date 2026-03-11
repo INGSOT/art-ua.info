@@ -11,7 +11,13 @@ const PLACEHOLDER_BY_PATH: Record<string, string> = {
     '/services': 'Пошук послуг',
 };
 
-export default function SearchSection() {
+interface SearchSectionProps {
+    value?: string;
+    onChange?: (value: string) => void;
+    onSearch?: () => void;
+}
+
+export default function SearchSection({ value, onChange, onSearch }: SearchSectionProps) {
     const pathname = usePathname();
     const placeholder = PLACEHOLDER_BY_PATH[pathname] ?? 'Пошук';
 
@@ -22,15 +28,21 @@ export default function SearchSection() {
                     type="text"
                     placeholder={placeholder}
                     className="font-wix w-full h-full bg-[#343434] text-white placeholder-gray-400 px-6 pr-16 rounded-none"
+                    value={value ?? ''}
+                    onChange={(event) => onChange?.(event.target.value)}
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                <button
+                    type="button"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center"
+                    onClick={onSearch}
+                >
                     <Image
                         src="/search.svg"
                         alt="Search"
                         width={24}
                         height={24}
                     />
-                </div>
+                </button>
             </div>
         </section>
     )
