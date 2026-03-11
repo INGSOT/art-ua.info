@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import AddProjectCover from "../../new_project/AddProjectCover";
+import AddProjectCover from "../new_project/AddProjectCover";
+
+interface ServiceFormProps {
+  mode?: "create" | "edit";
+}
 
 interface Option {
   id: string;
@@ -10,7 +14,7 @@ interface Option {
   nameEn: string;
 }
 
-export default function NewServiceForm() {
+export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
   const [serviceCover, setServiceCover] = useState<string | null>(null);
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
   const [serviceNameUa, setServiceNameUa] = useState("");
@@ -28,6 +32,8 @@ export default function NewServiceForm() {
   const [isNegotiableHovered, setIsNegotiableHovered] = useState(false);
   const [isPublishHovered, setIsPublishHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
+
+  const isEditMode = mode === "edit";
 
   const currencies = [
     { id: 'hryvnia', icon: '/hryvnia.svg' },
@@ -392,7 +398,7 @@ export default function NewServiceForm() {
           </div>
         </div>
 
-        {/* Publish Button */}
+        {/* Publish / Save Button */}
         <button
           type="button"
           onClick={handlePublish}
@@ -403,7 +409,7 @@ export default function NewServiceForm() {
           }`}
         >
           <span className="flex items-center justify-center flex-1 px-6 font-bold text-[#343434]">
-            Опублікувати
+            {isEditMode ? "Зберегти" : "Опублікувати"}
           </span>
           <div className="flex items-center justify-center w-[60px] border-l border-[#343434]">
             <Image

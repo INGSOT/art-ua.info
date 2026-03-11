@@ -12,7 +12,7 @@ export default function Services() {
   };
 
   const handleEditClick = () => {
-    // Placeholder for edit service functionality
+    router.push("/profile/services/edit");
   };
 
   return (

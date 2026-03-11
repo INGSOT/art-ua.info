@@ -27,9 +27,9 @@ export default function ProjectInfo() {
         {/* Tags */}
         <div className="flex flex-wrap gap-4 mb-8 justify-center">
           {projectDetails.tags.map((tag, index) => (
-            <div key={index} className={`bg-[#343434] px-4 md:px-6 py-3 rounded ${tag.hasIcon ? 'flex items-center gap-2' : ''}`}>
+            <div key={index} className={`bg-[#343434] px-4 md:px-6 py-3 ${tag.hasIcon ? 'flex items-center gap-2' : ''}`}>
               {tag.hasIcon && <Image src="/coins.svg" alt="Coins" width={24} height={24} />}
-              <span className={`font-bold text-sm md:text-base ${tag.hasIcon ? 'text-[#FECC39]' : 'text-white'}`}>{tag.text}</span>
+              <p className={` text-sm md:text-base ${tag.hasIcon ? 'text-[#FECC39]' : 'text-white'}`}>{tag.text}</p>
             </div>
           ))}
         </div>
@@ -106,10 +106,10 @@ export default function ProjectInfo() {
 
         {/* Project Links */}
         <div className="flex flex-col md:flex-row gap-4 md:gap-8 mb-6 items-center">
-          <p className="text-white font-bold text-sm md:text-[length:var(--h6-font-size)] text-center">
+          <p className="text-white font-bold">
             {projectDetails.links.saveArt}
           </p>
-          <p className="text-white font-bold text-sm md:text-[length:var(--h6-font-size)] text-center">
+          <p className="text-white font-bold">
             {projectDetails.links.artUa}
           </p>
         </div>
