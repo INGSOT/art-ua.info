@@ -47,10 +47,10 @@ export interface ProjectFilterButton {
 }
 
 export const myProjects: MyProject[] = [
-  // { id: 1, image: "/projects/project-photo-1.png", title: "Назва роботи", likes: 17 },
-  // { id: 2, image: "/projects/project-photo-2.png", title: "Назва роботи", likes: 17 },
-  // { id: 3, image: "/projects/project-photo-3.png", title: "Назва роботи", likes: 35 },
-  // { id: 4, image: "/projects/project-photo-4.png", title: "Назва роботи", likes: 17 },
+  { id: 1, image: "/projects/project-photo-1.png", title: "Назва роботи", likes: 17 },
+  { id: 2, image: "/projects/project-photo-2.png", title: "Назва роботи", likes: 17 },
+  { id: 3, image: "/projects/project-photo-3.png", title: "Назва роботи", likes: 35 },
+  { id: 4, image: "/projects/project-photo-4.png", title: "Назва роботи", likes: 17 },
 ];
 
 export const projectFilterButtons: ProjectFilterButton[] = [
@@ -176,3 +176,119 @@ export const servicesTexts: ServicesTexts = {
   addServiceButton: "Додати послугу",
   editServiceButton: "Редагувати послугу",
 };
+
+// Teams
+export type TeamCardType = "own" | "other";
+
+export interface TeamMember {
+  name: string;
+  avatar: string;
+}
+
+export interface ProfileTeam {
+  id: number;
+  type: TeamCardType;
+  avatar: string;
+  name: string;
+  description: string;
+  members: TeamMember[];
+}
+
+export const profileTeams: ProfileTeam[] = [
+  {
+    id: 1,
+    type: "own",
+    avatar: "/teams/team-photo-1.png",
+    name: "Довга назва команди на декілька слів",
+    description:
+      "Рекламна та UX/UI Design and Branding Design агенція, заснована у місті Нью-Мексико, США. Ми ведемо найкреативніший дизайн-проєкт, об’єднуючи бренди та аудиторії в digital. У фокусі: Website UX/UI Design, Mobile UX/UI Design, SASS Product Design.",
+    members: [
+      {
+        name: "Довгий Нікнейм",
+        avatar: "/artists/artist-photo-5.png",
+      },
+      {
+        name: "Ім’я Прізвище",
+        avatar: "/artists/artist-photo-6.png",
+      },
+      {
+        name: "Користувач з ніком",
+        avatar: "/artists/artist-photo-7.png",
+      },
+    ],
+  },
+  {
+    id: 2,
+    type: "other",
+    avatar: "/teams/team-photo-2.png",
+    name: "Назва команди",
+    description:
+      "Рекламна та UX/UI Design and Branding Design агенція, заснована у місті Нью-Мексико, США. Ми ведемо найкреативніший дизайн-проєкт, об’єднуючи бренди та аудиторії в digital. У фокусі: Website UX/UI Design, Mobile UX/UI Design, SASS Product Design.",
+    members: [
+      {
+        name: "Довгий Нікнейм",
+        avatar: "/artists/artist-photo-8.png",
+      },
+      {
+        name: "Ім’я Прізвище",
+        avatar: "/artists/artist-photo-9.png",
+      },
+      {
+        name: "Користувач з ніком",
+        avatar: "/artists/artist-photo-10.png",
+      },
+      {
+        name: "Ще одне ім’я",
+        avatar: "/artists/artist-photo-5.png",
+      },
+    ],
+  },
+  {
+    id: 3,
+    type: "other",
+    avatar: "/teams/team-photo-3.png",
+    name: "Назва команди",
+    description:
+      "Рекламна та UX/UI Design and Branding Design агенція, заснована у місті Нью-Мексико, США. Ми ведемо найкреативніший дизайн-проєкт, об’єднуючи бренди та аудиторії в digital. У фокусі: Website UX/UI Design, Mobile UX/UI Design, SASS Product Design.",
+    members: [
+      {
+        name: "Довгий Нікнейм",
+        avatar: "/artists/artist-photo-6.png",
+      },
+      {
+        name: "Ім’я Прізвище",
+        avatar: "/artists/artist-photo-7.png",
+      },
+      {
+        name: "Користувач з ніком",
+        avatar: "/artists/artist-photo-8.png",
+      },
+      {
+        name: "Ще одне ім’я",
+        avatar: "/artists/artist-photo-9.png",
+      },
+      {
+        name: "Останнє ім’я",
+        avatar: "/artists/artist-photo-10.png",
+      },
+    ],
+  },
+  {
+    id: 4,
+    type: "own",
+    avatar: "/teams/team-photo-4.png",
+    name: "Довга назва команди на декілька слів",
+    description:
+      "Рекламна та UX/UI Design and Branding Design агенція, заснована у місті Нью-Мексико, США. Ми ведемо найкреативніший дизайн-проєкт, об’єднуючи бренди та аудиторії в digital. У фокусі: Website UX/UI Design, Mobile UX/UI Design, SASS Product Design.",
+    members: [
+      {
+        name: "Довгий Нікнейм",
+        avatar: "/artists/artist-photo-5.png",
+      },
+      {
+        name: "Ім’я Прізвище",
+        avatar: "/artists/artist-photo-6.png",
+      },
+    ],
+  },
+];
