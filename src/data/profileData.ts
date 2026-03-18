@@ -275,7 +275,7 @@ export const profileTeams: ProfileTeam[] = [
   },
   {
     id: 4,
-    type: "own",
+    type: "other",
     avatar: "/teams/team-photo-4.png",
     name: "Довга назва команди на декілька слів",
     description:

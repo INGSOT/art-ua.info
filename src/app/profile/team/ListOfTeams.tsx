@@ -4,13 +4,15 @@ import { profileTeams } from "../../../data/profileData";
 import TeamCard from "./TeamCard";
 
 export default function ListOfTeams() {
-
+  const router = useRouter();
 
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-20">
       {/* Create Team Button */}
       <div className="mb-8 flex justify-center">
         <button
+          type="button"
+          onClick={() => router.push("/profile/team/new")}
           className="h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-white w-full md:w-[320px]"
         >
           <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">

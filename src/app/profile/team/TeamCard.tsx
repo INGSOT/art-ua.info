@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import type { ProfileTeam } from "../../../data/profileData";
 
 interface TeamCardProps {
@@ -7,6 +8,7 @@ interface TeamCardProps {
 
 export default function TeamCard({ team }: TeamCardProps) {
   const isOwnTeam = team.type === "own";
+  const router = useRouter();
 
   return (
     <article className="relative w-full bg-[#343434] p-6 flex flex-col gap-4">
@@ -29,12 +31,23 @@ export default function TeamCard({ team }: TeamCardProps) {
         </div>
 
         <div className="ml-4 flex-shrink-0">
-          <Image
-            src={isOwnTeam ? "/edit_yellow.svg" : "/three_dots.svg"}
-            alt={isOwnTeam ? "Edit team" : "Team actions"}
-            width={24}
-            height={24}
-          />
+          {isOwnTeam ? (
+            <button
+              type="button"
+              onClick={() => router.push("/profile/team/edit")}
+              aria-label="Редагувати команду"
+              className="p-1 -m-1"
+            >
+              <Image src="/edit_yellow.svg" alt="" width={24} height={24} />
+            </button>
+          ) : (
+            <Image
+              src="/three_dots.svg"
+              alt="Дії команди"
+              width={24}
+              height={24}
+            />
+          )}
         </div>
       </div>
 

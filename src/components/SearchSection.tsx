@@ -15,19 +15,30 @@ interface SearchSectionProps {
     value?: string;
     onChange?: (value: string) => void;
     onSearch?: () => void;
+    placeholder?: string;
+    maxWidthPx?: number;
 }
 
-export default function SearchSection({ value, onChange, onSearch }: SearchSectionProps) {
+export default function SearchSection({
+    value,
+    onChange,
+    onSearch,
+    placeholder: placeholderProp,
+    maxWidthPx,
+}: SearchSectionProps) {
     const pathname = usePathname();
-    const placeholder = PLACEHOLDER_BY_PATH[pathname] ?? 'Пошук';
+    const placeholder = placeholderProp ?? PLACEHOLDER_BY_PATH[pathname] ?? 'Пошук';
 
     return (
         <section className="w-full bg-[#414141] flex justify-center items-center py-4 md:py-8 px-4 md:px-0">
-            <div className="relative w-full md:w-[600px] h-[60px]">
+            <div
+                className="relative w-full h-[60px]"
+                style={{ maxWidth: maxWidthPx ? `${maxWidthPx}px` : '600px' }}
+            >
                 <input
                     type="text"
                     placeholder={placeholder}
-                    className="font-wix w-full h-full bg-[#343434] text-white placeholder-gray-400 px-6 pr-16 rounded-none"
+                    className="font-wix w-full h-full bg-[#343434] text-white placeholder-[#A0A0A0] px-6 pr-16 rounded-none"
                     value={value ?? ''}
                     onChange={(event) => onChange?.(event.target.value)}
                 />
