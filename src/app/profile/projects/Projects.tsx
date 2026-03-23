@@ -12,7 +12,7 @@ export default function Projects() {
   const hasProjects = myProjects.length > 0;
 
   return (
-    <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-20">
+    <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
       {hasProjects ? (
         <>
           {/* Dark gray filter bar */}
@@ -37,10 +37,10 @@ export default function Projects() {
           </div>
 
           {/* Projects grid */}
-          <div className="px-4">
+          <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myProjects.map((project) => (
-                <Link key={project.id} href="#" className="block group">
+                <Link key={project.id} href="/profile/projects/project" className="block group">
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
                     <CardContent className="p-0 flex flex-col gap-3">
                       {/* Project image with likes overlay */}

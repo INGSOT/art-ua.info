@@ -16,7 +16,7 @@ export default function Menu({ activeItem }: MenuProps) {
     { id: "catalogs", label: "Каталоги", href: "/profile/catalogs" },
     { id: "services", label: "Послуги", href: "/profile/services" },
     { id: "team", label: "Команда", href: "/profile/team" },
-    { id: "info", label: "Інформація", href: "#" },
+    { id: "info", label: "Інформація", href: "/profile/info" },
     { id: "notifications", label: "Сповіщення", href: "#" },
   ];
 

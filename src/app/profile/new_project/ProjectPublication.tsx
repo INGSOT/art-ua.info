@@ -99,7 +99,7 @@ export default function ProjectPublication() {
   };
 
   return (
-    <section className="w-full bg-[#FFFCF5] flex flex-col items-center py-10 px-4 md:px-10 lg:px-20 border-b border-black">
+    <section className="w-full bg-[#FFFCF5] flex flex-col items-center py-10 px-4 md:px-10 lg:px-[75px] border-b border-black">
       {notification && (
         <Message
           type={notification.type}

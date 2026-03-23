@@ -68,6 +68,46 @@ export const profileTexts = {
   editProfileButton: "Редагувати профіль",
 };
 
+// Profile Information
+export interface ProfileSocialLink {
+  icon: string;
+  alt: string;
+  url: string;
+}
+
+export interface ProfileInfo {
+  website: string;
+  socialLinks: ProfileSocialLink[];
+  location: {
+    country: string;
+    city: string;
+  };
+  description: string[];
+}
+
+export const profileInfo: ProfileInfo = {
+  website: "website.com",
+  socialLinks: [
+    { icon: "/socials/deviantart_yellow.svg", alt: "DeviantArt", url: "https://deviantart.com" },
+    { icon: "/socials/pinterest_yellow.svg", alt: "Pinterest", url: "https://pinterest.com" },
+    { icon: "/socials/youtube_yellow.svg", alt: "YouTube", url: "https://youtube.com" },
+    { icon: "/socials/instagram_yellow.svg", alt: "Instagram", url: "https://instagram.com" },
+    { icon: "/socials/facebook_yellow.svg", alt: "Facebook", url: "https://facebook.com" },
+    { icon: "/socials/linked_in_yellow.svg", alt: "LinkedIn", url: "https://linkedin.com" },
+    { icon: "/socials/x_yellow.svg", alt: "X", url: "https://x.com" },
+  ],
+  location: {
+    country: "Україна",
+    city: "Кривий ріг",
+  },
+  description: [
+    "Текст опису про себе.",
+    "Культурна спадщина України в контексті нових історичних подій набула особливої актуальності та нових змістів.",
+    "Сьогодні образотворче мистецтво у фарбах на холсті відображає не просто сюжети чи метафори, а небувалий у сучасній історії злам епох. Художники фіксують не тільки події, а ще й глибину емоційно-почуттєвого фону, який неможливо передати на словах та в стрічці новин. Це - новітнє мистецтво, сучасне, переосмислене, глибинне, на віки.",
+    "Саме зараз настає його час - аби уберегти наступні покоління від руїн, транслюючи біль крізь художні образи.",
+  ],
+};
+
 // My Catalogs
 export interface MyCatalog {
   id: number;

@@ -51,7 +51,7 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-20 bg-[#414141] min-h-screen">
+    <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-[75px] bg-[#414141] min-h-screen">
       <form className="flex flex-col items-center gap-8 w-full max-w-[1000px]">
         {/* Cover Upload */}
         <div className="w-full flex justify-center">

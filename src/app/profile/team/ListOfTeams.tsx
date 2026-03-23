@@ -7,7 +7,7 @@ export default function ListOfTeams() {
   const router = useRouter();
 
   return (
-    <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-20">
+    <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
       {/* Create Team Button */}
       <div className="mb-8 flex justify-center">
         <button

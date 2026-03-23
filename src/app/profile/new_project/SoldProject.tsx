@@ -9,7 +9,7 @@ export default function SoldProject() {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <section className="w-full bg-[#414141] flex flex-col items-center py-10 px-4 md:px-10 lg:px-20 border-t border-black">
+    <section className="w-full bg-[#414141] flex flex-col items-center py-10 px-4 md:px-10 lg:px-[75px] border-t border-black">
       {/* Description Text */}
       <p className="text-white text-center mb-6 max-w-4xl">
         {newProjectTexts.soldProjectDescription}

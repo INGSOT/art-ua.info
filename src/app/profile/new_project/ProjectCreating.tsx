@@ -320,7 +320,7 @@ export default function ProjectCreating() {
   ];
 
   return (
-    <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-20 bg-[#414141] min-h-screen">
+    <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-[75px] bg-[#414141] min-h-screen">
       <form className="flex flex-col items-center gap-8 w-full">
       {/* Title */}
       <h1 className="text-[#A0A0A0] text-[32px] md:text-[40px] font-bold text-center">
