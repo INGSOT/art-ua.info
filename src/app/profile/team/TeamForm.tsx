@@ -3,10 +3,17 @@
 import { useState } from "react";
 import Image from "next/image";
 import AddProjectCover from "../new_project/AddProjectCover";
-import SearchSection from "../../../components/SearchSection";
+import { artistsData, teamsData } from "../../../data/participantsData";
 
 interface TeamFormProps {
   mode?: "create" | "edit";
+}
+
+interface MemberOption {
+  key: string;
+  name: string;
+  icon: string;
+  type: "artist" | "team";
 }
 
 export default function TeamForm({ mode = "create" }: TeamFormProps) {
@@ -36,6 +43,7 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
   const [aboutEn, setAboutEn] = useState("");
 
   const [membersQuery, setMembersQuery] = useState("");
+  const [selectedMembers, setSelectedMembers] = useState<MemberOption[]>([]);
 
   const [isPrimaryHovered, setIsPrimaryHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
@@ -48,6 +56,51 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
   const handleDelete = () => {
     // TODO: implement delete logic
     console.log("Deleting team...");
+  };
+
+  const normalizedMembersQuery = membersQuery.trim().toLowerCase();
+  const matchedArtists = normalizedMembersQuery
+    ? artistsData
+        .filter((artist) =>
+          artist.artistName.toLowerCase().includes(normalizedMembersQuery)
+        )
+        .map((artist) => ({
+          key: `artist-${artist.id}`,
+          name: artist.artistName,
+          icon: artist.artistPhoto,
+          type: "artist",
+        }))
+    : [];
+
+  const matchedTeams = normalizedMembersQuery
+    ? teamsData
+        .filter((team) =>
+          team.artistName.toLowerCase().includes(normalizedMembersQuery)
+        )
+        .map((team) => ({
+          key: `team-${team.id}`,
+          name: team.artistName,
+          icon: team.artistPhoto,
+          type: "team",
+        }))
+    : [];
+
+  const searchResults = [...matchedArtists, ...matchedTeams].filter(
+    (result) => !selectedMembers.some((member) => member.key === result.key)
+  );
+
+  const handleAddMember = (member: MemberOption) => {
+    setSelectedMembers((prev) => {
+      if (prev.some((item) => item.key === member.key)) {
+        return prev;
+      }
+      return [...prev, member];
+    });
+    setMembersQuery("");
+  };
+
+  const handleRemoveMember = (memberKey: string) => {
+    setSelectedMembers((prev) => prev.filter((member) => member.key !== memberKey));
   };
 
   return (
@@ -315,12 +368,98 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
             Учасники
           </div>
 
-          <SearchSection
-            value={membersQuery}
-            onChange={setMembersQuery}
-            placeholder="Вкажіть ім’я або назву компанії"
-            maxWidthPx={1000}
-          />
+          {selectedMembers.length > 0 && (
+            <div className="w-full flex flex-col gap-3">
+              {selectedMembers.map((member) => (
+                <div
+                  key={member.key}
+                  className="w-full h-[60px] bg-[#343434] text-white px-4 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                      <Image
+                        src={member.icon}
+                        alt={member.type === "artist" ? "Артист" : "Команда"}
+                        width={32}
+                        height={32}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="font-wix truncate">{member.name}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveMember(member.key)}
+                    className="flex items-center justify-center shrink-0"
+                    aria-label="Видалити учасника"
+                  >
+                    <Image
+                      src="/yellow_cross.svg"
+                      alt="Видалити"
+                      width={24}
+                      height={24}
+                    />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="w-full flex flex-col gap-1">
+            <div className="font-wix text-white text-sm">
+              Додайте учасника до команди
+            </div>
+
+            <div className="relative w-full h-[60px]">
+              <input
+                type="text"
+                value={membersQuery}
+                onChange={(e) => setMembersQuery(e.target.value)}
+                placeholder="Вкажіть ім’я або назву команди"
+                className="font-wix w-full h-full bg-[#343434] text-white placeholder-[#A0A0A0] px-6 pr-16"
+              />
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center"
+              >
+                <Image src="/search.svg" alt="Search" width={24} height={24} />
+              </button>
+            </div>
+
+            {searchResults.length > 0 && (
+              <div className="w-full">
+                {searchResults.map((result) => (
+                  <button
+                    key={result.key}
+                    type="button"
+                    onClick={() => handleAddMember(result)}
+                    className="w-full h-[60px] bg-[#343434] text-white px-4 flex items-center justify-between border-t border-[#414141] hover:bg-[#3a3a3a] transition-colors"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                        <Image
+                          src={result.icon}
+                          alt={result.type === "artist" ? "Артист" : "Команда"}
+                          width={32}
+                          height={32}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span className="font-wix truncate">
+                        {result.name}
+                      </span>
+                    </div>
+                    <Image
+                      src="/yellow_plus.svg"
+                      alt="Додати"
+                      width={24}
+                      height={24}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Primary Button */}
