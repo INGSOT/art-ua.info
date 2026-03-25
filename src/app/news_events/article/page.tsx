@@ -1,7 +1,7 @@
 import Photo from "./Photo";
 import ArticleText from "./ArticleText";
 import SocialLinksBar from "./SocialLinksBar";
-import JoinCommunityWrapper from "../../../common_elements/JoinCommunityWrapper";
+import JoinCommunityWrapper from "../../../components/JoinCommunityWrapper";
 import Header from "../../../components/Header";
 
 export default function ArticlePage() {

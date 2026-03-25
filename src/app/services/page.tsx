@@ -8,7 +8,7 @@ import ServicesFilterSection from './ServicesFilterSection';
 import ListOfServices from './ListOfServices';
 import { servicesData } from '../../data/servicesData';
 import PaginationSection from '../../components/PaginationSection';
-import JoinCommunityWrapper from '../../common_elements/JoinCommunityWrapper';
+import JoinCommunityWrapper from '../../components/JoinCommunityWrapper';
 
 
 export default function ServicesPage() {

@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Header from "../../components/Header";
-import LatestNews from "../../common_elements/LatestNews";
-import JoinCommunityWrapper from "../../common_elements/JoinCommunityWrapper";
+import LatestNews from "../../components/LatestNews";
+import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
 import { authorsFilters } from "../../components/filters/filterConfig";
-import Participant from "./Participant";
+import Participant from "../../components/Participant";
 import SortingControls from "./SortingControls";
 import PaginationSection from "../../components/PaginationSection";
 import { artistsData, teamsData, TeamData, ArtistData } from "../../data/participantsData";

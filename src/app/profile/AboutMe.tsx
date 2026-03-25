@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { aboutMeData, profileTexts } from "../../data/profileData";
@@ -37,9 +38,10 @@ export default function AboutMe() {
         {/* Teams */}
         <div className="flex flex-wrap justify-start md:justify-center gap-4 mb-8">
           {aboutMeData.teams.map((team, index) => (
-            <div
+            <Link
               key={index}
-              className="flex items-center gap-3 bg-[#414141] px-4 py-2 rounded-full"
+              href={`/team/projects?team=${index + 1}`}
+              className="flex items-center gap-3 bg-[#414141] px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
             >
               <div className="w-8 h-8 flex-shrink-0 rounded-full overflow-hidden">
                 <Image
@@ -51,7 +53,7 @@ export default function AboutMe() {
                 />
               </div>
               <span className="text-white text-sm font-bold text-left">{team.name}</span>
-            </div>
+            </Link>
           ))}
         </div>
 

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Header from "../../components/Header";
-import LatestNews from "../../common_elements/LatestNews";
-import JoinCommunityWrapper from "../../common_elements/JoinCommunityWrapper";
+import LatestNews from "../../components/LatestNews";
+import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
 import { projectsFilters } from "../../components/filters/filterConfig";

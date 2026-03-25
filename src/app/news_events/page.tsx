@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import JoinCommunityWrapper from "../../common_elements/JoinCommunityWrapper";
+import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import ListOfNews from "./ListOfNews";
 import { newsData } from "../../data/newsData";

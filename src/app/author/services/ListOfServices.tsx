@@ -1,6 +1,6 @@
 "use client";
 
-import ServiceCard from "./ServiceCard";
+import ServiceCard from "../../../components/ServiceCard";
 import { authorServices } from "../../../data/authorData";
 
 export default function ListOfServices() {
@@ -11,8 +11,9 @@ export default function ListOfServices() {
                     <ServiceCard
                         key={service.id}
                         image={service.image}
-                        buttonLabel={service.buttonLabel}
+                        overlayButtonLabel={service.buttonLabel}
                         title={service.title}
+                        footer={{ variant: "order" }}
                     />
                 ))}
             </div>

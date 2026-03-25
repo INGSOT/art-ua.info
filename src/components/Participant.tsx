@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Avatar, AvatarImage } from "../../components/ui/avatar";
-import { Badge } from "../../components/ui/badge";
+import { Avatar, AvatarImage } from "./ui/avatar";
+import { Badge } from "./ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 
-import { PhotoData } from "../../data/participantsData";
+import { PhotoData } from "../data/participantsData";
 
 interface ParticipantProps {
   artistPhoto: string;

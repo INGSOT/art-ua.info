@@ -244,10 +244,10 @@ export const aboutAuthorData: AboutAuthorData = {
   description: "Художник, скульптор, архітектор, режисер, співак",
   avatar: "/image-13.png",
   teams: [
-    { name: "Назва Команди", icon: "/teams/team-photo-1.png" },
-    { name: "Назва Команди", icon: "/teams/team-photo-2.png" },
-    { name: "Довга назва команди на декілька слів", icon: "/teams/team-photo-3.png" },
-    { name: "Довга назва команди", icon: "/teams/team-photo-4.png" },
+    { name: "Команда 1", icon: "/teams/team-photo-1.png" },
+    { name: "Команда 2", icon: "/teams/team-photo-2.png" },
+    { name: "Команда 3", icon: "/teams/team-photo-3.png" },
+    { name: "Команда 4", icon: "/teams/team-photo-4.png" },
   ],
   buttons: [
     { id: "save-art", label: "save-art.in.ua/username" },

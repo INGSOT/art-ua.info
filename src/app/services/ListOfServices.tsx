@@ -1,6 +1,6 @@
 'use client';
 
-import ServiceCard from './ServiceCard';
+import ServiceCard from './ServiceItem';
 import { servicesData } from '../../data/servicesData';
 
 interface ListOfServicesProps {

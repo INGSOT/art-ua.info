@@ -2,7 +2,7 @@
 
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import JoinCommunityWrapper from "../../common_elements/JoinCommunityWrapper";
+import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
 import { faqFilters } from "../../components/filters/filterConfig";

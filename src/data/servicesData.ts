@@ -1,4 +1,4 @@
-export interface ServiceCardData {
+export interface ServiceItemData {
     id: number;
     authorName: string;
     authorAvatar: string;
@@ -9,7 +9,7 @@ export interface ServiceCardData {
     priceNegotiable: boolean;
 }
 
-export const servicesData: ServiceCardData[] = [
+export const servicesData: ServiceItemData[] = [
     {
         id: 1,
         authorName: "Олена Коваленко",

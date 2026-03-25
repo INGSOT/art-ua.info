@@ -2,13 +2,13 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { ServiceCardData } from '../../data/servicesData';
+import { ServiceItemData } from '../../data/servicesData';
 
-interface ServiceCardProps {
-    service: ServiceCardData;
+interface ServiceItemProps {
+    service: ServiceItemData;
 }
 
-export default function ServiceCard({ service }: ServiceCardProps) {
+export default function ServiceItem({ service }: ServiceItemProps) {
     const [isHovered, setIsHovered] = useState(false);
 
     return (
