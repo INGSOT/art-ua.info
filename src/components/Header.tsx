@@ -1,13 +1,20 @@
+'use client';
+
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { navigationItems, socialIcons, languageOptions } from "../data/headerData";
+import SearchModal from "./SearchModal";
 
 interface HeaderProps {
   isHomePage?: boolean;
 }
 
 export default function Header({ isHomePage = false }: HeaderProps) {
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+
     return (
+    <>
     <header className={`flex items-center gap-4 md:gap-[30px] p-4 md:p-[30px] flex-wrap lg:flex-nowrap ${isHomePage ? 'bg-transparent' : 'bg-[#414141]'}`}>
         <Link href="/" className="inline-flex items-center gap-2 flex-[0_0_auto] group">
           <img className="w-11 h-11" alt="Logos" src="/logos.svg" />
@@ -90,6 +97,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
             variant="ghost"
             size="icon"
             className="w-11 h-11 hover:bg-transparent"
+            onClick={() => setIsSearchOpen(true)}
           >
             <img className="w-6 h-6" alt="Search" src="/search.svg" />
           </Button>
@@ -108,6 +116,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
             variant="ghost"
             size="icon"
             className="w-11 h-11 hover:bg-transparent"
+            onClick={() => setIsSearchOpen(true)}
           >
             <img className="w-6 h-6" alt="Search" src="/search.svg" />
           </Button>
@@ -126,10 +135,13 @@ export default function Header({ isHomePage = false }: HeaderProps) {
             variant="ghost"
             size="icon"
             className="w-11 h-11 hover:bg-transparent"
+            onClick={() => setIsSearchOpen(true)}
           >
             <img className="w-6 h-6" alt="Search" src="/search.svg" />
           </Button>
         </div>
       </header>
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+    </>
     )
 }
