@@ -5,6 +5,9 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { navigationItems, socialIcons, languageOptions } from "../data/headerData";
 import SearchModal from "./SearchModal";
+import LoginModal from "./LoginModal";
+import RegistrationModal from "./RegistrationModal";
+import ResetPassModal from "./ResetPassModal";
 
 interface HeaderProps {
   isHomePage?: boolean;
@@ -12,6 +15,18 @@ interface HeaderProps {
 
 export default function Header({ isHomePage = false }: HeaderProps) {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
+    const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
+
+    const openLoginModal = () => {
+      setDisableAuthAnimation(false);
+      setActiveAuthModal("login");
+    };
+
+    const closeAuthModal = () => {
+      setDisableAuthAnimation(false);
+      setActiveAuthModal(null);
+    };
 
     return (
     <>
@@ -89,6 +104,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
             variant="ghost"
             size="icon"
             className="w-11 h-11 hover:bg-transparent"
+            onClick={openLoginModal}
           >
             <img className="w-6 h-6" alt="Login" src="/login.svg" />
           </Button>
@@ -108,6 +124,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
             variant="ghost"
             size="icon"
             className="w-11 h-11 hover:bg-transparent"
+            onClick={openLoginModal}
           >
             <img className="w-6 h-6" alt="Login" src="/login.svg" />
           </Button>
@@ -127,6 +144,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
             variant="ghost"
             size="icon"
             className="w-11 h-11 hover:bg-transparent"
+            onClick={openLoginModal}
           >
             <img className="w-6 h-6" alt="Login" src="/login.svg" />
           </Button>
@@ -142,6 +160,37 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         </div>
       </header>
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <LoginModal
+        isOpen={activeAuthModal === "login"}
+        onClose={closeAuthModal}
+        disableAnimation={disableAuthAnimation}
+        onSwitchToRegister={() => {
+          setDisableAuthAnimation(true);
+          setActiveAuthModal("register");
+        }}
+        onSwitchToResetPassword={() => {
+          setDisableAuthAnimation(true);
+          setActiveAuthModal("reset");
+        }}
+      />
+      <RegistrationModal
+        isOpen={activeAuthModal === "register"}
+        onClose={closeAuthModal}
+        disableAnimation={disableAuthAnimation}
+        onSwitchToLogin={() => {
+          setDisableAuthAnimation(true);
+          setActiveAuthModal("login");
+        }}
+      />
+      <ResetPassModal
+        isOpen={activeAuthModal === "reset"}
+        onClose={closeAuthModal}
+        disableAnimation={disableAuthAnimation}
+        onSwitchToLogin={() => {
+          setDisableAuthAnimation(true);
+          setActiveAuthModal("login");
+        }}
+      />
     </>
     )
 }
