@@ -6,15 +6,31 @@ import type { Catalog } from "../../data/catalogsData";
 
 interface ListOfCatalogsProps {
   catalogs: Catalog[];
+  disableInteractions?: boolean;
 }
 
-export default function ListOfCatalogs({ catalogs }: ListOfCatalogsProps) {
+export default function ListOfCatalogs({ catalogs, disableInteractions = false }: ListOfCatalogsProps) {
+  if (catalogs.length === 0) {
+    return (
+      <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
+        <p className="font-wix text-white text-lg md:text-2xl">Каталогів не знайдено</p>
+        <Image src="/masks.svg" alt="Каталогів не знайдено" width={380} height={285} priority />
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+    <div
+      className={`grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 ${
+        disableInteractions ? "pointer-events-none" : ""
+      }`}
+    >
       {catalogs.map((catalog) => (
         <Card
           key={catalog.id}
-          className="bg-transparent border-0 outline-none shadow-none rounded-none group cursor-pointer"
+          className={`bg-transparent border-0 outline-none shadow-none rounded-none ${
+            disableInteractions ? "" : "group cursor-pointer"
+          }`}
         >
           <CardContent className="p-0 flex flex-col gap-2 md:gap-3">
             {/* Catalog image with likes overlay */}
@@ -26,10 +42,18 @@ export default function ListOfCatalogs({ catalogs }: ListOfCatalogsProps) {
                 className="object-cover"
               />
               {/* Darkening overlay on hover */}
-              <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+              <div
+                className={`absolute inset-0 opacity-0 transition-opacity duration-300 ${
+                  disableInteractions ? "bg-black/0" : "bg-black group-hover:opacity-50"
+                }`}
+              ></div>
               
               {/* Centered arrow on hover */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+              <div
+                className={`absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 z-10 ${
+                  disableInteractions ? "" : "group-hover:opacity-100"
+                }`}
+              >
                 <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
               </div>
               

@@ -8,6 +8,7 @@ export interface ArtistData {
   artistPhoto: string;
   artistName: string;
   artistType: string;
+  artCategory: string;
   tags: string[];
   photos: PhotoData[];
   catalogButtonText: string;
@@ -28,8 +29,9 @@ export const artistsData: ArtistData[] = [
     id: 1,
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Олена Кравець",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Режисер",
+    artCategory: "directing",
+    tags: ["Режисура", "Постановка", "Театр", "Сцена"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/turquoise-blue_painting.png", likes: 17 },
@@ -43,8 +45,9 @@ export const artistsData: ArtistData[] = [
     id: 2,
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Максим Шевченко",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Постмодернізм"],
+    artistType: "Актор",
+    artCategory: "acting",
+    tags: ["Акторське мистецтво", "Сцена", "Театр", "Перформанс"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/autumn.png", likes: 25 },
@@ -58,8 +61,9 @@ export const artistsData: ArtistData[] = [
     id: 3,
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Ірина Мельник",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Музикант",
+    artCategory: "music",
+    tags: ["Музичне мистецтво", "Вокал", "Інструментал", "Сцена"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/big_lebovski.png", likes: 20 },
@@ -73,8 +77,9 @@ export const artistsData: ArtistData[] = [
     id: 4,
     artistPhoto: "/artists/artist-photo-8.png",
     artistName: "Андрій Соколенко",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Хореограф",
+    artCategory: "choreography",
+    tags: ["Хореографічне мистецтво", "Танець", "Постановка", "Сцена"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/pulp_fiction.png", likes: 30 },
@@ -88,8 +93,9 @@ export const artistsData: ArtistData[] = [
     id: 5,
     artistPhoto: "/artists/artist-photo-9.png",
     artistName: "Наталія Бондар",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Перформер",
+    artCategory: "original-genre",
+    tags: ["Оригінальний жанр", "Перформанс", "Сцена", "Імпровізація"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/ship.png", likes: 18 },
@@ -103,8 +109,9 @@ export const artistsData: ArtistData[] = [
     id: 6,
     artistPhoto: "/artists/artist-photo-10.png",
     artistName: "Дмитро Романюк",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Фотограф",
+    artCategory: "art-photography",
+    tags: ["Художня фотографія", "Портрет", "Студійна зйомка", "Арт-фото"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/autumn.png", likes: 21 },
@@ -118,8 +125,9 @@ export const artistsData: ArtistData[] = [
     id: 7,
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Софія Ткаченко",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Відеомейкер",
+    artCategory: "video-editing",
+    tags: ["Відеозйомка та монтаж", "Монтаж", "Постпродакшн", "Кліпмейкінг"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/big_lebovski.png", likes: 24 },
@@ -133,8 +141,9 @@ export const artistsData: ArtistData[] = [
     id: 8,
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Юрій Коваленко",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Кінорежисер",
+    artCategory: "cinema",
+    tags: ["Повнометражний кінематограф", "Кіно", "Сценарій", "Постановка"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/pulp_fiction.png", likes: 22 },
@@ -148,8 +157,9 @@ export const artistsData: ArtistData[] = [
     id: 9,
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Марина Гончар",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "AR-художник",
+    artCategory: "ar",
+    tags: ["Доповнена реальність", "AR", "Інтерактив", "Цифрове мистецтво"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/ship.png", likes: 20 },
@@ -163,8 +173,9 @@ export const artistsData: ArtistData[] = [
     id: 10,
     artistPhoto: "/artists/artist-photo-8.png",
     artistName: "Віталій Лисенко",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Живописець",
+    artCategory: "painting",
+    tags: ["Живопис", "Полотно", "Олія", "Колористика"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/turquoise-blue_painting.png", likes: 23 },
@@ -178,8 +189,9 @@ export const artistsData: ArtistData[] = [
     id: 11,
     artistPhoto: "/artists/artist-photo-9.png",
     artistName: "Катерина Дорошенко",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Скульптор",
+    artCategory: "sculpture",
+    tags: ["Скульптура", "Пластика", "Бронза", "Камінь"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/autumn.png", likes: 26 },
@@ -193,8 +205,9 @@ export const artistsData: ArtistData[] = [
     id: 12,
     artistPhoto: "/artists/artist-photo-10.png",
     artistName: "Павло Яценко",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Графік",
+    artCategory: "graphics",
+    tags: ["Графіка", "Ілюстрація", "Ліногравюра", "Ескіз"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/big_lebovski.png", likes: 17 },
@@ -208,8 +221,9 @@ export const artistsData: ArtistData[] = [
     id: 13,
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Людмила Черненко",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Поет",
+    artCategory: "poetry",
+    tags: ["Поезія", "Вірші", "Лірика", "Сучасна поезія"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/ship.png", likes: 19 },
@@ -223,8 +237,9 @@ export const artistsData: ArtistData[] = [
     id: 14,
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Тарас Омельчук",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Прозаїк",
+    artCategory: "poetry",
+    tags: ["Проза", "Роман", "Оповідання", "Драматургія"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/pulp_fiction.png", likes: 25 },
@@ -238,8 +253,9 @@ export const artistsData: ArtistData[] = [
     id: 15,
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Аліна Савчук",
-    artistType: "Скульптор · Художник",
-    tags: ["Скульптури", "Картини", "Графіка", "Модернізм"],
+    artistType: "Режисер",
+    artCategory: "directing",
+    tags: ["Режисура", "Кіно", "Постановка", "Авторський стиль"],
     catalogButtonText: "До каталогу робіт",
     photos: [
       { image: "/gallery/turquoise-blue_painting.png", likes: 22 },

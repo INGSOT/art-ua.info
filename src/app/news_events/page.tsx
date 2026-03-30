@@ -13,7 +13,12 @@ import Image from "next/image";
 
 const ITEMS_PER_PAGE = 12;
 
-type SortOption = "Популярні" | "Новіші" | "Давніші";
+type SortOption = "Новіші" | "Давніші";
+
+const parseNewsDate = (dateValue: string) => {
+    const [day, month, year] = dateValue.split(".").map(Number);
+    return new Date(year, month - 1, day).getTime();
+};
 
 export default function NewsEventsPage() {
     const [currentPage, setCurrentPage] = useState(1);
@@ -36,11 +41,18 @@ export default function NewsEventsPage() {
         ? newsData.filter((newsItem) => newsItem.title.toLowerCase().includes(normalizedSearchQuery))
         : newsData;
 
-    const hasResults = filteredNews.length > 0;
-    const totalPages = hasResults ? Math.ceil(filteredNews.length / ITEMS_PER_PAGE) : 0;
+    const sortedNews = [...filteredNews].sort((a, b) => {
+        const dateA = parseNewsDate(a.date);
+        const dateB = parseNewsDate(b.date);
+
+        return sortOption === "Новіші" ? dateB - dateA : dateA - dateB;
+    });
+
+    const hasResults = sortedNews.length > 0;
+    const totalPages = hasResults ? Math.ceil(sortedNews.length / ITEMS_PER_PAGE) : 0;
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentNews = filteredNews.slice(startIndex, endIndex);
+    const currentNews = sortedNews.slice(startIndex, endIndex);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -49,6 +61,7 @@ export default function NewsEventsPage() {
 
     const handleSortChange = (option: SortOption) => {
         setSortOption(option);
+        setCurrentPage(1);
         setIsSortOpen(false);
     };
 
@@ -103,7 +116,7 @@ export default function NewsEventsPage() {
                     {/* Sorting and News Section */}
                     <div className="flex flex-col w-full">
                         {/* Sorting Dropdown */}
-                        <div className="relative mb-4 md:mb-6 inline-block w-fit">
+                        <div className="relative z-20 mb-4 md:mb-6 inline-block w-fit">
                             <button 
                                 onClick={() => setIsSortOpen(!isSortOpen)}
                                 className="flex items-center gap-2 text-white font-bold text-sm md:text-base bg-[#343434] px-3 md:px-4 py-2 md:py-3 hover:text-[#FECC39] transition-colors"
@@ -119,8 +132,8 @@ export default function NewsEventsPage() {
                             
                             {/* Dropdown Menu */}
                             {isSortOpen && (
-                                <div className="absolute top-full left-0 mt-1 bg-[#343434] z-10 min-w-[200px] border-2 border-[#1a1a1a]">
-                                    {(["Популярні", "Новіші", "Давніші"] as SortOption[]).map((option) => (
+                                <div className="absolute top-full left-0 mt-1 bg-[#343434] z-30 min-w-[200px] border-2 border-[#1a1a1a]">
+                                    {(["Новіші", "Давніші"] as SortOption[]).map((option) => (
                                         <button
                                             key={option}
                                             onClick={() => handleSortChange(option)}
@@ -138,7 +151,7 @@ export default function NewsEventsPage() {
                         </div>
 
                         {/* News Grid */}
-                        <ListOfNews news={currentNews} />
+                        <ListOfNews news={currentNews} disableHover={isSortOpen} />
                     </div>
                 </section>
             ) : null}

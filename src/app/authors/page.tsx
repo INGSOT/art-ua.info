@@ -22,6 +22,13 @@ export default function AuthorsPage() {
 
     const participantParam = searchParams.get("participant");
     const searchQueryParam = searchParams.get("search") ?? "";
+    const artFieldsSection = authorsFilters.find((section) => section.id === "art-fields");
+    const artItems =
+        artFieldsSection?.subsections?.flatMap((subsection) => subsection.items ?? []) ?? [];
+    const allowedArtCategoryIds = new Set(artItems.map((item) => item.id));
+    const selectedArtCategoryIds = searchParams
+        .getAll("art_subcategory")
+        .filter((value) => allowedArtCategoryIds.has(value));
 
     type ParticipantFilter = "artist" | "team" | "all";
 
@@ -55,6 +62,10 @@ export default function AuthorsPage() {
             base.all = true;
         }
 
+        artItems.forEach((item) => {
+            base[item.id] = selectedArtCategoryIds.includes(item.id);
+        });
+
         return base;
     })();
 
@@ -75,6 +86,10 @@ export default function AuthorsPage() {
             nextFilter = "all";
         }
 
+        const selectedIds = artItems
+            .map((item) => item.id)
+            .filter((id) => !!filters[id]);
+
         const params = new URLSearchParams(searchParams.toString());
 
         if (nextFilter === "artist") {
@@ -84,6 +99,11 @@ export default function AuthorsPage() {
         } else {
             params.delete("participant");
         }
+
+        params.delete("art_subcategory");
+        selectedIds.forEach((id) => {
+            params.append("art_subcategory", id);
+        });
 
         const search = params.toString();
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
@@ -99,10 +119,17 @@ export default function AuthorsPage() {
         activeData = [...artistsData, ...teamsData];
     }
 
+    const filteredDataByCategory = selectedArtCategoryIds.length
+        ? activeData.filter(
+            (participant): participant is ArtistData =>
+                "artCategory" in participant && selectedArtCategoryIds.includes(participant.artCategory)
+        )
+        : activeData;
+
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
 
     const filteredData = normalizedSearchQuery
-        ? activeData.filter((participant) => {
+        ? filteredDataByCategory.filter((participant) => {
             const nameMatch = participant.artistName.toLowerCase().includes(normalizedSearchQuery);
             const typeMatch = participant.artistType.toLowerCase().includes(normalizedSearchQuery);
             const tagsMatch = participant.tags.some((tag) =>
@@ -111,7 +138,7 @@ export default function AuthorsPage() {
 
             return nameMatch || typeMatch || tagsMatch;
         })
-        : activeData;
+        : filteredDataByCategory;
 
     const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;

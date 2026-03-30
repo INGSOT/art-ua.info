@@ -7,15 +7,26 @@ import type { News } from "../../data/newsData";
 
 interface ListOfNewsProps {
   news: News[];
+  disableHover?: boolean;
 }
 
-export default function ListOfNews({ news }: ListOfNewsProps) {
+export default function ListOfNews({ news, disableHover = false }: ListOfNewsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {news.map((newsItem) => (
-        <Link href="/news_events/article" key={newsItem.id}>
+        <Link
+          href="/news_events/article"
+          key={newsItem.id}
+          onClick={(event) => {
+            if (disableHover) {
+              event.preventDefault();
+            }
+          }}
+          aria-disabled={disableHover}
+          tabIndex={disableHover ? -1 : undefined}
+        >
           <Card
-            className="bg-transparent border-0 outline-none shadow-none rounded-none cursor-pointer group"
+            className={`bg-transparent border-0 outline-none shadow-none rounded-none ${disableHover ? "cursor-default" : "cursor-pointer group"}`}
           >
             <CardContent className="p-0 flex flex-col gap-2 md:gap-3">
               {/* News image - square aspect ratio */}
@@ -27,10 +38,10 @@ export default function ListOfNews({ news }: ListOfNewsProps) {
                   className="object-cover"
                 />
                 {/* Darkening overlay on hover */}
-                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
+                <div className={`absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ${disableHover ? "" : "group-hover:opacity-50"}`}></div>
                 
                 {/* Centered arrow on hover */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                <div className={`absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 z-10 ${disableHover ? "" : "group-hover:opacity-100"}`}>
                   <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
                 </div>
               </div>
