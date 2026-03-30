@@ -3,22 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
-import { newsData } from "../../data/newsData";
+import type { News } from "../../data/newsData";
 
 interface ListOfNewsProps {
-  currentPage: number;
-  itemsPerPage: number;
+  news: News[];
 }
 
-export default function ListOfNews({ currentPage, itemsPerPage }: ListOfNewsProps) {
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentNews = newsData.slice(startIndex, endIndex);
-
+export default function ListOfNews({ news }: ListOfNewsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-      {currentNews.map((news) => (
-        <Link href="/news_events/article" key={news.id}>
+      {news.map((newsItem) => (
+        <Link href="/news_events/article" key={newsItem.id}>
           <Card
             className="bg-transparent border-0 outline-none shadow-none rounded-none cursor-pointer group"
           >
@@ -26,8 +21,8 @@ export default function ListOfNews({ currentPage, itemsPerPage }: ListOfNewsProp
               {/* News image - square aspect ratio */}
               <div className="relative w-full aspect-square bg-cover bg-center overflow-hidden">
                 <Image
-                  src={news.image}
-                  alt={news.title}
+                  src={newsItem.image}
+                  alt={newsItem.title}
                   fill
                   className="object-cover"
                 />
@@ -41,12 +36,12 @@ export default function ListOfNews({ currentPage, itemsPerPage }: ListOfNewsProp
               </div>
               {/* Category and Date */}
               <div className="flex items-center justify-between text-xs md:text-sm">
-                <span className="font-wix text-white">Новини</span>
-                <span className="font-wix text-white">{news.date}</span>
+                <span className="font-wix text-white">{newsItem.category}</span>
+                <span className="font-wix text-white">{newsItem.date}</span>
               </div>
               {/* News title */}
               <h3 className="font-h6 font-bold text-white text-lg md:text-xl lg:text-2xl tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
-                {news.title}
+                {newsItem.title}
               </h3>
             </CardContent>
           </Card>

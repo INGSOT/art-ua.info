@@ -5,14 +5,15 @@ import {
   AccordionTrigger,
 } from "../../components/ui/accordion";
 import { Button } from "../../components/ui/button";
-import { faqData } from "../../data/mainData";
+import Link from "next/link";
+import { faqData } from "../../data/faqData";
 
 export default function FAQ() {
   return (
     <section className="flex flex-col items-center gap-[30px] px-4 py-10 md:py-20 w-full bg-[#414141] border-b border-solid border-[#343434]">
       <div className="w-full max-w-[1440px] flex flex-col gap-[30px]">
         <h4 className="self-start max-w-[600px] font-h4 font-bold text-white text-left text-[24px] md:text-[32px] lg:text-[40px] tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] [font-style:var(--h4-font-style)">
-          {faqData.title}
+          Часті питання
         </h4>
 
         <Accordion
@@ -21,7 +22,7 @@ export default function FAQ() {
           defaultValue="item-1"
           className="w-full flex flex-col bg-[#343434]"
         >
-        {faqData.questions.map((faq) => (
+        {faqData.slice(0, 6).map((faq) => (
           <AccordionItem key={faq.id} value={faq.id} className="border-none">
             <div className="flex flex-col w-full bg-[#343434] border border-solid border-[#272727]">
               <div className="flex items-stretch w-full border-b border-[#272727]">
@@ -66,10 +67,11 @@ export default function FAQ() {
       </div>
 
       <Button
+        asChild
         variant="ghost"
         className="w-[300px] h-[60px] p-3 bg-[#FFFCF5] hover:bg-[#FECC39] rounded-none font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)]"
       >
-        {faqData.buttonText}
+        <Link href="/faq">Усі питання</Link>
       </Button>
     </section>
   );

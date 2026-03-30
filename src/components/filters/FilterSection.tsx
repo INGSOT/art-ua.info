@@ -49,7 +49,7 @@ export default function FilterSection({ filters, onFilterChange, initialSelected
     };
 
     return (
-        <div className="hidden lg:flex lg:w-[360px] bg-[#414141] flex-col gap-4 px-2 pb-4">
+        <div className="hidden lg:flex lg:w-[316px] bg-[#414141] flex-col gap-4 px-2 pb-4">
             {filters.map((section) => (
                 <div key={section.id}>
                     {/* Section Header */}

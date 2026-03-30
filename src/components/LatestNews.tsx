@@ -1,24 +1,27 @@
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
-import { latestNewsData } from "../data/latestNewsData";
+import { newsData } from "../data/newsData";
+import Link from "next/link";
 
 export default function LatestNews() {
+  const latestThreeNews = newsData.slice(0, 3);
+
   return (
     <section className="flex flex-col items-center gap-[30px] px-4 py-10 md:py-20 w-full bg-white">
       <div className="flex flex-col w-full max-w-[1440px] items-start gap-2.5">
         <p className="self-stretch mt-[-1.00px] font-p1 font-[number:var(--p1-font-weight)] text-[#FECC39] text-[length:var(--p1-font-size)] tracking-[var(--p1-letter-spacing)] leading-[var(--p1-line-height)] [font-style:var(--p1-font-style)]">
-          {latestNewsData.tagline}
+           Новини та події
         </p>
 
         <h4 className="self-stretch font-h4 font-bold text-black text-[24px] md:text-[32px] lg:text-[40px] tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] [font-style:var(--h4-font-style)] max-w-[600px] lg:whitespace-nowrap">
-          {latestNewsData.title}
+         Актуальні новини та події у спільноті
         </h4>
       </div>
 
       <div className="flex flex-wrap items-start justify-center md:justify-start lg:justify-center gap-6 md:gap-[30px] lg:gap-[60px] w-full max-w-[1440px]">
-        {latestNewsData.newsItems.map((item, index) => (
+        {latestThreeNews.map((item) => (
           <Card
-            key={index}
+            key={item.id}
             className="flex flex-col w-full md:w-[calc(50%-15px)] lg:max-w-[440px] items-start gap-2.5 border-0 shadow-none"
           >
             <CardContent className="flex flex-col w-full items-start gap-2.5 p-0">
@@ -62,8 +65,11 @@ export default function LatestNews() {
         </button>
 
         <div className="flex-1 flex justify-center">
-          <Button className="w-[300px] h-[60px] bg-[#343434] hover:bg-[#FECC39] text-[#FECC39] hover:text-[#343434] font-button font-bold text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none transition-colors">
-            {latestNewsData.buttonText}
+          <Button
+            asChild
+            className="w-[300px] h-[60px] bg-[#343434] hover:bg-[#FECC39] text-[#FECC39] hover:text-[#343434] font-button font-bold text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none transition-colors"
+          >
+            <Link href="/news_events">Більше новин</Link>
           </Button>
         </div>
 

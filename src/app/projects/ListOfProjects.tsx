@@ -2,21 +2,25 @@
 
 import Image from "next/image";
 import { Card, CardContent } from "../../components/ui/card";
-import { projectsData } from "../../data/projectsData";
+import { Project } from "../../data/projectsData";
 
 interface ListOfProjectsProps {
-  currentPage: number;
-  itemsPerPage: number;
+  projects: Project[];
 }
 
-export default function ListOfProjects({ currentPage, itemsPerPage }: ListOfProjectsProps) {
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProjects = projectsData.slice(startIndex, endIndex);
+export default function ListOfProjects({ projects }: ListOfProjectsProps) {
+  if (projects.length === 0) {
+    return (
+      <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
+        <p className="font-wix text-white text-lg md:text-2xl">Проєктів не знайдено</p>
+        <Image src="/masks.svg" alt="Проєктів не знайдено" width={380} height={285} priority />
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-      {currentProjects.map((project) => (
+      {projects.map((project) => (
         <Card
           key={project.id}
           className="bg-transparent border-0 outline-none shadow-none rounded-none group cursor-pointer"

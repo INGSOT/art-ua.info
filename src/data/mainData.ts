@@ -66,47 +66,6 @@ export const featuredWorksData = {
   ],
 };
 
-// Image Catalog Data
-export const imageCatalogData = {
-  tagline: "Каталоги",
-  title: "Каталоги",
-  buttonText: "Усі каталоги",
-  catalogs: [
-    {
-      id: 1,
-      title: "Назва каталогу",
-      image: "/gallery/mountain_landscape.png",
-      artistPhoto: "/artists/artist-photo-3.png",
-      artistName: "Вадим Ігнатенко",
-      count: null,
-    },
-    {
-      id: 2,
-      title: "Дуже довга Назва каталогу на декілька дуже довгих слів",
-      image: "/gallery/turquoise-blue_painting.png",
-      artistPhoto: "/artists/artist-photo-3.png",
-      artistName: "Вадим Ігнатенко",
-      count: 17,
-    },
-    {
-      id: 3,
-      title: "Назва каталогу",
-      image: "/gallery/autumn.png",
-      artistPhoto: "/artists/artist-photo-3.png",
-      artistName: "Вадим Ігнатенко",
-      count: 17,
-    },
-    {
-      id: 4,
-      title: "Дуже довга Назва каталогу на декілька слів",
-      image: "/gallery/samurai.png",
-      artistPhoto: "/artists/artist-photo-3.png",
-      artistName: "Вадим Ігнатенко",
-      count: 17,
-    },
-  ],
-};
-
 // Support Artists Data
 export const supportArtistsData = {
   title: "Підтримати митців",
@@ -119,79 +78,7 @@ export const joinCommunityData = {
   title1: "Приєднуйся вже зараз",
   title2: "та стань учасником арт-спільноти",
   joinText: "Приєднуйтесь\nзараз",
-  artists: [
-    {
-      photo: "/artists/artist-photo-1.png",
-      name: "Вадим\nІгнатенко",
-    },
-    {
-      photo: "/artists/artist-photo-2.png",
-      name: "Вадим\nІгнатенко",
-    },
-    {
-      photo: "/artists/artist-photo-3.png",
-      name: "Вадим\nІгнатенко",
-    },
-    {
-      photo: "/artists/artist-photo-4.png",
-      name: "Вадим\nІгнатенко",
-    },
-  ],
 };
-
-// FAQ Data
-export const faqData = {
-  title: "Часті питання",
-  buttonText: "Усі питання",
-  questions: [
-    {
-      id: "item-1",
-      question: "Текст питання",
-      answer: [
-        "Текст відповіді Р1.",
-        "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
-      ],
-      isOpen: true,
-    },
-    {
-      id: "item-2",
-      question: "Текст питання",
-      answer: [
-        "Текст відповіді Р1.",
-        "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
-      ],
-      isOpen: false,
-    },
-    {
-      id: "item-3",
-      question: "Текст питання",
-      answer: [
-        "Текст відповіді Р1.",
-        "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
-      ],
-      isOpen: false,
-    },
-    {
-      id: "item-4",
-      question: "Текст питання",
-      answer: [
-        "Текст відповіді Р1.",
-        "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
-      ],
-      isOpen: false,
-    },
-    {
-      id: "item-5",
-      question: "Текст питання",
-      answer: [
-        "Текст відповіді Р1.",
-        "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
-      ],
-      isOpen: false,
-    },
-  ],
-};
-
 // Partners Data
 export const partnersData = {
   title: "Партнери",

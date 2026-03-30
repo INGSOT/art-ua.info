@@ -45,7 +45,7 @@ export default function ServicesFilterSection() {
     ];
 
     return (
-        <div className="hidden lg:flex lg:w-[360px] bg-[#414141] flex-col gap-4 px-2 pb-4">
+        <div className="hidden lg:flex lg:w-[316px] bg-[#414141] flex-col gap-4 px-2 pb-4">
             {/* Regular filters */}
             {servicesFilters.map((section: FilterSectionType) => (
                 <div key={section.id}>

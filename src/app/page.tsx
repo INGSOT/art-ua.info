@@ -11,7 +11,11 @@ import FAQ from "./main/FAQ";
 import Partners from "./main/Partners";
 import JoinCommunityWrapper from "../components/JoinCommunityWrapper";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
+  const seed = Date.now();
+
   return (
     <>
     <HeroBanner />
@@ -19,7 +23,7 @@ export default function Home() {
     <PlatformDescription />
     <PlatformFeatures />
     <FeaturedWorks />
-    <ImageCatalog />
+    <ImageCatalog seed={seed} />
     <SupportArtists />
     <JoinCommunity />
     <LatestNews />

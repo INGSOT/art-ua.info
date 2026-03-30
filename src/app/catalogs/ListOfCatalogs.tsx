@@ -2,21 +2,16 @@
 
 import Image from "next/image";
 import { Card, CardContent } from "../../components/ui/card";
-import { catalogsData } from "../../data/catalogsData";
+import type { Catalog } from "../../data/catalogsData";
 
 interface ListOfCatalogsProps {
-  currentPage: number;
-  itemsPerPage: number;
+  catalogs: Catalog[];
 }
 
-export default function ListOfCatalogs({ currentPage, itemsPerPage }: ListOfCatalogsProps) {
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentCatalogs = catalogsData.slice(startIndex, endIndex);
-
+export default function ListOfCatalogs({ catalogs }: ListOfCatalogsProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-      {currentCatalogs.map((catalog) => (
+      {catalogs.map((catalog) => (
         <Card
           key={catalog.id}
           className="bg-transparent border-0 outline-none shadow-none rounded-none group cursor-pointer"
