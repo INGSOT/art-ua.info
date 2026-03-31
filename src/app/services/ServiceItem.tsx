@@ -21,7 +21,7 @@ export default function ServiceItem({ service }: ServiceItemProps) {
     };
 
     return (
-        <div className="bg-[#343434] flex flex-col lg:flex-row relative">
+        <div className="bg-[#343434] flex flex-col lg:flex-row relative w-full max-w-[1100px]">
             {/* Left side - Avatar, Image and Content */}
             <div className="flex flex-col lg:flex-row flex-1">
                 {/* Avatar and Image */}

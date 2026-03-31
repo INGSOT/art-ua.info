@@ -14,6 +14,8 @@ interface ServicesFilterSectionProps {
     initialMinPrice?: number;
     initialMaxPrice?: number;
     onPriceApply?: (minPrice: number, maxPrice: number) => void;
+    initialLocationSearch?: string;
+    onLocationSearch?: (location: string) => void;
 }
 
 export default function ServicesFilterSection({
@@ -24,6 +26,8 @@ export default function ServicesFilterSection({
     initialMinPrice = 0,
     initialMaxPrice = 1000000,
     onPriceApply,
+    initialLocationSearch = '',
+    onLocationSearch,
 }: ServicesFilterSectionProps) {
     const MAX_PRICE = 1000000;
     // Initialize expanded sections
@@ -48,7 +52,10 @@ export default function ServicesFilterSection({
     const [maxPrice, setMaxPrice] = useState(normalizedInitialMaxPrice);
     const [minPriceInput, setMinPriceInput] = useState(String(normalizedInitialMinPrice));
     const [maxPriceInput, setMaxPriceInput] = useState(String(normalizedInitialMaxPrice));
-    const [locationSearch, setLocationSearch] = useState('');
+    const [locationSearch, setLocationSearch] = useState(initialLocationSearch);
+    const performerItemIds = new Set(
+        servicesFilters.find((section) => section.id === 'performer')?.items?.map((item) => item.id) ?? []
+    );
 
     useEffect(() => {
         const nextMin = Math.max(0, Math.min(initialMinPrice, MAX_PRICE));
@@ -65,6 +72,10 @@ export default function ServicesFilterSection({
         setMaxPriceInput(String(maxPrice));
     }, [maxPrice]);
 
+    useEffect(() => {
+        setLocationSearch(initialLocationSearch);
+    }, [initialLocationSearch]);
+
     const toggleSection = (sectionId: string) => {
         setExpandedSections(prev => ({
             ...prev,
@@ -73,8 +84,12 @@ export default function ServicesFilterSection({
     };
 
     const toggleFilter = (filterId: string) => {
+        const isPerformerFilter = performerItemIds.has(filterId);
         const newFilters = {
             ...selectedFilters,
+            ...(isPerformerFilter
+                ? Object.fromEntries(Array.from(performerItemIds).map((id) => [id, false]))
+                : {}),
             [filterId]: !selectedFilters[filterId]
         };
         setSelectedFilters(newFilters);
@@ -91,6 +106,10 @@ export default function ServicesFilterSection({
         setMinPrice(nextMin);
         setMaxPrice(nextMax);
         onPriceApply?.(nextMin, nextMax);
+    };
+
+    const applyLocationSearch = () => {
+        onLocationSearch?.(locationSearch);
     };
 
     const currencies = [
@@ -376,16 +395,26 @@ export default function ServicesFilterSection({
                                 placeholder="Пошук"
                                 value={locationSearch}
                                 onChange={(e) => setLocationSearch(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        applyLocationSearch();
+                                    }
+                                }}
                                 className="font-wix w-full h-full bg-[#343434] text-white placeholder-gray-400 px-4 pr-12 rounded-none"
                             />
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <button
+                                type="button"
+                                onClick={applyLocationSearch}
+                                className="absolute right-4 top-1/2 -translate-y-1/2"
+                                aria-label="Search by location"
+                            >
                                 <Image
                                     src="/search.svg"
                                     alt="Search"
                                     width={20}
                                     height={20}
                                 />
-                            </div>
+                            </button>
                         </div>
                     </div>
                 )}
