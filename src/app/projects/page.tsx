@@ -53,7 +53,7 @@ export default function ProjectsPage() {
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
 
     const filteredProjectsByCategory = selectedArtCategoryIds.length
-        ? projectsData.filter((project) => selectedArtCategoryIds.includes(project.artCategory))
+        ? projectsData.filter((project) => selectedArtCategoryIds.includes(project.artSubCategory))
         : projectsData;
 
     const filteredProjects = normalizedSearchQuery

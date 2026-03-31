@@ -51,6 +51,7 @@ input[type="range"].range-slider {
   appearance: none;
   background: transparent;
   cursor: pointer;
+  pointer-events: none;
 }
 
 input[type="range"].range-slider::-webkit-slider-thumb {
@@ -61,6 +62,7 @@ input[type="range"].range-slider::-webkit-slider-thumb {
   background: transparent;
   cursor: pointer;
   border: none;
+  pointer-events: auto;
 }
 
 input[type="range"].range-slider::-moz-range-thumb {
@@ -69,6 +71,7 @@ input[type="range"].range-slider::-moz-range-thumb {
   background: transparent;
   cursor: pointer;
   border: none;
+  pointer-events: auto;
 }
 
 /* Text input and textarea focus styles - yellow left border */

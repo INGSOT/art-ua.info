@@ -60,9 +60,9 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         </div>
 
         <div className="h-full flex flex-col items-center justify-center">
-          <div className="mb-6 font-bold text-white text-[18px] font-[family-name:var(--font-unbounded)] text-center">
+          {/* <div className="mb-6 font-bold text-white text-[18px] font-[family-name:var(--font-unbounded)] text-center">
             Шукайте митців та їх проекти
-          </div>
+          </div> */}
 
           <div className="w-full">
             <SearchSection

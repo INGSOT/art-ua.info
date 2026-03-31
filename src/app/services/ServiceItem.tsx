@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { ServiceItemData } from '../../data/servicesData';
+import { CurrencyCode, ServiceItemData } from '../../data/servicesData';
 
 interface ServiceItemProps {
     service: ServiceItemData;
@@ -10,6 +10,15 @@ interface ServiceItemProps {
 
 export default function ServiceItem({ service }: ServiceItemProps) {
     const [isHovered, setIsHovered] = useState(false);
+    const formattedPrice =
+        typeof service.price === 'number'
+            ? service.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+            : '';
+    const currencyIconByCode: Record<CurrencyCode, string> = {
+        UAH: '/hryvnia.svg',
+        USD: '/dollar.svg',
+        EUR: '/euro.svg',
+    };
 
     return (
         <div className="bg-[#343434] flex flex-col lg:flex-row relative">
@@ -59,7 +68,22 @@ export default function ServiceItem({ service }: ServiceItemProps) {
                     {/* Price and Square button */}
                     <div className="flex items-center gap-3 w-full">
                         <button className="bg-[#FECC39] hover:bg-white text-black font-bold px-6 py-3 transition-colors">
-                            {service.priceNegotiable ? 'Ціна договірна' : `${service.price} грн`}
+                            {service.priceNegotiable ? (
+                                'Ціна договірна'
+                            ) : (
+                                <span className="flex items-center gap-2">
+                                    <span>{formattedPrice}</span>
+                                    {service.currency && (
+                                        <Image
+                                            src={currencyIconByCode[service.currency]}
+                                            alt={service.currency}
+                                            width={28}
+                                            height={28}
+                                            className="-ml-3"
+                                        />
+                                    )}
+                                </span>
+                            )}
                         </button>
 
                         <button

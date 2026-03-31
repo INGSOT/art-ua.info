@@ -72,7 +72,7 @@ export default function CatalogsPage() {
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
 
     const filteredCatalogsByCategory = selectedArtCategoryIds.length
-        ? catalogsData.filter((catalog) => selectedArtCategoryIds.includes(catalog.artCategory))
+        ? catalogsData.filter((catalog) => selectedArtCategoryIds.includes(catalog.artSubCategory))
         : catalogsData;
 
     const filteredCatalogs = normalizedSearchQuery

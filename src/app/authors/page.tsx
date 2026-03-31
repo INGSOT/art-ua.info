@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Header from "../../components/Header";
@@ -122,7 +123,7 @@ export default function AuthorsPage() {
     const filteredDataByCategory = selectedArtCategoryIds.length
         ? activeData.filter(
             (participant): participant is ArtistData =>
-                "artCategory" in participant && selectedArtCategoryIds.includes(participant.artCategory)
+                "artSubCategory" in participant && selectedArtCategoryIds.includes(participant.artSubCategory)
         )
         : activeData;
 
@@ -224,27 +225,34 @@ export default function AuthorsPage() {
                         </div>
                         <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-8 min-w-0">
                             <SortingControls />
-                            {currentParticipants.map((participant) => (
-                                <Participant
-                                    key={participant.id}
-                                    artistPhoto={participant.artistPhoto}
-                                    artistName={participant.artistName}
-                                    artistType={participant.artistType}
-                                    tags={participant.tags}
-                                    photos={participant.photos}
-                                    catalogButtonText={
-                                        "catalogButtonText" in participant && !("teamMembers" in participant)
-                                            ? participant.catalogButtonText
-                                            : ""
-                                    }
-                                    isTeam={"teamMembers" in participant}
-                                    memberAvatars={
-                                        "teamMembers" in participant
-                                            ? (participant as TeamData).teamMembers
-                                            : undefined
-                                    }
-                                />
-                            ))}
+                            {filteredData.length === 0 ? (
+                                <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
+                                    <p className="font-wix text-white text-lg md:text-2xl">Авторів не знайдено</p>
+                                    <Image src="/masks.svg" alt="Авторів не знайдено" width={380} height={285} priority />
+                                </div>
+                            ) : (
+                                currentParticipants.map((participant) => (
+                                    <Participant
+                                        key={participant.id}
+                                        artistPhoto={participant.artistPhoto}
+                                        artistName={participant.artistName}
+                                        artistType={participant.artistType}
+                                        tags={participant.tags}
+                                        photos={participant.photos}
+                                        catalogButtonText={
+                                            "catalogButtonText" in participant && !("teamMembers" in participant)
+                                                ? participant.catalogButtonText
+                                                : ""
+                                        }
+                                        isTeam={"teamMembers" in participant}
+                                        memberAvatars={
+                                            "teamMembers" in participant
+                                                ? (participant as TeamData).teamMembers
+                                                : undefined
+                                        }
+                                    />
+                                ))
+                            )}
                         </div>
                     </div>
                     <PaginationSection

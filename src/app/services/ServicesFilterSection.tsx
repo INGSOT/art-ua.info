@@ -1,11 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { servicesFilters } from '../../components/filters/filterConfig';
 import { FilterSection as FilterSectionType, FilterItem } from '../../components/filters/filterConfig';
+import { CurrencyCode } from '../../data/servicesData';
 
-export default function ServicesFilterSection() {
+interface ServicesFilterSectionProps {
+    onFilterChange?: (filters: Record<string, boolean>) => void;
+    initialSelectedFilters?: Record<string, boolean>;
+    selectedCurrency?: CurrencyCode | null;
+    onCurrencyChange?: (currency: CurrencyCode | null) => void;
+    initialMinPrice?: number;
+    initialMaxPrice?: number;
+    onPriceApply?: (minPrice: number, maxPrice: number) => void;
+}
+
+export default function ServicesFilterSection({
+    onFilterChange,
+    initialSelectedFilters = {},
+    selectedCurrency = null,
+    onCurrencyChange,
+    initialMinPrice = 0,
+    initialMaxPrice = 1000000,
+    onPriceApply,
+}: ServicesFilterSectionProps) {
+    const MAX_PRICE = 1000000;
     // Initialize expanded sections
     const initialExpandedSections = servicesFilters.reduce((acc: Record<string, boolean>, section: FilterSectionType) => {
         acc[section.id] = true;
@@ -17,11 +37,33 @@ export default function ServicesFilterSection() {
     initialExpandedSections['location'] = true;
 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(initialExpandedSections);
-    const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean>>({});
-    const [selectedCurrency, setSelectedCurrency] = useState<'hryvnia' | 'dollar' | 'euro' | null>(null);
-    const [minPrice, setMinPrice] = useState(0);
-    const [maxPrice, setMaxPrice] = useState(1000000);
+    const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean>>(initialSelectedFilters);
+    const normalizedInitialMinPrice = Math.max(0, Math.min(initialMinPrice, MAX_PRICE));
+    const normalizedInitialMaxPrice = Math.max(
+        normalizedInitialMinPrice,
+        Math.min(initialMaxPrice, MAX_PRICE)
+    );
+
+    const [minPrice, setMinPrice] = useState(normalizedInitialMinPrice);
+    const [maxPrice, setMaxPrice] = useState(normalizedInitialMaxPrice);
+    const [minPriceInput, setMinPriceInput] = useState(String(normalizedInitialMinPrice));
+    const [maxPriceInput, setMaxPriceInput] = useState(String(normalizedInitialMaxPrice));
     const [locationSearch, setLocationSearch] = useState('');
+
+    useEffect(() => {
+        const nextMin = Math.max(0, Math.min(initialMinPrice, MAX_PRICE));
+        const nextMax = Math.max(nextMin, Math.min(initialMaxPrice, MAX_PRICE));
+        setMinPrice(nextMin);
+        setMaxPrice(nextMax);
+    }, [initialMinPrice, initialMaxPrice]);
+
+    useEffect(() => {
+        setMinPriceInput(String(minPrice));
+    }, [minPrice]);
+
+    useEffect(() => {
+        setMaxPriceInput(String(maxPrice));
+    }, [maxPrice]);
 
     const toggleSection = (sectionId: string) => {
         setExpandedSections(prev => ({
@@ -36,12 +78,25 @@ export default function ServicesFilterSection() {
             [filterId]: !selectedFilters[filterId]
         };
         setSelectedFilters(newFilters);
+        onFilterChange?.(newFilters);
+    };
+
+    const normalizeAndApplyPrice = () => {
+        const parsedMin = minPriceInput === '' ? 0 : parseInt(minPriceInput, 10);
+        const parsedMax = maxPriceInput === '' ? minPrice : parseInt(maxPriceInput, 10);
+
+        const nextMin = Math.max(0, Math.min(parsedMin, MAX_PRICE));
+        const nextMax = Math.max(nextMin, Math.min(parsedMax, MAX_PRICE));
+
+        setMinPrice(nextMin);
+        setMaxPrice(nextMax);
+        onPriceApply?.(nextMin, nextMax);
     };
 
     const currencies = [
-        { id: 'hryvnia', icon: '/hryvnia.svg' },
-        { id: 'dollar', icon: '/dollar.svg' },
-        { id: 'euro', icon: '/euro.svg' },
+        { id: 'UAH' as CurrencyCode, defaultIcon: '/yellow_hryvnia.svg', activeIcon: '/hryvnia.svg', defaultIconWidth: 26, defaultIconHeight: 24 },
+        { id: 'USD' as CurrencyCode, defaultIcon: '/yellow_dollar.svg', activeIcon: '/dollar.svg', defaultIconWidth: 22, defaultIconHeight: 28 },
+        { id: 'EUR' as CurrencyCode, defaultIcon: '/yellow_euro.svg', activeIcon: '/euro.svg', defaultIconWidth: 23, defaultIconHeight: 24 },
     ];
 
     return (
@@ -119,13 +174,16 @@ export default function ServicesFilterSection() {
                             {currencies.map((currency) => (
                                 <CurrencyButton
                                     key={currency.id}
-                                    icon={currency.icon}
+                                    defaultIcon={currency.defaultIcon}
+                                    activeIcon={currency.activeIcon}
+                                    defaultIconWidth={currency.defaultIconWidth}
+                                    defaultIconHeight={currency.defaultIconHeight}
                                     isSelected={selectedCurrency === currency.id}
                                     onClick={() => {
                                         if (selectedCurrency === currency.id) {
-                                            setSelectedCurrency(null);
+                                            onCurrencyChange?.(null);
                                         } else {
-                                            setSelectedCurrency(currency.id as any);
+                                            onCurrencyChange?.(currency.id);
                                         }
                                     }}
                                 />
@@ -138,11 +196,28 @@ export default function ServicesFilterSection() {
                                 <label className="font-wix text-white text-sm mb-1 block">Від</label>
                                 <input
                                     type="text"
-                                    value={minPrice.toLocaleString()}
+                                    value={minPriceInput}
                                     onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, '');
-                                        const num = value ? parseInt(value) : 0;
-                                        setMinPrice(Math.min(num, maxPrice));
+                                        const rawValue = e.target.value.replace(/\D/g, '');
+                                        setMinPriceInput(rawValue);
+
+                                        if (rawValue === '') {
+                                            return;
+                                        }
+
+                                        const num = parseInt(rawValue, 10);
+                                        const clamped = Math.min(num, MAX_PRICE);
+                                        setMinPrice(Math.min(clamped, maxPrice));
+                                    }}
+                                    onBlur={() => {
+                                        if (minPriceInput === '') {
+                                            setMinPrice(0);
+                                            return;
+                                        }
+
+                                        const num = parseInt(minPriceInput, 10);
+                                        const clamped = Math.min(num, MAX_PRICE);
+                                        setMinPrice(Math.min(clamped, maxPrice));
                                     }}
                                     className="font-wix w-full h-10 bg-[#343434] text-white px-3"
                                 />
@@ -151,11 +226,28 @@ export default function ServicesFilterSection() {
                                 <label className="font-wix text-white text-sm mb-1 block">До</label>
                                 <input
                                     type="text"
-                                    value={maxPrice.toLocaleString()}
+                                    value={maxPriceInput}
                                     onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, '');
-                                        const num = value ? parseInt(value) : 0;
-                                        setMaxPrice(Math.max(num, minPrice));
+                                        const rawValue = e.target.value.replace(/\D/g, '');
+                                        setMaxPriceInput(rawValue);
+
+                                        if (rawValue === '') {
+                                            return;
+                                        }
+
+                                        const num = parseInt(rawValue, 10);
+                                        const clamped = Math.min(num, MAX_PRICE);
+                                        setMaxPrice(Math.max(clamped, minPrice));
+                                    }}
+                                    onBlur={() => {
+                                        if (maxPriceInput === '') {
+                                            setMaxPrice(minPrice);
+                                            return;
+                                        }
+
+                                        const num = parseInt(maxPriceInput, 10);
+                                        const clamped = Math.min(num, MAX_PRICE);
+                                        setMaxPrice(Math.max(clamped, minPrice));
                                     }}
                                     className="font-wix w-full h-10 bg-[#343434] text-white px-3"
                                 />
@@ -172,8 +264,8 @@ export default function ServicesFilterSection() {
                                 <div 
                                     className="absolute top-1/2 -translate-y-1/2 h-2 bg-[#FECC39] rounded-full pointer-events-none"
                                     style={{
-                                        left: `${(minPrice / 1000000) * 100}%`,
-                                        right: `${100 - (maxPrice / 1000000) * 100}%`
+                                        left: `${(minPrice / MAX_PRICE) * 100}%`,
+                                        right: `${100 - (maxPrice / MAX_PRICE) * 100}%`
                                     }}
                                 />
                                 
@@ -181,18 +273,20 @@ export default function ServicesFilterSection() {
                                 <input
                                     type="range"
                                     min="0"
-                                    max="1000000"
+                                    max={MAX_PRICE}
                                     value={minPrice}
                                     onChange={(e) => {
-                                        const value = Number(e.target.value);
+                                        const value = Math.min(Number(e.target.value), MAX_PRICE);
                                         if (value <= maxPrice) {
                                             setMinPrice(value);
                                         }
                                     }}
                                     className="absolute w-full h-full opacity-0 cursor-pointer range-slider"
                                     style={{ 
-                                        zIndex: minPrice > (maxPrice - 50000) ? 5 : 3,
-                                        pointerEvents: 'auto'
+                                        zIndex: 4,
+                                        // Чуть уменьшаем активную область слева справа,
+                                        // чтобы при max = MAX_PRICE правый ползунок всегда был доступен
+                                        clipPath: `inset(0 ${Math.max(0, 105 - (maxPrice / MAX_PRICE) * 100)}% 0 0)`
                                     }}
                                 />
                                 
@@ -200,18 +294,18 @@ export default function ServicesFilterSection() {
                                 <input
                                     type="range"
                                     min="0"
-                                    max="1000000"
+                                    max={MAX_PRICE}
                                     value={maxPrice}
                                     onChange={(e) => {
-                                        const value = Number(e.target.value);
+                                        const value = Math.min(Number(e.target.value), MAX_PRICE);
                                         if (value >= minPrice) {
                                             setMaxPrice(value);
                                         }
                                     }}
                                     className="absolute w-full h-full opacity-0 cursor-pointer range-slider"
                                     style={{ 
-                                        zIndex: maxPrice < (minPrice + 50000) ? 5 : 4,
-                                        pointerEvents: 'auto'
+                                        zIndex: 3,
+                                        clipPath: `inset(0 0 0 ${(minPrice / MAX_PRICE) * 100}%)`
                                     }}
                                 />
                                 
@@ -219,7 +313,7 @@ export default function ServicesFilterSection() {
                                 <div 
                                     className="absolute w-6 h-6 bg-[#FECC39] flex items-center justify-center pointer-events-none"
                                     style={{ 
-                                        left: `${(minPrice / 1000000) * 100}%`, 
+                                        left: `${(minPrice / MAX_PRICE) * 100}%`, 
                                         top: '50%',
                                         transform: 'translate(-50%, -50%)',
                                         zIndex: 5
@@ -232,7 +326,7 @@ export default function ServicesFilterSection() {
                                 <div 
                                     className="absolute w-6 h-6 bg-[#FECC39] flex items-center justify-center pointer-events-none"
                                     style={{ 
-                                        left: `${(maxPrice / 1000000) * 100}%`, 
+                                        left: `${(maxPrice / MAX_PRICE) * 100}%`, 
                                         top: '50%',
                                         transform: 'translate(-50%, -50%)',
                                         zIndex: 5
@@ -241,7 +335,10 @@ export default function ServicesFilterSection() {
                                     <div className="w-2 h-2 bg-[#272727]" />
                                 </div>
                             </div>
-                            <button className="w-10 h-10 bg-[#FECC39] flex items-center justify-center hover:bg-white transition-colors">
+                            <button
+                                onClick={normalizeAndApplyPrice}
+                                className="w-10 h-10 bg-[#FECC39] flex items-center justify-center hover:bg-white transition-colors"
+                            >
                                 <Image
                                     src="/grey_check.svg"
                                     alt="Apply"
@@ -298,12 +395,16 @@ export default function ServicesFilterSection() {
 }
 
 // Currency Button Component
-function CurrencyButton({ icon, isSelected, onClick }: {
-    icon: string;
+function CurrencyButton({ defaultIcon, activeIcon, defaultIconWidth, defaultIconHeight, isSelected, onClick }: {
+    defaultIcon: string;
+    activeIcon: string;
+    defaultIconWidth: number;
+    defaultIconHeight: number;
     isSelected: boolean;
     onClick: () => void;
 }) {
     const [isHovered, setIsHovered] = useState(false);
+    const showActiveIcon = isSelected || isHovered;
 
     return (
         <button
@@ -315,13 +416,10 @@ function CurrencyButton({ icon, isSelected, onClick }: {
             }`}
         >
             <Image
-                src={icon}
+                src={showActiveIcon ? activeIcon : defaultIcon}
                 alt="Currency"
-                width={48}
-                height={48}
-                className={`transition-all ${
-                    isSelected || isHovered ? 'brightness-0' : 'brightness-100'
-                }`}
+                width={showActiveIcon ? 48 : defaultIconWidth}
+                height={showActiveIcon ? 48 : defaultIconHeight}
             />
         </button>
     );

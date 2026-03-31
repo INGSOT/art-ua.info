@@ -8,7 +8,7 @@ export interface ArtistData {
   artistPhoto: string;
   artistName: string;
   artistType: string;
-  artCategory: string;
+  artSubCategory: string;
   tags: string[];
   photos: PhotoData[];
   catalogButtonText: string;
@@ -30,7 +30,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Олена Кравець",
     artistType: "Режисер",
-    artCategory: "directing",
+    artSubCategory: "directing",
     tags: ["Режисура", "Постановка", "Театр", "Сцена"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -46,7 +46,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Максим Шевченко",
     artistType: "Актор",
-    artCategory: "acting",
+    artSubCategory: "acting",
     tags: ["Акторське мистецтво", "Сцена", "Театр", "Перформанс"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -62,7 +62,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Ірина Мельник",
     artistType: "Музикант",
-    artCategory: "music",
+    artSubCategory: "music",
     tags: ["Музичне мистецтво", "Вокал", "Інструментал", "Сцена"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -78,7 +78,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-8.png",
     artistName: "Андрій Соколенко",
     artistType: "Хореограф",
-    artCategory: "choreography",
+    artSubCategory: "choreography",
     tags: ["Хореографічне мистецтво", "Танець", "Постановка", "Сцена"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -94,7 +94,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-9.png",
     artistName: "Наталія Бондар",
     artistType: "Перформер",
-    artCategory: "original-genre",
+    artSubCategory: "original-genre",
     tags: ["Оригінальний жанр", "Перформанс", "Сцена", "Імпровізація"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -110,7 +110,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-10.png",
     artistName: "Дмитро Романюк",
     artistType: "Фотограф",
-    artCategory: "art-photography",
+    artSubCategory: "art-photography",
     tags: ["Художня фотографія", "Портрет", "Студійна зйомка", "Арт-фото"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -126,7 +126,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Софія Ткаченко",
     artistType: "Відеомейкер",
-    artCategory: "video-editing",
+    artSubCategory: "video-editing",
     tags: ["Відеозйомка та монтаж", "Монтаж", "Постпродакшн", "Кліпмейкінг"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -142,7 +142,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Юрій Коваленко",
     artistType: "Кінорежисер",
-    artCategory: "cinema",
+    artSubCategory: "cinema",
     tags: ["Повнометражний кінематограф", "Кіно", "Сценарій", "Постановка"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -158,7 +158,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Марина Гончар",
     artistType: "AR-художник",
-    artCategory: "ar",
+    artSubCategory: "ar",
     tags: ["Доповнена реальність", "AR", "Інтерактив", "Цифрове мистецтво"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -174,7 +174,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-8.png",
     artistName: "Віталій Лисенко",
     artistType: "Живописець",
-    artCategory: "painting",
+    artSubCategory: "painting",
     tags: ["Живопис", "Полотно", "Олія", "Колористика"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -190,7 +190,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-9.png",
     artistName: "Катерина Дорошенко",
     artistType: "Скульптор",
-    artCategory: "sculpture",
+    artSubCategory: "sculpture",
     tags: ["Скульптура", "Пластика", "Бронза", "Камінь"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -206,7 +206,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-10.png",
     artistName: "Павло Яценко",
     artistType: "Графік",
-    artCategory: "graphics",
+    artSubCategory: "graphics",
     tags: ["Графіка", "Ілюстрація", "Ліногравюра", "Ескіз"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -222,7 +222,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Людмила Черненко",
     artistType: "Поет",
-    artCategory: "poetry",
+    artSubCategory: "poetry",
     tags: ["Поезія", "Вірші", "Лірика", "Сучасна поезія"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -238,7 +238,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Тарас Омельчук",
     artistType: "Прозаїк",
-    artCategory: "poetry",
+    artSubCategory: "poetry",
     tags: ["Проза", "Роман", "Оповідання", "Драматургія"],
     catalogButtonText: "До каталогу робіт",
     photos: [
@@ -254,7 +254,7 @@ export const artistsData: ArtistData[] = [
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Аліна Савчук",
     artistType: "Режисер",
-    artCategory: "directing",
+    artSubCategory: "directing",
     tags: ["Режисура", "Кіно", "Постановка", "Авторський стиль"],
     catalogButtonText: "До каталогу робіт",
     photos: [
