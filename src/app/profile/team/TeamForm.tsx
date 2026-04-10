@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import AddProjectCover from "../new_project/AddProjectCover";
-import { artistsData, teamsData } from "../../../data/participantsData";
+import { artistsData } from "../../../data/artistsData";
+import { teamData } from "../../../data/teamData";
 
 interface TeamFormProps {
   mode?: "create" | "edit";
@@ -73,14 +74,14 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
     : [];
 
   const matchedTeams = normalizedMembersQuery
-    ? teamsData
+    ? teamData
         .filter((team) =>
-          team.artistName.toLowerCase().includes(normalizedMembersQuery)
+          team.name.toLowerCase().includes(normalizedMembersQuery)
         )
         .map((team) => ({
           key: `team-${team.id}`,
-          name: team.artistName,
-          icon: team.artistPhoto,
+          name: team.name,
+          icon: team.avatar,
           type: "team",
         }))
     : [];

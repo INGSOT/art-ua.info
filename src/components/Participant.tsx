@@ -6,7 +6,7 @@ import { Badge } from "./ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 
-import { PhotoData } from "../data/participantsData";
+import { PhotoData } from "../data/artistsData";
 
 interface ParticipantProps {
   artistPhoto: string;

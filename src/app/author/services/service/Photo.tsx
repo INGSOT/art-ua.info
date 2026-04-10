@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { serviceDetailsData } from "../../../../data/authorData";
+import { serviceDetailsData } from "../../../../data/profileData";
 
 export default function Photo() {
     return (

@@ -1,4 +1,4 @@
-import { artistsData } from "./participantsData";
+import { artistsData } from "./artistsData";
 
 export interface Catalog {
   id: number;

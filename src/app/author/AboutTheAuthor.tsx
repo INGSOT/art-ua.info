@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
-import { aboutAuthorData } from "../../data/authorData";
+import { aboutMeData } from "../../data/profileData";
 
 export default function AboutTheAuthor() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
@@ -16,7 +16,7 @@ export default function AboutTheAuthor() {
         <div className="relative mb-6">
           <div className="w-[160px] h-[160px] rounded-full overflow-hidden border-4 border-yellow-500">
             <Image
-              src={aboutAuthorData.avatar}
+              src={aboutMeData.avatar}
               alt="Author Avatar"
               width={160}
               height={160}
@@ -27,17 +27,17 @@ export default function AboutTheAuthor() {
 
         {/* Name */}
         <h2 className="text-white text-3xl font-bold mb-4 text-center">
-          {aboutAuthorData.name}
+          {aboutMeData.name}
         </h2>
 
         {/* Description */}
         <p className="text-white text-center mb-8">
-          {aboutAuthorData.description}
+          {aboutMeData.description}
         </p>
 
         {/* Teams */}
         <div className="flex flex-wrap justify-start md:justify-center gap-4 mb-8">
-          {aboutAuthorData.teams.map((team, index) => (
+          {aboutMeData.teams.map((team, index) => (
             <Link
               key={index}
               href={`/team/projects?team=${index + 1}`}
@@ -59,7 +59,7 @@ export default function AboutTheAuthor() {
 
         {/* Buttons */}
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-          {aboutAuthorData.buttons.map((button) => (
+          {aboutMeData.buttons.map((button) => (
             <Button
               key={button.id}
               className={`h-[60px] flex items-stretch transition-all duration-300 rounded-none p-0 w-full md:w-auto ${

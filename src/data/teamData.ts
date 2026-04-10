@@ -39,6 +39,8 @@ export interface TeamProfile {
   username: string;
   name: string;
   category: string;
+  /** Теги для каталогу /authors (фільтр і пошук). */
+  tags: string[];
   avatar: string;
   projects: TeamProject[];
   members: TeamMember[];
@@ -61,6 +63,7 @@ export const teamData: TeamProfile[] = [
     username: "komanda-1",
     name: "Команда 1",
     category: "Музичний гурт · інді та електроніка",
+    tags: ["Інді", "Електроніка", "Живі виступи"],
     avatar: "/teams/team-photo-1.png",
     projects: [
       { id: 101, image: "/projects/project-photo-1.png", title: "Альбом «Нічні мости»", likes: 124 },
@@ -117,6 +120,7 @@ export const teamData: TeamProfile[] = [
     username: "komanda-2",
     name: "Команда 2",
     category: "Театральна трупа · сучасна драма",
+    tags: ["Драма", "Перформанс", "Постановка"],
     avatar: "/teams/team-photo-2.png",
     projects: [
       { id: 201, image: "/projects/project-photo-2.png", title: "Вистава «Кімната без дверей»", likes: 312 },
@@ -166,6 +170,7 @@ export const teamData: TeamProfile[] = [
     username: "komanda-3",
     name: "Команда 3",
     category: "Студія візуального мистецтва та брендингу",
+    tags: ["Брендинг", "Айдентика", "Графіка"],
     avatar: "/teams/team-photo-3.png",
     projects: [
       { id: 301, image: "/projects/project-photo-3.png", title: "Айдентика культурного центру", likes: 445 },
@@ -221,6 +226,7 @@ export const teamData: TeamProfile[] = [
     username: "komanda-4",
     name: "Команда 4",
     category: "Документальне кіно та відеопродакшн",
+    tags: ["Документалістика", "Зйомка", "Монтаж"],
     avatar: "/teams/team-photo-4.png",
     projects: [
       { id: 401, image: "/projects/project-photo-4.png", title: "Фільм «Східний коридор» (короткий метр)", likes: 521 },

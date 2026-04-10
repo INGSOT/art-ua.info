@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { serviceDetailsData } from "../../../../data/authorData";
+import { serviceDetailsData } from "../../../../data/profileData";
 import Message from "../../../../components/Message";
 
 export default function OrderForm() {

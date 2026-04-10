@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { authorInfo } from "../../../data/authorData";
+import { profileInfo } from "../../../data/profileData";
 
 export default function Information() {
   return (
@@ -11,10 +11,10 @@ export default function Information() {
         <div className="flex flex-col md:flex-row md:items-center justify-start h-full px-4 md:px-[30px] gap-4 md:gap-6">
           <div className="flex items-center gap-4">
             <Image src="/planet.svg" alt="Website" width={24} height={24} />
-            <span className="text-white text-sm font-bold">{authorInfo.website}</span>
+            <span className="text-white text-sm font-bold">{profileInfo.website}</span>
           </div>
           <div className="flex items-center gap-4 flex-wrap md:flex-nowrap">
-            {authorInfo.socialLinks.map((social) => (
+            {profileInfo.socialLinks.map((social) => (
               <a
                 key={social.alt}
                 href={social.url}
@@ -33,15 +33,15 @@ export default function Information() {
       <div className="w-full max-w-[960px] bg-[#343434] h-[80px] mb-6 mx-auto">
         <div className="flex items-center h-full px-4 md:px-[30px] gap-4">
           <Image src="/earth.svg" alt="Location" width={24} height={24} />
-          <span className=" font-wix text-white text-sm font-bold">{authorInfo.location.country}</span>
-          <span className=" font-wix text-white text-sm font-bold">{authorInfo.location.city}</span>
+          <span className=" font-wix text-white text-sm font-bold">{profileInfo.location.country}</span>
+          <span className=" font-wix text-white text-sm font-bold">{profileInfo.location.city}</span>
         </div>
       </div>
 
       {/* Description text */}
       <div className="w-full max-w-[960px] mx-auto">
         <div className="text-white space-y-4">
-          {authorInfo.description.map((paragraph, index) => (
+          {profileInfo.description.map((paragraph, index) => (
             <p key={index}>{paragraph}</p>
           ))}
         </div>

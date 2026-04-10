@@ -3,23 +3,19 @@
 import { useMemo } from "react";
 import Participant from "../../../components/Participant";
 import { useCurrentTeam } from "../useCurrentTeam";
-import { artistsData, teamsData, type ArtistData } from "../../../data/participantsData";
+import { artistsData, type ArtistData } from "../../../data/artistsData";
 
 export default function Participants() {
   const team = useCurrentTeam();
-  const teamId = Number(team.id);
 
   const members = useMemo((): ArtistData[] => {
-    const teamEntry = teamsData.find((t) => t.id === teamId);
-    if (!teamEntry) return [];
-
-    // Уникальные участники в рамках одной команды (в `teamMembers` могут быть дубликаты).
+    // Унікальні аватари учасників команди (у `members` теоретично можуть бути дублікати).
     const uniquePhotoPaths: string[] = [];
     const seen = new Set<string>();
-    for (const photoPath of teamEntry.teamMembers) {
-      if (seen.has(photoPath)) continue;
-      seen.add(photoPath);
-      uniquePhotoPaths.push(photoPath);
+    for (const m of team.members) {
+      if (seen.has(m.avatar)) continue;
+      seen.add(m.avatar);
+      uniquePhotoPaths.push(m.avatar);
     }
 
     const photoToArtist = new Map(artistsData.map((artist) => [artist.artistPhoto, artist] as const));
@@ -39,7 +35,7 @@ export default function Participants() {
     }
 
     return uniqueById;
-  }, [teamId]);
+  }, [team]);
 
   if (members.length === 0) {
     return (

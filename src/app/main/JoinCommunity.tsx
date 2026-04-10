@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { artistsData } from "../../data/participantsData";
+import { artistsData } from "../../data/artistsData";
 import { joinCommunityData } from "../../data/mainData";
 
 type Participant = {

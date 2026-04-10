@@ -12,7 +12,8 @@ import { authorsFilters } from "../../components/filters/filterConfig";
 import Participant from "../../components/Participant";
 import SortingControls from "./SortingControls";
 import PaginationSection from "../../components/PaginationSection";
-import { artistsData, teamsData, TeamData, ArtistData } from "../../data/participantsData";
+import { artistsData, type ArtistData } from "../../data/artistsData";
+import { teamData, type TeamProfile } from "../../data/teamData";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -110,14 +111,14 @@ export default function AuthorsPage() {
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
-    let activeData: (ArtistData | TeamData)[] = [];
+    let activeData: (ArtistData | TeamProfile)[] = [];
 
     if (currentParticipantFilter === "artist") {
         activeData = artistsData;
     } else if (currentParticipantFilter === "team") {
-        activeData = teamsData;
+        activeData = teamData;
     } else {
-        activeData = [...artistsData, ...teamsData];
+        activeData = [...artistsData, ...teamData];
     }
 
     const filteredDataByCategory = selectedArtCategoryIds.length
@@ -131,8 +132,12 @@ export default function AuthorsPage() {
 
     const filteredData = normalizedSearchQuery
         ? filteredDataByCategory.filter((participant) => {
-            const nameMatch = participant.artistName.toLowerCase().includes(normalizedSearchQuery);
-            const typeMatch = participant.artistType.toLowerCase().includes(normalizedSearchQuery);
+            const name =
+                "artistName" in participant ? participant.artistName : participant.name;
+            const role =
+                "artistType" in participant ? participant.artistType : participant.category;
+            const nameMatch = name.toLowerCase().includes(normalizedSearchQuery);
+            const typeMatch = role.toLowerCase().includes(normalizedSearchQuery);
             const tagsMatch = participant.tags.some((tag) =>
                 tag.toLowerCase().includes(normalizedSearchQuery)
             );
@@ -231,27 +236,34 @@ export default function AuthorsPage() {
                                     <Image src="/masks.svg" alt="Авторів не знайдено" width={380} height={285} priority />
                                 </div>
                             ) : (
-                                currentParticipants.map((participant) => (
-                                    <Participant
-                                        key={participant.id}
-                                        artistPhoto={participant.artistPhoto}
-                                        artistName={participant.artistName}
-                                        artistType={participant.artistType}
-                                        tags={participant.tags}
-                                        photos={participant.photos}
-                                        catalogButtonText={
-                                            "catalogButtonText" in participant && !("teamMembers" in participant)
-                                                ? participant.catalogButtonText
-                                                : ""
-                                        }
-                                        isTeam={"teamMembers" in participant}
-                                        memberAvatars={
-                                            "teamMembers" in participant
-                                                ? (participant as TeamData).teamMembers
-                                                : undefined
-                                        }
-                                    />
-                                ))
+                                currentParticipants.map((participant) =>
+                                    "artSubCategory" in participant ? (
+                                        <Participant
+                                            key={participant.id}
+                                            artistPhoto={participant.artistPhoto}
+                                            artistName={participant.artistName}
+                                            artistType={participant.artistType}
+                                            tags={participant.tags}
+                                            photos={participant.photos}
+                                            catalogButtonText={participant.catalogButtonText}
+                                        />
+                                    ) : (
+                                        <Participant
+                                            key={participant.id}
+                                            artistPhoto={participant.avatar}
+                                            artistName={participant.name}
+                                            artistType={participant.category}
+                                            tags={participant.tags}
+                                            photos={participant.projects.map((p) => ({
+                                                image: p.image,
+                                                likes: p.likes,
+                                            }))}
+                                            catalogButtonText=""
+                                            isTeam
+                                            memberAvatars={participant.members.map((m) => m.avatar)}
+                                        />
+                                    )
+                                )
                             )}
                         </div>
                     </div>

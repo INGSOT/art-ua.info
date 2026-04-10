@@ -1,4 +1,5 @@
-import { artistsData, teamsData } from "./participantsData";
+import { artistsData } from "./artistsData";
+import { getTeamById } from "./teamData";
 
 export type CurrencyCode = "UAH" | "USD" | "EUR";
 export type ServicePerformerType = "artist" | "team";
@@ -19,7 +20,14 @@ export interface ServiceItemData {
 }
 
 const artistById = new Map(artistsData.map((artist) => [artist.id, artist]));
-const teamById = new Map(teamsData.map((team) => [team.id, team]));
+
+/** Ключі як у колишньому `teamsData` (id 1…5), значення — `TeamProfile.id` у `teamData`. */
+const teamServiceLegacyKeyToProfileId: Record<number, string> = {
+    1: "3",
+    2: "1",
+    3: "2",
+    5: "4",
+};
 
 const getServiceAuthor = (serviceId: number) => {
     const artist = artistById.get(serviceId);
@@ -31,12 +39,13 @@ const getServiceAuthor = (serviceId: number) => {
     };
 };
 
-const getTeamServiceAuthor = (teamId: number) => {
-    const team = teamById.get(teamId);
+const getTeamServiceAuthor = (legacyTeamKey: number) => {
+    const profileId = teamServiceLegacyKeyToProfileId[legacyTeamKey];
+    const team = getTeamById(profileId);
 
     return {
-        authorName: team?.artistName ?? "",
-        authorAvatar: team?.artistPhoto ?? "",
+        authorName: team.name,
+        authorAvatar: team.avatar,
         performerType: "team" as const,
     };
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { serviceDetailsData } from "../../../../data/authorData";
+import { serviceDetailsData } from "../../../../data/profileData";
 
 export default function ServiceDescription() {
     return (

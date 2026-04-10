@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { projectDetails } from "../../../../data/authorData";
+import { projectDetails } from "../../../../data/profileData";
 
 export default function ProjectInfo() {
   const [activeSlide, setActiveSlide] = useState(0);
