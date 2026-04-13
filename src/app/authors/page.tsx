@@ -240,6 +240,7 @@ export default function AuthorsPage() {
                                     "artSubCategory" in participant ? (
                                         <Participant
                                             key={participant.id}
+                                            artistId={participant.id}
                                             artistPhoto={participant.artistPhoto}
                                             artistName={participant.artistName}
                                             artistType={participant.artistType}

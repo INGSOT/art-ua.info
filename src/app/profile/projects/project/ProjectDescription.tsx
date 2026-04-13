@@ -1,11 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { projectDescriptionData } from "../../../../data/profileData";
+import { useProfileView } from "../../ProfileViewContext";
 
 export default function ProjectDescription() {
+  const { projectDescriptionData, id: profileId } = useProfileView();
   const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    setActiveSlide(0);
+  }, [profileId]);
 
   const handlePrevSlide = () => {
     setActiveSlide((prev) => (prev === 0 ? projectDescriptionData.slides.length - 1 : prev - 1));

@@ -1,8 +1,10 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import { CurrencyCode, ServiceItemData } from '../../data/servicesData';
+import { withAuthorId } from '../../lib/authorQuery';
 
 interface ServiceItemProps {
     service: ServiceItemData;
@@ -10,6 +12,9 @@ interface ServiceItemProps {
 
 export default function ServiceItem({ service }: ServiceItemProps) {
     const [isHovered, setIsHovered] = useState(false);
+    const authorHref = typeof service.authorId === 'number'
+        ? withAuthorId('/author/projects', service.authorId)
+        : null;
     const formattedPrice =
         typeof service.price === 'number'
             ? service.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
@@ -27,20 +32,37 @@ export default function ServiceItem({ service }: ServiceItemProps) {
                 {/* Avatar and Image */}
                 <div className="flex flex-col w-full lg:w-[300px] flex-shrink-0">
                     {/* Author info */}
-                    <div className="flex items-center gap-3 p-4">
-                        <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-600 flex-shrink-0">
-                            <Image
-                                src={service.authorAvatar}
-                                alt={service.authorName}
-                                width={48}
-                                height={48}
-                                className="w-full h-full object-cover"
-                            />
+                    {authorHref ? (
+                        <Link href={authorHref} className="flex items-center gap-3 p-4 w-fit">
+                            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-600 flex-shrink-0">
+                                <Image
+                                    src={service.authorAvatar}
+                                    alt={service.authorName}
+                                    width={48}
+                                    height={48}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <span className="text-white font-bold text-base">
+                                {service.authorName}
+                            </span>
+                        </Link>
+                    ) : (
+                        <div className="flex items-center gap-3 p-4">
+                            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-600 flex-shrink-0">
+                                <Image
+                                    src={service.authorAvatar}
+                                    alt={service.authorName}
+                                    width={48}
+                                    height={48}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <span className="text-white font-bold text-base">
+                                {service.authorName}
+                            </span>
                         </div>
-                        <span className="text-white font-bold text-base">
-                            {service.authorName}
-                        </span>
-                    </div>
+                    )}
 
                     {/* Service image - no padding */}
                     <div className="w-full aspect-square relative overflow-hidden">

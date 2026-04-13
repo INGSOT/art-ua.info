@@ -3,17 +3,22 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import ServiceCard from "../../../components/ServiceCard";
-import { myServices, servicesTexts } from "../../../data/profileData";
+import { servicesTexts } from "../../../data/profileData";
+import { getMyServicesByAuthorId } from "../../../data/servicesData";
+import { withProfileId } from "../../../lib/authorQuery";
+import { useProfileView } from "../ProfileViewContext";
 
 export default function Services() {
   const router = useRouter();
+  const { id: profileId } = useProfileView();
+  const myServices = getMyServicesByAuthorId(profileId);
 
   const handleAddClick = () => {
-    router.push("/profile/services/new");
+    router.push(withProfileId("/profile/services/new", profileId));
   };
 
   const handleEditClick = () => {
-    router.push("/profile/services/edit");
+    router.push(withProfileId("/profile/services/edit", profileId));
   };
 
   return (

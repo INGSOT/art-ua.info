@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { catalogsTexts, myCatalogs } from "../../../data/profileData";
+import { catalogsTexts } from "../../../data/profileData";
+import { getMyCatalogsByAuthorId } from "../../../data/catalogsData";
+import { useProfileView } from "../ProfileViewContext";
 import DeleteCatalog from "./DeleteCatalog";
 import AddCatalog from "./AddCatalog";
 
 export default function Catalogs() {
+  const profile = useProfileView();
+  const profileCatalogs = useMemo(
+    () => getMyCatalogsByAuthorId(profile.id),
+    [profile.id],
+  );
   const [selectedCatalogs, setSelectedCatalogs] = useState<number[]>([]);
   const [hoveredCheckbox, setHoveredCheckbox] = useState<number | null>(null);
-  const [catalogs, setCatalogs] = useState(myCatalogs);
+  const [catalogs, setCatalogs] = useState(() => [...profileCatalogs]);
+
+  useEffect(() => {
+    setCatalogs([...profileCatalogs]);
+    setSelectedCatalogs([]);
+  }, [profile.id, profileCatalogs]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [catalogToDelete, setCatalogToDelete] = useState<number | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);

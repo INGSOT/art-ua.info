@@ -4,10 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
-import { aboutMeData, profileTexts } from "../../data/profileData";
+import { profileTexts } from "../../data/profileData";
+import { useProfileView } from "./ProfileViewContext";
 
 export default function AboutMe() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+  const { aboutMe: aboutMeData } = useProfileView();
 
   return (
     <section className="w-full bg-[#414141] py-16 px-4">

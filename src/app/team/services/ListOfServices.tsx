@@ -1,6 +1,7 @@
 "use client";
 
 import ServiceCard from "../../../components/ServiceCard";
+import { withAuthorId } from "../../../lib/authorQuery";
 import { useCurrentTeam } from "../useCurrentTeam";
 
 export default function ListOfServices() {
@@ -15,7 +16,10 @@ export default function ListOfServices() {
             image={service.image}
             overlayButtonLabel={service.buttonLabel}
             title={service.title}
-            footer={{ variant: "order", href: "/author/services/service" }}
+            footer={{
+              variant: "order",
+              href: withAuthorId("/author/services/service", 1),
+            }}
           />
         ))}
       </div>

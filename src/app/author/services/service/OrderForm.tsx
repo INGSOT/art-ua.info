@@ -1,16 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { serviceDetailsData } from "../../../../data/profileData";
+import { useAuthorProfile } from "../../AuthorProfileContext";
 import Message from "../../../../components/Message";
 
 export default function OrderForm() {
+    const { serviceDetailsData, id: authorProfileId } = useAuthorProfile();
     const [selectedOptions, setSelectedOptions] = useState<Record<string, boolean>>({});
     const [hoveredOptions, setHoveredOptions] = useState<Record<string, boolean>>({});
     const [isButtonHovered, setIsButtonHovered] = useState(false);
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     const [notification, setNotification] = useState<{ type: "error" | "success"; text: string } | null>(null);
+
+    useEffect(() => {
+        setSelectedOptions({});
+        setFormValues({});
+        setNotification(null);
+    }, [authorProfileId]);
 
     const toggleOption = (id: string) => {
         setSelectedOptions(prev => ({ ...prev, [id]: !prev[id] }));

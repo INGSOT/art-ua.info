@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
 import type { Catalog } from "../../data/catalogsData";
+import { withAuthorId } from "../../lib/authorQuery";
 
 interface ListOfCatalogsProps {
   catalogs: Catalog[];
@@ -69,7 +71,10 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
               {catalog.title}
             </h3>
             {/* Author info */}
-            <div className="flex items-center gap-2 md:gap-3">
+            <Link
+              href={withAuthorId("/author/projects", catalog.authorId)}
+              className="flex items-center gap-2 md:gap-3 w-fit"
+            >
               <div className="w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border-2 border-yellow-500">
                 <Image
                   src={catalog.authorAvatar}
@@ -80,7 +85,7 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
                 />
               </div>
               <span className="font-wix text-white text-xs md:text-sm font-bold">{catalog.authorName}</span>
-            </div>
+            </Link>
           </CardContent>
         </Card>
       ))}

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { withAuthorId } from "../../lib/authorQuery";
 
 type MenuProps = {
   activeItem?: string;
@@ -9,12 +11,18 @@ type MenuProps = {
 
 export default function Menu({ activeItem }: MenuProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const rawId = searchParams.get("id");
+  const authorId =
+    rawId !== null && rawId !== "" && !Number.isNaN(Number(rawId))
+      ? Number(rawId)
+      : 1;
 
   const menuItems = [
-    { id: "projects", label: "Проєкти", href: "/author/projects" },
-    { id: "catalogs", label: "Каталоги", href: "/author/catalogs" },
-    { id: "services", label: "Послуги", href: "/author/services" },
-    { id: "info", label: "Інформація", href: "/author/info" },
+    { id: "projects", label: "Проєкти", href: withAuthorId("/author/projects", authorId) },
+    { id: "catalogs", label: "Каталоги", href: withAuthorId("/author/catalogs", authorId) },
+    { id: "services", label: "Послуги", href: withAuthorId("/author/services", authorId) },
+    { id: "info", label: "Інформація", href: withAuthorId("/author/info", authorId) },
   ];
 
   return (

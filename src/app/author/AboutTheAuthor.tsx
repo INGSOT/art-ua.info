@@ -4,10 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
-import { aboutMeData } from "../../data/profileData";
+import { useAuthorProfile } from "./AuthorProfileContext";
 
 export default function AboutTheAuthor() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
+  const { aboutMe: aboutMeData } = useAuthorProfile();
 
   return (
     <section className="w-full bg-[#414141] py-16 px-4">

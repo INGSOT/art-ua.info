@@ -4,10 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../../components/ui/card";
-import { myProjects, projectFilterButtons, projectEmptyState } from "../../../data/profileData";
+import { projectFilterButtons, projectEmptyState } from "../../../data/profileData";
+import { getMyProjectsByAuthorId } from "../../../data/projectsData";
+import { useAuthorProfile } from "../AuthorProfileContext";
+import { withAuthorId } from "../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
+  const { id: authorId } = useAuthorProfile();
+  const myProjects = getMyProjectsByAuthorId(authorId);
 
   const hasProjects = myProjects.length > 0;
 
@@ -40,7 +45,11 @@ export default function Projects() {
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myProjects.map((project) => (
-                <Link key={project.id} href="/author/projects/project" className="block group">
+                <Link
+                  key={project.id}
+                  href={withAuthorId("/author/projects/project", authorId)}
+                  className="block group"
+                >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
                     <CardContent className="p-0 flex flex-col gap-3">
                       {/* Project image with likes overlay */}

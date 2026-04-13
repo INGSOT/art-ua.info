@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { profileInfo } from "../../../data/profileData";
+import { useAuthorProfile } from "../AuthorProfileContext";
 
 export default function Information() {
+  const { profileInfo } = useAuthorProfile();
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
       {/* Website section */}

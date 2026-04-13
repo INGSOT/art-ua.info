@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { profileInfo } from "../../../data/profileData";
+import { useProfileView } from "../ProfileViewContext";
 
 export default function Information() {
+  const { profileInfo } = useProfileView();
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
       <div className="w-full bg-[#343434] h-auto md:h-[80px] mb-4 py-4 md:py-0">

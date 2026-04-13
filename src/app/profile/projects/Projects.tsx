@@ -4,10 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../../components/ui/card";
-import { myProjects, projectFilterButtons, projectEmptyState } from "../../../data/profileData";
+import { projectFilterButtons, projectEmptyState } from "../../../data/profileData";
+import { getMyProjectsByAuthorId } from "../../../data/projectsData";
+import { useProfileView } from "../ProfileViewContext";
+import { withProfileId } from "../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
+  const { id: profileId } = useProfileView();
+  const myProjects = getMyProjectsByAuthorId(profileId);
 
   const hasProjects = myProjects.length > 0;
 
@@ -40,7 +45,11 @@ export default function Projects() {
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {myProjects.map((project) => (
-                <Link key={project.id} href="/profile/projects/project" className="block group">
+                <Link
+                  key={project.id}
+                  href={withProfileId("/profile/projects/project", profileId)}
+                  className="block group"
+                >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
                     <CardContent className="p-0 flex flex-col gap-3">
                       {/* Project image with likes overlay */}
@@ -86,7 +95,10 @@ export default function Projects() {
           <p className="font-wix mt-6 text-white text-base md:text-lg text-center">
             {projectEmptyState.subMessage}
           </p>
-          <Link href="/profile/new_project" className="mt-8 h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-[#FECC39] w-full md:w-[320px]">
+          <Link
+            href={withProfileId("/profile/new_project", profileId)}
+            className="mt-8 h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-[#FECC39] w-full md:w-[320px]"
+          >
             <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">
               {projectEmptyState.createButtonText}
             </span>

@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { serviceDetailsData } from "../../../../data/profileData";
+import { useAuthorProfile } from "../../AuthorProfileContext";
 
 export default function Photo() {
+    const { serviceDetailsData } = useAuthorProfile();
     return (
         <div className="w-full lg:w-1/2 flex flex-col">
             {/* Photo */}

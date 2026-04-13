@@ -1,14 +1,19 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { withProfileId } from "../../../lib/authorQuery";
 import type { ProfileTeam } from "../../../data/profileData";
+import { useProfileView } from "../ProfileViewContext";
 
 interface TeamCardProps {
   team: ProfileTeam;
+  /** Приховати кнопки редагування / меню (публічний перегляд автора). */
+  readOnly?: boolean;
 }
 
-export default function TeamCard({ team }: TeamCardProps) {
+export default function TeamCard({ team, readOnly = false }: TeamCardProps) {
   const isOwnTeam = team.type === "own";
   const router = useRouter();
+  const { id: profileId } = useProfileView();
 
   return (
     <article className="relative w-full bg-[#343434] p-6 flex flex-col gap-4">
@@ -30,25 +35,29 @@ export default function TeamCard({ team }: TeamCardProps) {
           </h2>
         </div>
 
-        <div className="ml-4 flex-shrink-0">
-          {isOwnTeam ? (
-            <button
-              type="button"
-              onClick={() => router.push("/profile/team/edit")}
-              aria-label="Редагувати команду"
-              className="p-1 -m-1"
-            >
-              <Image src="/edit_yellow.svg" alt="" width={24} height={24} />
-            </button>
-          ) : (
-            <Image
-              src="/three_dots.svg"
-              alt="Дії команди"
-              width={24}
-              height={24}
-            />
-          )}
-        </div>
+        {!readOnly && (
+          <div className="ml-4 flex-shrink-0">
+            {isOwnTeam ? (
+              <button
+                type="button"
+                onClick={() =>
+                router.push(withProfileId("/profile/team/edit", profileId))
+              }
+                aria-label="Редагувати команду"
+                className="p-1 -m-1"
+              >
+                <Image src="/edit_yellow.svg" alt="" width={24} height={24} />
+              </button>
+            ) : (
+              <Image
+                src="/three_dots.svg"
+                alt="Дії команди"
+                width={24}
+                height={24}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/* Description */}

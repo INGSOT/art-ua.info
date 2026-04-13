@@ -1,10 +1,12 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { profileTeams } from "../../../data/profileData";
+import { withProfileId } from "../../../lib/authorQuery";
+import { useProfileView } from "../ProfileViewContext";
 import TeamCard from "./TeamCard";
 
 export default function ListOfTeams() {
   const router = useRouter();
+  const { profileTeams, id: profileId } = useProfileView();
 
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
@@ -12,7 +14,7 @@ export default function ListOfTeams() {
       <div className="mb-8 flex justify-center">
         <button
           type="button"
-          onClick={() => router.push("/profile/team/new")}
+          onClick={() => router.push(withProfileId("/profile/team/new", profileId))}
           className="h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-white w-full md:w-[320px]"
         >
           <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">

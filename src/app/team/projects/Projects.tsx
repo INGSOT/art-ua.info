@@ -9,6 +9,7 @@ import {
   teamProjectEmptyState,
 } from "../../../data/teamData";
 import { useCurrentTeam } from "../useCurrentTeam";
+import { withAuthorId } from "../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
@@ -45,7 +46,11 @@ export default function Projects() {
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {projects.map((project) => (
-                <Link key={project.id} href="/author/projects/project" className="block group">
+                <Link
+                  key={project.id}
+                  href={withAuthorId("/author/projects/project", 1)}
+                  className="block group"
+                >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
                     <CardContent className="p-0 flex flex-col gap-3">
                       <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">

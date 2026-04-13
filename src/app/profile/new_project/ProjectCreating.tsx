@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../data/newProjectData";
-import { aboutMeData } from "../../../data/profileData";
+import { useProfileView } from "../ProfileViewContext";
 import AddProjectCover from "./AddProjectCover";
 import AddWork from "./AddWork";
 import SelectArtForm from "./SelectArtForm";
@@ -50,6 +50,7 @@ type ContentBlock =
   | { type: 'link'; data: LinkBlock };
 
 export default function ProjectCreating() {
+  const { aboutMe } = useProfileView();
   const [selectedOwner, setSelectedOwner] = useState<string | null>(null);
   const [hoveredOwner, setHoveredOwner] = useState<string | null>(null);
   const [projectNameUa, setProjectNameUa] = useState("");
@@ -308,10 +309,10 @@ export default function ProjectCreating() {
     {
       id: "author",
       type: "author" as const,
-      name: aboutMeData.name,
-      avatar: aboutMeData.avatar,
+      name: aboutMe.name,
+      avatar: aboutMe.avatar,
     },
-    ...aboutMeData.teams.map((team, index) => ({
+    ...aboutMe.teams.map((team, index) => ({
       id: `team-${index}`,
       type: "team" as const,
       name: team.name,

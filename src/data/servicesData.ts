@@ -6,6 +6,7 @@ export type ServicePerformerType = "artist" | "team";
 
 export interface ServiceItemData {
     id: number;
+    authorId?: number;
     authorName: string;
     authorAvatar: string;
     performerType: ServicePerformerType;
@@ -29,10 +30,11 @@ const teamServiceLegacyKeyToProfileId: Record<number, string> = {
     5: "4",
 };
 
-const getServiceAuthor = (serviceId: number) => {
-    const artist = artistById.get(serviceId);
+const getServiceAuthor = (artistId: number) => {
+    const artist = artistById.get(artistId);
 
     return {
+        authorId: artistId,
         authorName: artist?.artistName ?? "",
         authorAvatar: artist?.artistPhoto ?? "",
         performerType: "artist" as const,
@@ -231,7 +233,7 @@ export const servicesData: ServiceItemData[] = [
     },
     {
         id: 16,
-        ...getServiceAuthor(1),
+        ...getServiceAuthor(15),
         serviceImage: "/services.jpg",
         title: "Підготовка акторських self-tape",
         description: "Допомагаю акторам підготувати self-tape для кастингів: розбір сцени, партнерство в кадрі, запис і первинний монтаж. Фокус на точній подачі персонажа та технічно чистій картинці. За потреби можу підготувати кілька версій сцени для різних заявок.",
@@ -285,3 +287,31 @@ export const servicesData: ServiceItemData[] = [
         priceNegotiable: false,
     },
 ];
+
+export interface MyServiceCard {
+    id: number;
+    image: string;
+    buttonLabel: string;
+    title: string;
+}
+
+const formatServicePrice = (service: ServiceItemData): string => {
+    if (service.priceNegotiable || typeof service.price !== "number" || !service.currency) {
+        return "Ціна договірна";
+    }
+
+    return `Від ${service.price.toLocaleString("uk-UA")} ${service.currency}`;
+};
+
+export const getServicesByAuthorId = (authorId: number): ServiceItemData[] =>
+    servicesData.filter(
+        (service) => service.performerType === "artist" && service.authorId === authorId
+    );
+
+export const getMyServicesByAuthorId = (authorId: number): MyServiceCard[] =>
+    getServicesByAuthorId(authorId).map((service) => ({
+        id: service.id,
+        image: service.serviceImage,
+        buttonLabel: formatServicePrice(service),
+        title: service.title,
+    }));

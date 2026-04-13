@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { PhotoData } from "../data/artistsData";
+import { withAuthorId } from "../lib/authorQuery";
 
 interface ParticipantProps {
   artistPhoto: string;
@@ -15,6 +16,8 @@ interface ParticipantProps {
   tags: string[];
   photos: PhotoData[];
   catalogButtonText: string;
+  /** Для митців: перехід на публічний профіль /author?id=… */
+  artistId?: number;
   isTeam?: boolean;
   memberAvatars?: string[];
 }
@@ -56,6 +59,7 @@ export default function Participant({
   tags,
   photos,
   catalogButtonText,
+  artistId,
   isTeam = false,
   memberAvatars = [],
 }: ParticipantProps) {
@@ -94,7 +98,14 @@ export default function Participant({
       <div className="flex flex-col lg:flex-row w-full">
         {/* Section 1: Artist Info */}
         <div className="flex items-center gap-3 p-3 bg-[#343434] border-b lg:border-b-0 lg:border-r border-[#272727]">
-          <Link href="/author/projects" className="flex items-center gap-3">
+          <Link
+            href={
+              artistId != null
+                ? withAuthorId("/author", artistId)
+                : "/author"
+            }
+            className="flex items-center gap-3"
+          >
             <Avatar className="w-[60px] h-[60px] border border-solid border-[#272727] flex-shrink-0">
               <AvatarImage
                 src={artistPhoto}

@@ -1,8 +1,9 @@
 "use client";
 
-import { serviceDetailsData } from "../../../../data/profileData";
+import { useAuthorProfile } from "../../AuthorProfileContext";
 
 export default function ServiceDescription() {
+    const { serviceDetailsData } = useAuthorProfile();
     return (
         <div className="w-full bg-[#FFFCF5] p-8 lg:p-12">
             {/* Breadcrumb */}
