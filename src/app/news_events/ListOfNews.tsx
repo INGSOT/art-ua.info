@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
-import type { News } from "../../data/newsData";
+import type { NewsItem } from "../../data/newsData";
 
 interface ListOfNewsProps {
-  news: News[];
+  news: NewsItem[];
   disableHover?: boolean;
 }
 
@@ -15,7 +15,7 @@ export default function ListOfNews({ news, disableHover = false }: ListOfNewsPro
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {news.map((newsItem) => (
         <Link
-          href="/news_events/article"
+          href={`/news_events/${newsItem.slug}`}
           key={newsItem.id}
           onClick={(event) => {
             if (disableHover) {
@@ -32,7 +32,7 @@ export default function ListOfNews({ news, disableHover = false }: ListOfNewsPro
               {/* News image - square aspect ratio */}
               <div className="relative w-full aspect-square bg-cover bg-center overflow-hidden">
                 <Image
-                  src={newsItem.image}
+                  src={newsItem.mainImage}
                   alt={newsItem.title}
                   fill
                   className="object-cover"
