@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { withAuthorId } from "../../lib/authorQuery";
+import { useAuthorProfile } from "./AuthorProfileContext";
 
 type MenuProps = {
   activeItem?: string;
@@ -11,18 +11,13 @@ type MenuProps = {
 
 export default function Menu({ activeItem }: MenuProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const rawId = searchParams.get("id");
-  const authorId =
-    rawId !== null && rawId !== "" && !Number.isNaN(Number(rawId))
-      ? Number(rawId)
-      : 1;
+  const { slug } = useAuthorProfile();
 
   const menuItems = [
-    { id: "projects", label: "Проєкти", href: withAuthorId("/author/projects", authorId) },
-    { id: "catalogs", label: "Каталоги", href: withAuthorId("/author/catalogs", authorId) },
-    { id: "services", label: "Послуги", href: withAuthorId("/author/services", authorId) },
-    { id: "info", label: "Інформація", href: withAuthorId("/author/info", authorId) },
+    { id: "projects", label: "Проєкти", href: withAuthorId("/author/projects", slug) },
+    { id: "catalogs", label: "Каталоги", href: withAuthorId("/author/catalogs", slug) },
+    { id: "services", label: "Послуги", href: withAuthorId("/author/services", slug) },
+    { id: "info", label: "Інформація", href: withAuthorId("/author/info", slug) },
   ];
 
   return (

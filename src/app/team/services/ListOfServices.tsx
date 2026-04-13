@@ -1,6 +1,7 @@
 "use client";
 
 import ServiceCard from "../../../components/ServiceCard";
+import { DEFAULT_AUTHOR_PROFILE_SLUG } from "../../../data/profileData";
 import { withAuthorId } from "../../../lib/authorQuery";
 import { useCurrentTeam } from "../useCurrentTeam";
 
@@ -18,7 +19,7 @@ export default function ListOfServices() {
             title={service.title}
             footer={{
               variant: "order",
-              href: withAuthorId("/author/services/service", 1),
+              href: withAuthorId("/author/services/service", DEFAULT_AUTHOR_PROFILE_SLUG),
             }}
           />
         ))}

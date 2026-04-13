@@ -10,15 +10,15 @@ import { useProfileView } from "../ProfileViewContext";
 
 export default function Services() {
   const router = useRouter();
-  const { id: profileId } = useProfileView();
+  const { id: profileId, slug } = useProfileView();
   const myServices = getMyServicesByAuthorId(profileId);
 
   const handleAddClick = () => {
-    router.push(withProfileId("/profile/services/new", profileId));
+    router.push(withProfileId("/profile/services/new", slug));
   };
 
   const handleEditClick = () => {
-    router.push(withProfileId("/profile/services/edit", profileId));
+    router.push(withProfileId("/profile/services/edit", slug));
   };
 
   return (

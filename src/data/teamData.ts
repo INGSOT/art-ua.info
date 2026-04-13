@@ -277,11 +277,20 @@ export const teamData: TeamProfile[] = [
 
 /** За замовчуванням — перша команда (Команда 1). */
 export const defaultTeamId = teamData[0].id;
+export const defaultTeamSlug = teamData[0].username;
 
 export function getTeamById(id: string | null | undefined): TeamProfile {
   if (id == null || id === "") {
     return teamData[0];
   }
   const found = teamData.find((t) => t.id === id);
+  return found ?? teamData[0];
+}
+
+export function getTeamBySlug(slug: string | null | undefined): TeamProfile {
+  if (slug == null || slug === "") {
+    return teamData[0];
+  }
+  const found = teamData.find((team) => team.username === slug);
   return found ?? teamData[0];
 }

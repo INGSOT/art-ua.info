@@ -261,6 +261,7 @@ export default function AuthorsPage() {
                                             }))}
                                             catalogButtonText=""
                                             isTeam
+                                            teamSlug={participant.username}
                                             memberAvatars={participant.members.map((m) => m.avatar)}
                                         />
                                     )

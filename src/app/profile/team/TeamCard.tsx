@@ -13,7 +13,7 @@ interface TeamCardProps {
 export default function TeamCard({ team, readOnly = false }: TeamCardProps) {
   const isOwnTeam = team.type === "own";
   const router = useRouter();
-  const { id: profileId } = useProfileView();
+  const { slug } = useProfileView();
 
   return (
     <article className="relative w-full bg-[#343434] p-6 flex flex-col gap-4">
@@ -41,7 +41,7 @@ export default function TeamCard({ team, readOnly = false }: TeamCardProps) {
               <button
                 type="button"
                 onClick={() =>
-                router.push(withProfileId("/profile/team/edit", profileId))
+                router.push(withProfileId("/profile/team/edit", slug))
               }
                 aria-label="Редагувати команду"
                 className="p-1 -m-1"

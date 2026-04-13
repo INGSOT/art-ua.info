@@ -8,6 +8,7 @@ import {
   teamProjectFilterButtons,
   teamProjectEmptyState,
 } from "../../../data/teamData";
+import { DEFAULT_AUTHOR_PROFILE_SLUG } from "../../../data/profileData";
 import { useCurrentTeam } from "../useCurrentTeam";
 import { withAuthorId } from "../../../lib/authorQuery";
 
@@ -48,7 +49,7 @@ export default function Projects() {
               {projects.map((project) => (
                 <Link
                   key={project.id}
-                  href={withAuthorId("/author/projects/project", 1)}
+                  href={withAuthorId("/author/projects/project", DEFAULT_AUTHOR_PROFILE_SLUG)}
                   className="block group"
                 >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">

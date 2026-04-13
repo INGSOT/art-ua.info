@@ -10,13 +10,13 @@ type MenuProps = {
 
 export default function Menu({ activeItem }: MenuProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const teamId = useCurrentTeam().id;
+  const teamSlug = useCurrentTeam().username;
 
   const menuItems = [
-    { id: "projects", label: "Проєкти", href: hrefWithTeam("/team/projects", teamId) },
-    { id: "services", label: "Послуги", href: hrefWithTeam("/team/services", teamId) },
-    { id: "participants", label: "Учасники", href: hrefWithTeam("/team/participants", teamId) },
-    { id: "info", label: "Інформація", href: hrefWithTeam("/team/info", teamId) },
+    { id: "projects", label: "Проєкти", href: hrefWithTeam("/team/projects", teamSlug) },
+    { id: "services", label: "Послуги", href: hrefWithTeam("/team/services", teamSlug) },
+    { id: "participants", label: "Учасники", href: hrefWithTeam("/team/participants", teamSlug) },
+    { id: "info", label: "Інформація", href: hrefWithTeam("/team/info", teamSlug) },
   ];
 
   return (

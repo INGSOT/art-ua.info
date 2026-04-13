@@ -1,5 +1,6 @@
 import type { ArtistData } from "./artistsData";
 import { artistsData } from "./artistsData";
+import { teamData } from "./teamData";
 
 // About Me
 export interface Team {
@@ -314,34 +315,15 @@ const AUTHOR_USERNAME_SLUGS: readonly string[] = [
   "alina-savchuk",
 ];
 
-const ARTIST_PHOTOS = [
-  "/artists/artist-photo-5.png",
-  "/artists/artist-photo-6.png",
-  "/artists/artist-photo-7.png",
-  "/artists/artist-photo-8.png",
-  "/artists/artist-photo-9.png",
-  "/artists/artist-photo-10.png",
-];
-
-function pickArtistPhoto(offset: number): string {
-  return ARTIST_PHOTOS[((offset % ARTIST_PHOTOS.length) + ARTIST_PHOTOS.length) % ARTIST_PHOTOS.length];
-}
-
 function buildAboutMe(artist: ArtistData, usernameSlug: string): AboutMeData {
   const tagLine = artist.tags.slice(0, 3).join(" · ");
-  const teamLabels = [
-    `Студія «Горизонт» · ${artist.artistType}`,
-    `Резиденція «Лінія» · ${artist.tags[0] ?? "арт"}`,
-    `Колектив «Піксель» · співпраця`,
-    `Фестиваль «Квант» · ${artist.tags[1] ?? "сцена"}`,
-  ];
   return {
     name: artist.artistName,
     description: `${artist.artistType}. ${tagLine}.`,
     avatar: artist.artistPhoto,
-    teams: teamLabels.map((name, i) => ({
-      name,
-      icon: `/teams/team-photo-${(i % 4) + 1}.png`,
+    teams: teamData.map((team) => ({
+      name: team.name,
+      icon: team.avatar,
     })),
     buttons: [
       { id: "save-art", label: `save-art.in.ua/${usernameSlug}` },
@@ -350,35 +332,15 @@ function buildAboutMe(artist: ArtistData, usernameSlug: string): AboutMeData {
   };
 }
 
-function buildProfileTeams(artist: ArtistData): ProfileTeam[] {
-  const base = artist.id * 1000;
-  const firstName = artist.artistName.split(" ")[0];
-  return [
-    {
-      id: base + 1,
-      type: "own",
-      avatar: "/teams/team-photo-1.png",
-      name: `Колектив «${firstName}» · основна команда`,
-      description: `Творче ядро навколо ${artist.artistName}. Фокус: ${artist.artistType.toLowerCase()}, ключові теми — ${artist.tags.slice(0, 2).join(", ")}. Працюємо з живими форматами та цифровими носіями.`,
-      members: [
-        { name: artist.artistName, avatar: artist.artistPhoto },
-        { name: "Співавтор практики", avatar: pickArtistPhoto(artist.id + 1) },
-        { name: "Продюсерка лінії", avatar: pickArtistPhoto(artist.id + 2) },
-      ],
-    },
-    {
-      id: base + 2,
-      type: "other",
-      avatar: "/teams/team-photo-3.png",
-      name: `Партнерський проєкт «Спільна сцена»`,
-      description: `Міждисциплінарна група, з якою ${firstName} реалізує спільні покази та експериментальні формати. Акцент на ${artist.tags[2] ?? "імпровізації"} та співпраці з локальними майданчиками.`,
-      members: [
-        { name: "Кураторка напряму", avatar: pickArtistPhoto(artist.id + 3) },
-        { name: "Звукорежисер", avatar: pickArtistPhoto(artist.id + 4) },
-        { name: "Художник світла", avatar: pickArtistPhoto(artist.id + 5) },
-      ],
-    },
-  ];
+function buildProfileTeams(): ProfileTeam[] {
+  return teamData.map((team, index) => ({
+    id: Number(team.id),
+    type: index === 0 ? "own" : "other",
+    avatar: team.avatar,
+    name: team.name,
+    description: team.info.description[0] ?? team.category,
+    members: team.members,
+  }));
 }
 
 function buildProfileInfo(artist: ArtistData, usernameSlug: string): ProfileInfo {
@@ -486,6 +448,7 @@ function buildServiceDetailsData(artist: ArtistData): ServiceDetailsData {
 
 export interface AuthorProfileBundle {
   id: number;
+  slug: string;
   aboutMe: AboutMeData;
   profileInfo: ProfileInfo;
   profileTeams: ProfileTeam[];
@@ -499,9 +462,10 @@ function buildAuthorProfile(artist: ArtistData): AuthorProfileBundle {
     AUTHOR_USERNAME_SLUGS[artist.id - 1] ?? `artist-${artist.id}`;
   return {
     id: artist.id,
+    slug: usernameSlug,
     aboutMe: buildAboutMe(artist, usernameSlug),
     profileInfo: buildProfileInfo(artist, usernameSlug),
-    profileTeams: buildProfileTeams(artist),
+    profileTeams: buildProfileTeams(),
     projectDetails: buildProjectDetails(artist),
     projectDescriptionData: buildProjectDescriptionData(artist, usernameSlug),
     serviceDetailsData: buildServiceDetailsData(artist),
@@ -514,6 +478,7 @@ export const authorProfiles: AuthorProfileBundle[] = artistsData.map((a) =>
 );
 
 export const DEFAULT_AUTHOR_PROFILE_ID = 1;
+export const DEFAULT_AUTHOR_PROFILE_SLUG = AUTHOR_USERNAME_SLUGS[0] ?? "olena-kravets";
 
 export function getAuthorProfileById(
   id: number | string | null | undefined,
@@ -530,6 +495,22 @@ export function getAuthorProfileById(
       : DEFAULT_AUTHOR_PROFILE_ID;
   const found = authorProfiles.find((p) => p.id === resolved);
   return found ?? authorProfiles[0];
+}
+
+export function getAuthorProfileBySlug(
+  slug: string | null | undefined,
+): AuthorProfileBundle {
+  const normalized = (slug ?? "").trim().toLowerCase();
+  if (!normalized) {
+    return getAuthorProfileById(DEFAULT_AUTHOR_PROFILE_ID);
+  }
+
+  const found = authorProfiles.find((p) => p.slug.toLowerCase() === normalized);
+  return found ?? getAuthorProfileById(DEFAULT_AUTHOR_PROFILE_ID);
+}
+
+export function getAuthorSlugById(id: number): string {
+  return authorProfiles.find((p) => p.id === id)?.slug ?? DEFAULT_AUTHOR_PROFILE_SLUG;
 }
 
 /** Дані редактора /profile за замовчуванням (перший митець у каталозі). */

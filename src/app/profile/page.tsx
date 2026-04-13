@@ -1,16 +1,6 @@
 import { redirect } from "next/navigation";
+import { DEFAULT_AUTHOR_PROFILE_SLUG } from "../../data/profileData";
 
-type SearchParams = Promise<{ id?: string }>;
-
-export default async function ProfileRootPage({
-  searchParams,
-}: {
-  searchParams: SearchParams;
-}) {
-  const { id } = await searchParams;
-  const q =
-    id !== undefined && id !== ""
-      ? `?id=${encodeURIComponent(id)}`
-      : "?id=1";
-  redirect(`/profile/projects${q}`);
+export default function ProfileRootPage() {
+  redirect(`/profile/${DEFAULT_AUTHOR_PROFILE_SLUG}/projects`);
 }

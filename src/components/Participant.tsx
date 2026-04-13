@@ -8,6 +8,7 @@ import Link from "next/link";
 
 import { PhotoData } from "../data/artistsData";
 import { withAuthorId } from "../lib/authorQuery";
+import { getAuthorSlugById } from "../data/profileData";
 
 interface ParticipantProps {
   artistPhoto: string;
@@ -16,9 +17,10 @@ interface ParticipantProps {
   tags: string[];
   photos: PhotoData[];
   catalogButtonText: string;
-  /** Для митців: перехід на публічний профіль /author?id=… */
+  /** Для митців: перехід на публічний профіль /author/<slug>/... */
   artistId?: number;
   isTeam?: boolean;
+  teamSlug?: string;
   memberAvatars?: string[];
 }
 
@@ -61,6 +63,7 @@ export default function Participant({
   catalogButtonText,
   artistId,
   isTeam = false,
+  teamSlug,
   memberAvatars = [],
 }: ParticipantProps) {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -100,8 +103,12 @@ export default function Participant({
         <div className="flex items-center gap-3 p-3 bg-[#343434] border-b lg:border-b-0 lg:border-r border-[#272727]">
           <Link
             href={
-              artistId != null
-                ? withAuthorId("/author", artistId)
+              isTeam
+                ? teamSlug != null && teamSlug !== ""
+                  ? `/team/${teamSlug}`
+                  : "/team"
+                : artistId != null
+                ? withAuthorId("/author", getAuthorSlugById(artistId))
                 : "/author"
             }
             className="flex items-center gap-3"

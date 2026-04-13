@@ -1,20 +1,19 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
-  getAuthorProfileById,
+  getAuthorProfileBySlug,
   type AuthorProfileBundle,
 } from "../../data/profileData";
 
 const AuthorProfileContext = createContext<AuthorProfileBundle | null>(null);
 
 export function AuthorProfileProvider({ children }: { children: ReactNode }) {
-  const searchParams = useSearchParams();
+  const params = useParams<{ slug?: string }>();
   const profile = useMemo(() => {
-    const raw = searchParams.get("id");
-    return getAuthorProfileById(raw);
-  }, [searchParams]);
+    return getAuthorProfileBySlug(params?.slug);
+  }, [params]);
 
   return (
     <AuthorProfileContext.Provider value={profile}>

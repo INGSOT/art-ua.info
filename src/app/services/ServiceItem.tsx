@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { CurrencyCode, ServiceItemData } from '../../data/servicesData';
+import { getAuthorSlugById } from '../../data/profileData';
 import { withAuthorId } from '../../lib/authorQuery';
 
 interface ServiceItemProps {
@@ -13,7 +14,7 @@ interface ServiceItemProps {
 export default function ServiceItem({ service }: ServiceItemProps) {
     const [isHovered, setIsHovered] = useState(false);
     const authorHref = typeof service.authorId === 'number'
-        ? withAuthorId('/author/projects', service.authorId)
+        ? withAuthorId('/author/projects', getAuthorSlugById(service.authorId))
         : null;
     const formattedPrice =
         typeof service.price === 'number'

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { withProfileId } from "../../lib/authorQuery";
+import { useProfileView } from "./ProfileViewContext";
 
 type MenuProps = {
   activeItem?: string;
@@ -11,20 +11,15 @@ type MenuProps = {
 
 export default function Menu({ activeItem }: MenuProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const rawId = searchParams.get("id");
-  const profileId =
-    rawId !== null && rawId !== "" && !Number.isNaN(Number(rawId))
-      ? Number(rawId)
-      : 1;
+  const { slug } = useProfileView();
 
   const menuItems = [
-    { id: "projects", label: "Проєкти", href: withProfileId("/profile/projects", profileId) },
+    { id: "projects", label: "Проєкти", href: withProfileId("/profile/projects", slug) },
     { id: "drafts", label: "Чернетки", href: "#" },
-    { id: "catalogs", label: "Каталоги", href: withProfileId("/profile/catalogs", profileId) },
-    { id: "services", label: "Послуги", href: withProfileId("/profile/services", profileId) },
-    { id: "team", label: "Команда", href: withProfileId("/profile/team", profileId) },
-    { id: "info", label: "Інформація", href: withProfileId("/profile/info", profileId) },
+    { id: "catalogs", label: "Каталоги", href: withProfileId("/profile/catalogs", slug) },
+    { id: "services", label: "Послуги", href: withProfileId("/profile/services", slug) },
+    { id: "team", label: "Команда", href: withProfileId("/profile/team", slug) },
+    { id: "info", label: "Інформація", href: withProfileId("/profile/info", slug) },
     { id: "notifications", label: "Сповіщення", href: "#" },
   ];
 

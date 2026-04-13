@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
 import type { Catalog } from "../../data/catalogsData";
+import { getAuthorSlugById } from "../../data/profileData";
 import { withAuthorId } from "../../lib/authorQuery";
 
 interface ListOfCatalogsProps {
@@ -72,7 +73,7 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
             </h3>
             {/* Author info */}
             <Link
-              href={withAuthorId("/author/projects", catalog.authorId)}
+              href={withAuthorId("/author/projects", getAuthorSlugById(catalog.authorId))}
               className="flex items-center gap-2 md:gap-3 w-fit"
             >
               <div className="w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border-2 border-yellow-500">

@@ -1,19 +1,19 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
-  getAuthorProfileById,
+  getAuthorProfileBySlug,
   type AuthorProfileBundle,
 } from "../../data/profileData";
 
 const ProfileViewContext = createContext<AuthorProfileBundle | null>(null);
 
 export function ProfileViewProvider({ children }: { children: ReactNode }) {
-  const searchParams = useSearchParams();
+  const params = useParams<{ slug?: string }>();
   const profile = useMemo(() => {
-    return getAuthorProfileById(searchParams.get("id"));
-  }, [searchParams]);
+    return getAuthorProfileBySlug(params?.slug);
+  }, [params]);
 
   return (
     <ProfileViewContext.Provider value={profile}>

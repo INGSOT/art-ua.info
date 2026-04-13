@@ -11,7 +11,7 @@ import { withAuthorId } from "../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
-  const { id: authorId } = useAuthorProfile();
+  const { id: authorId, slug } = useAuthorProfile();
   const myProjects = getMyProjectsByAuthorId(authorId);
 
   const hasProjects = myProjects.length > 0;
@@ -47,7 +47,7 @@ export default function Projects() {
               {myProjects.map((project) => (
                 <Link
                   key={project.id}
-                  href={withAuthorId("/author/projects/project", authorId)}
+                  href={withAuthorId("/author/projects/project", slug)}
                   className="block group"
                 >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">

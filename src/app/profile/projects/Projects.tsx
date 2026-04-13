@@ -11,7 +11,7 @@ import { withProfileId } from "../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
-  const { id: profileId } = useProfileView();
+  const { id: profileId, slug } = useProfileView();
   const myProjects = getMyProjectsByAuthorId(profileId);
 
   const hasProjects = myProjects.length > 0;
@@ -47,7 +47,7 @@ export default function Projects() {
               {myProjects.map((project) => (
                 <Link
                   key={project.id}
-                  href={withProfileId("/profile/projects/project", profileId)}
+                  href={withProfileId("/profile/projects/project", slug)}
                   className="block group"
                 >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
@@ -96,7 +96,7 @@ export default function Projects() {
             {projectEmptyState.subMessage}
           </p>
           <Link
-            href={withProfileId("/profile/new_project", profileId)}
+            href={withProfileId("/profile/new_project", slug)}
             className="mt-8 h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-[#FECC39] w-full md:w-[320px]"
           >
             <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">

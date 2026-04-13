@@ -1,9 +1,24 @@
-/** Додає або оновлює query-параметр id для сторінок публічного профілю автора. */
-export function withAuthorId(path: string, authorId: number): string {
-  const u = new URL(path, "http://localhost");
-  u.searchParams.set("id", String(authorId));
-  return `${u.pathname}${u.search}`;
+function normalizePath(path: string): string {
+  return path.trim().replace(/^\/+|\/+$/g, "");
 }
 
-/** Те саме для секції /profile (профіль за id митця). */
-export const withProfileId = withAuthorId;
+/** Будує шлях для публічного профілю у форматі /author/<slug>/<tab>. */
+export function withAuthorId(path: string, authorSlug: string): string {
+  const rest = normalizePath(path).replace(/^author\/?/, "");
+  const encodedSlug = encodeURIComponent(authorSlug);
+  return rest ? `/author/${encodedSlug}/${rest}` : `/author/${encodedSlug}`;
+}
+
+/** Те саме для приватної секції /profile/<slug>/<tab>. */
+export function withProfileId(path: string, authorSlug: string): string {
+  const rest = normalizePath(path).replace(/^profile\/?/, "");
+  const encodedSlug = encodeURIComponent(authorSlug);
+  return rest ? `/profile/${encodedSlug}/${rest}` : `/profile/${encodedSlug}`;
+}
+
+/** Те саме для публічної сторінки команди /team/<slug>/<tab>. */
+export function withTeamId(path: string, teamSlug: string): string {
+  const rest = normalizePath(path).replace(/^team\/?/, "");
+  const encodedSlug = encodeURIComponent(teamSlug);
+  return rest ? `/team/${encodedSlug}/${rest}` : `/team/${encodedSlug}`;
+}
