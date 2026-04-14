@@ -5,6 +5,7 @@ export interface PhotoData {
 
 export interface ArtistData {
   id: number;
+  slug: string;
   artistPhoto: string;
   artistName: string;
   artistType: string;
@@ -17,6 +18,7 @@ export interface ArtistData {
 export const artistsData: ArtistData[] = [
   {
     id: 1,
+    slug: "olena-kravets",
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Олена Кравець",
     artistType: "Режисер",
@@ -33,6 +35,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 2,
+    slug: "maksym-shevchenko",
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Максим Шевченко",
     artistType: "Актор",
@@ -49,6 +52,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 3,
+    slug: "iryna-melnyk",
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Ірина Мельник",
     artistType: "Музикант",
@@ -65,6 +69,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 4,
+    slug: "andriy-sokolenko",
     artistPhoto: "/artists/artist-photo-8.png",
     artistName: "Андрій Соколенко",
     artistType: "Хореограф",
@@ -81,6 +86,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 5,
+    slug: "nataliia-bondar",
     artistPhoto: "/artists/artist-photo-9.png",
     artistName: "Наталія Бондар",
     artistType: "Перформер",
@@ -97,6 +103,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 6,
+    slug: "dmytro-romaniuk",
     artistPhoto: "/artists/artist-photo-10.png",
     artistName: "Дмитро Романюк",
     artistType: "Фотограф",
@@ -113,6 +120,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 7,
+    slug: "sofiia-tkachenko",
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Софія Ткаченко",
     artistType: "Відеомейкер",
@@ -129,6 +137,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 8,
+    slug: "yurii-kovalenko",
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Юрій Коваленко",
     artistType: "Кінорежисер",
@@ -145,6 +154,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 9,
+    slug: "maryna-honchar",
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Марина Гончар",
     artistType: "AR-художник",
@@ -161,6 +171,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 10,
+    slug: "vitalii-lysenko",
     artistPhoto: "/artists/artist-photo-8.png",
     artistName: "Віталій Лисенко",
     artistType: "Живописець",
@@ -177,6 +188,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 11,
+    slug: "kateryna-doroshenko",
     artistPhoto: "/artists/artist-photo-9.png",
     artistName: "Катерина Дорошенко",
     artistType: "Скульптор",
@@ -193,6 +205,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 12,
+    slug: "pavlo-yatsenko",
     artistPhoto: "/artists/artist-photo-10.png",
     artistName: "Павло Яценко",
     artistType: "Графік",
@@ -209,6 +222,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 13,
+    slug: "liudmyla-chernenko",
     artistPhoto: "/artists/artist-photo-5.png",
     artistName: "Людмила Черненко",
     artistType: "Поет",
@@ -225,6 +239,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 14,
+    slug: "taras-omelchuk",
     artistPhoto: "/artists/artist-photo-6.png",
     artistName: "Тарас Омельчук",
     artistType: "Прозаїк",
@@ -241,6 +256,7 @@ export const artistsData: ArtistData[] = [
   },
   {
     id: 15,
+    slug: "alina-savchuk",
     artistPhoto: "/artists/artist-photo-7.png",
     artistName: "Аліна Савчук",
     artistType: "Режисер",

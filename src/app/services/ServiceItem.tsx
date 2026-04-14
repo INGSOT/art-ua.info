@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { CurrencyCode, ServiceItemData } from '../../data/servicesData';
 import { getAuthorSlugById } from '../../data/profileData';
-import { withAuthorId } from '../../lib/authorQuery';
+import { teamData } from '../../data/teamData';
+import { withAuthorId, withTeamId } from '../../lib/authorQuery';
 
 interface ServiceItemProps {
     service: ServiceItemData;
@@ -13,9 +14,15 @@ interface ServiceItemProps {
 
 export default function ServiceItem({ service }: ServiceItemProps) {
     const [isHovered, setIsHovered] = useState(false);
-    const authorHref = typeof service.authorId === 'number'
-        ? withAuthorId('/author/projects', getAuthorSlugById(service.authorId))
-        : null;
+    const authorHref =
+        service.performerType === 'team'
+            ? (() => {
+                  const team = teamData.find((item) => item.name === service.authorName);
+                  return team ? withTeamId('/team/projects', team.username) : null;
+              })()
+            : typeof service.authorId === 'number'
+              ? withAuthorId('/author/projects', getAuthorSlugById(service.authorId))
+              : null;
     const formattedPrice =
         typeof service.price === 'number'
             ? service.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
@@ -109,7 +116,8 @@ export default function ServiceItem({ service }: ServiceItemProps) {
                             )}
                         </button>
 
-                        <button
+                        <Link
+                            href={`/services/${service.slug}`}
                             onMouseEnter={() => setIsHovered(true)}
                             onMouseLeave={() => setIsHovered(false)}
                             className={`ml-auto w-12 h-12 flex items-center justify-center transition-colors ${
@@ -122,7 +130,7 @@ export default function ServiceItem({ service }: ServiceItemProps) {
                                 width={16}
                                 height={16}
                             />
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>

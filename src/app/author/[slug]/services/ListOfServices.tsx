@@ -3,10 +3,9 @@
 import ServiceCard from "../../../../components/ServiceCard";
 import { getMyServicesByAuthorId } from "../../../../data/servicesData";
 import { useAuthorProfile } from "../../AuthorProfileContext";
-import { withAuthorId } from "../../../../lib/authorQuery";
 
 export default function ListOfServices() {
-    const { id: authorId, slug } = useAuthorProfile();
+    const { id: authorId } = useAuthorProfile();
     const myServices = getMyServicesByAuthorId(authorId);
     return (
         <section className="w-full bg-[#414141] py-8 md:py-12 lg:py-16">
@@ -19,7 +18,7 @@ export default function ListOfServices() {
                         title={service.title}
                         footer={{
                           variant: "order",
-                          href: withAuthorId("/author/services/service", slug),
+                          href: `/services/${service.slug}`,
                         }}
                     />
                 ))}

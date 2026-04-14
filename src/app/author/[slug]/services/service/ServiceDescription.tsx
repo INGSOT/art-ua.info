@@ -1,9 +1,16 @@
 "use client";
 
-import { useAuthorProfile } from "../../../AuthorProfileContext";
+import { useMemo } from "react";
+import { useParams } from "next/navigation";
+import { getServicePageData } from "../../../../../data/servicesData";
 
 export default function ServiceDescription() {
-    const { serviceDetailsData } = useAuthorProfile();
+    const params = useParams<{ slug?: string }>();
+    const serviceDetailsData = useMemo(() => {
+        const routeSlug = typeof params?.slug === "string" ? params.slug : undefined;
+        return getServicePageData(routeSlug);
+    }, [params]);
+
     return (
         <div className="w-full bg-[#FFFCF5] p-8 lg:p-12">
             {/* Breadcrumb */}

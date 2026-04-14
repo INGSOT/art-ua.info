@@ -1,12 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useAuthorProfile } from "../../../AuthorProfileContext";
+import { useParams } from "next/navigation";
 import Message from "../../../../../components/Message";
+import { getServicePageData } from "../../../../../data/servicesData";
 
 export default function OrderForm() {
-    const { serviceDetailsData, id: authorProfileId } = useAuthorProfile();
+    const params = useParams<{ slug?: string }>();
+    const routeSlug = useMemo(
+        () => (typeof params?.slug === "string" ? params.slug : undefined),
+        [params]
+    );
+    const serviceDetailsData = useMemo(
+        () => getServicePageData(routeSlug),
+        [routeSlug]
+    );
     const [selectedOptions, setSelectedOptions] = useState<Record<string, boolean>>({});
     const [hoveredOptions, setHoveredOptions] = useState<Record<string, boolean>>({});
     const [isButtonHovered, setIsButtonHovered] = useState(false);
@@ -17,7 +26,7 @@ export default function OrderForm() {
         setSelectedOptions({});
         setFormValues({});
         setNotification(null);
-    }, [authorProfileId]);
+    }, [routeSlug]);
 
     const toggleOption = (id: string) => {
         setSelectedOptions(prev => ({ ...prev, [id]: !prev[id] }));

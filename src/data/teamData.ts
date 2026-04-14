@@ -1,3 +1,5 @@
+import { artistsData } from "./artistsData";
+
 // Публічна сторінка команди (/team/*). Масив команд відповідає «Команда 1»…«Команда 4» на /author та /profile.
 export interface TeamProject {
   id: number;
@@ -7,6 +9,7 @@ export interface TeamProject {
 }
 
 export interface TeamMember {
+  artistId: number;
   name: string;
   avatar: string;
 }
@@ -48,6 +51,20 @@ export interface TeamProfile {
   info: TeamInfo;
 }
 
+function resolveTeamMembers(artistIds: number[]): TeamMember[] {
+  return artistIds
+    .map((artistId) => {
+      const artist = artistsData.find((item) => item.id === artistId);
+      if (!artist) return null;
+      return {
+        artistId,
+        name: artist.artistName,
+        avatar: artist.artistPhoto,
+      };
+    })
+    .filter((member): member is TeamMember => member !== null);
+}
+
 export const teamProjectFilterButtons = [
   { id: "all", text: "Усі категорії" },
   { id: "new", text: "Нові" },
@@ -71,11 +88,7 @@ export const teamData: TeamProfile[] = [
       { id: 103, image: "/projects/project-photo-3.png", title: "Живий сет на фестивалі", likes: 256 },
       { id: 104, image: "/gallery/autumn.png", title: "Саундтрек до короткометражки", likes: 41 },
     ],
-    members: [
-      { name: "Олена К.", avatar: "/artists/artist-photo-5.png" },
-      { name: "Марко В.", avatar: "/artists/artist-photo-6.png" },
-      { name: "Ірина С.", avatar: "/artists/artist-photo-7.png" },
-    ],
+    members: resolveTeamMembers([1, 2, 3]),
     services: [
       {
         id: 11,
@@ -127,12 +140,7 @@ export const teamData: TeamProfile[] = [
       { id: 202, image: "/gallery/pulp_fiction.png", title: "Читка п'єси у просторі галереї", likes: 67 },
       { id: 203, image: "/gallery/mountain_landscape.png", title: "Вуличний перформанс «Лінія»", likes: 198 },
     ],
-    members: [
-      { name: "Андрій П.", avatar: "/artists/artist-photo-8.png" },
-      { name: "Софія М.", avatar: "/artists/artist-photo-9.png" },
-      { name: "Тарас Л.", avatar: "/artists/artist-photo-10.png" },
-      { name: "Наталія Д.", avatar: "/artists/artist-photo-5.png" },
-    ],
+    members: resolveTeamMembers([4, 5, 6, 7]),
     services: [
       {
         id: 21,
@@ -178,10 +186,7 @@ export const teamData: TeamProfile[] = [
       { id: 303, image: "/gallery/whale.png", title: "3D-інсталяція для публічного простору", likes: 92 },
       { id: 304, image: "/projects/project-photo-4.png", title: "Каталог виставки «Межі»", likes: 63 },
     ],
-    members: [
-      { name: "Дизайнер К.", avatar: "/artists/artist-photo-6.png" },
-      { name: "Художник Р.", avatar: "/artists/artist-photo-7.png" },
-    ],
+    members: resolveTeamMembers([2, 3]),
     services: [
       {
         id: 31,
@@ -233,13 +238,7 @@ export const teamData: TeamProfile[] = [
       { id: 402, image: "/gallery/ship.png", title: "Цикл інтерв'ю про ремесло", likes: 134 },
       { id: 403, image: "/gallery/big_lebovski.png", title: "Відеоінсталяція для музею", likes: 88 },
     ],
-    members: [
-      { name: "Режисер В.", avatar: "/artists/artist-photo-8.png" },
-      { name: "Оператор Ю.", avatar: "/artists/artist-photo-9.png" },
-      { name: "Продюсер Г.", avatar: "/artists/artist-photo-10.png" },
-      { name: "Монтаж М.", avatar: "/artists/artist-photo-5.png" },
-      { name: "Звук К.", avatar: "/artists/artist-photo-6.png" },
-    ],
+    members: resolveTeamMembers([8, 9, 10, 11, 12]),
     services: [
       {
         id: 41,

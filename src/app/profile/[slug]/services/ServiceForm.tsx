@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import AddProjectCover from "../../new_project/AddProjectCover";
+import AddProjectCover from "../new_project/AddProjectCover";
 
 interface ServiceFormProps {
   mode?: "create" | "edit";

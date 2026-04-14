@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {Button} from "../../components/ui/button";
 import {Badge} from "../../components/ui/badge";
 import { featuredWorksData } from "../../data/mainData";
@@ -120,6 +121,7 @@ useEffect(() => {
       </div>
 
       <Button
+        asChild
         className="w-[300px] h-[60px] p-3 text-id-6 font-button text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] transition-colors rounded-none"
         style={{
           backgroundColor: "#FECC39",
@@ -133,7 +135,7 @@ useEffect(() => {
           e.currentTarget.style.backgroundColor = "#FECC39";
         }}
       >
-        {featuredWorksData.buttonText}
+        <Link href="/projects">{featuredWorksData.buttonText}</Link>
       </Button>
     </section>
     )

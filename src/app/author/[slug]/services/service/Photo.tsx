@@ -1,10 +1,17 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
-import { useAuthorProfile } from "../../../AuthorProfileContext";
+import { useParams } from "next/navigation";
+import { getServicePageData } from "../../../../../data/servicesData";
 
 export default function Photo() {
-    const { serviceDetailsData } = useAuthorProfile();
+    const params = useParams<{ slug?: string }>();
+    const serviceDetailsData = useMemo(() => {
+        const routeSlug = typeof params?.slug === "string" ? params.slug : undefined;
+        return getServicePageData(routeSlug);
+    }, [params]);
+
     return (
         <div className="w-full lg:w-1/2 flex flex-col">
             {/* Photo */}

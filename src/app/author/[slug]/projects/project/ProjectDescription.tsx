@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useAuthorProfile } from "../../AuthorProfileContext";
+import { useAuthorProfile } from "../../../AuthorProfileContext";
 
 export default function ProjectDescription() {
   const { projectDescriptionData, id: authorId } = useAuthorProfile();

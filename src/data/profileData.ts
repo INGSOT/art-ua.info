@@ -1,11 +1,17 @@
 import type { ArtistData } from "./artistsData";
 import { artistsData } from "./artistsData";
+import {
+  getProjectsByAuthorId,
+  type ProjectDescriptionData,
+  type ProjectDetails,
+} from "./projectsData";
 import { teamData } from "./teamData";
 
 // About Me
 export interface Team {
   name: string;
   icon: string;
+  slug: string;
 }
 
 export interface AboutMeButton {
@@ -15,6 +21,7 @@ export interface AboutMeButton {
 
 export interface AboutMeData {
   name: string;
+  artistType: string;
   description: string;
   avatar: string;
   teams: Team[];
@@ -64,82 +71,6 @@ export interface ProfileInfo {
     city: string;
   };
   description: string[];
-}
-
-// Project Details (shared for author/profile pages)
-export interface ProjectTag {
-  text: string;
-  hasIcon: boolean;
-}
-
-export interface ProjectCharacteristic {
-  name: string;
-  description: string;
-}
-
-export interface ProjectDetails {
-  title: string;
-  tags: ProjectTag[];
-  links: {
-    saveArt: string;
-    artUa: string;
-  };
-  slides: string[];
-  initialLikes: number;
-  characteristicsTitle: string;
-  tableHeaders: {
-    name: string;
-    description: string;
-  };
-  characteristics: ProjectCharacteristic[];
-}
-
-// Project Description Page
-export interface ProjectDescriptionData {
-  slides: string[];
-  tags: string[];
-  date: string;
-  title: string;
-  aboutAuthor: {
-    avatar: string;
-    name: string;
-    description: string;
-    artUaLink: string;
-    saveArtLink: string;
-  };
-  socialLinks: Array<{
-    icon: string;
-    alt: string;
-  }>;
-  descriptionText: string[];
-}
-
-// Service Details
-export interface ServiceOption {
-  id: string;
-  label: string;
-}
-
-export interface ServiceFormField {
-  id: string;
-  label: string;
-  placeholder: string;
-  type: "text" | "email" | "tel" | "textarea";
-  rows?: number;
-}
-
-export interface ServiceDetailsData {
-  photo: string;
-  breadcrumb: {
-    authorName: string;
-    section: string;
-  };
-  title: string;
-  priceLabel: string;
-  description: string[];
-  options: ServiceOption[];
-  formFields: ServiceFormField[];
-  submitButtonLabel: string;
 }
 
 // My Catalogs
@@ -251,34 +182,6 @@ const DEFAULT_SOCIAL_LINKS: ProfileSocialLink[] = [
   { icon: "/socials/x_yellow.svg", alt: "X", url: "https://x.com" },
 ];
 
-const SERVICE_FORM_FIELDS: ServiceFormField[] = [
-  {
-    id: "name",
-    label: "Як до вас звертатись",
-    placeholder: "Ваше ім'я та прізвище",
-    type: "text",
-  },
-  {
-    id: "email",
-    label: "Електронна пошта",
-    placeholder: "Вкажіть адресу електронної пошти",
-    type: "email",
-  },
-  {
-    id: "phone",
-    label: "Телефон",
-    placeholder: "Вкажіть номер телефону",
-    type: "tel",
-  },
-  {
-    id: "message",
-    label: "Повідомлення",
-    placeholder: "Ваше повідомлення",
-    type: "textarea",
-    rows: 5,
-  },
-];
-
 const LOCATIONS: ReadonlyArray<{ country: string; city: string }> = [
   { country: "Україна", city: "Київ" },
   { country: "Україна", city: "Львів" },
@@ -297,33 +200,22 @@ const LOCATIONS: ReadonlyArray<{ country: string; city: string }> = [
   { country: "Україна", city: "Черкаси" },
 ];
 
-const AUTHOR_USERNAME_SLUGS: readonly string[] = [
-  "olena-kravets",
-  "maksym-shevchenko",
-  "iryna-melnyk",
-  "andriy-sokolenko",
-  "nataliia-bondar",
-  "dmytro-romaniuk",
-  "sofiia-tkachenko",
-  "yurii-kovalenko",
-  "maryna-honchar",
-  "vitalii-lysenko",
-  "kateryna-doroshenko",
-  "pavlo-yatsenko",
-  "liudmyla-chernenko",
-  "taras-omelchuk",
-  "alina-savchuk",
-];
+function getTeamsForArtist(artistId: number) {
+  return teamData.filter((team) => team.members.some((member) => member.artistId === artistId));
+}
 
 function buildAboutMe(artist: ArtistData, usernameSlug: string): AboutMeData {
   const tagLine = artist.tags.slice(0, 3).join(" · ");
+  const artistTeams = getTeamsForArtist(artist.id);
   return {
     name: artist.artistName,
+    artistType: artist.artistType,
     description: `${artist.artistType}. ${tagLine}.`,
     avatar: artist.artistPhoto,
-    teams: teamData.map((team) => ({
+    teams: artistTeams.map((team) => ({
       name: team.name,
       icon: team.avatar,
+      slug: team.username,
     })),
     buttons: [
       { id: "save-art", label: `save-art.in.ua/${usernameSlug}` },
@@ -332,8 +224,9 @@ function buildAboutMe(artist: ArtistData, usernameSlug: string): AboutMeData {
   };
 }
 
-function buildProfileTeams(): ProfileTeam[] {
-  return teamData.map((team, index) => ({
+function buildProfileTeams(artistId: number): ProfileTeam[] {
+  const artistTeams = getTeamsForArtist(artistId);
+  return artistTeams.map((team, index) => ({
     id: Number(team.id),
     type: index === 0 ? "own" : "other",
     avatar: team.avatar,
@@ -359,93 +252,6 @@ function buildProfileInfo(artist: ArtistData, usernameSlug: string): ProfileInfo
   };
 }
 
-function buildProjectDetails(artist: ArtistData): ProjectDetails {
-  const slides = artist.photos.map((p) => p.image).slice(0, 4);
-  const tagA = artist.tags[0] ?? "Авторський проєкт";
-  const tagB = artist.tags[1] ?? "У роботі";
-  return {
-    title: `Флагманський проєкт: ${artist.artistName}`,
-    tags: [
-      { text: tagA, hasIcon: false },
-      { text: tagB, hasIcon: true },
-    ],
-    links: {
-      saveArt: `Проєкт на save-art.in.ua/${AUTHOR_USERNAME_SLUGS[artist.id - 1] ?? "author"}`,
-      artUa: `Проєкт на art-ua.info/${AUTHOR_USERNAME_SLUGS[artist.id - 1] ?? "author"}`,
-    },
-    slides: slides.length >= 4 ? slides : [...slides, "/gallery/big_lebovski.png"].slice(0, 4),
-    initialLikes: 800 + artist.id * 31,
-    characteristicsTitle: "Характеристики проєкту:",
-    tableHeaders: { name: "Назва", description: "Опис" },
-    characteristics: [
-      { name: "Напрям", description: artist.artistType },
-      { name: "Жанрові маркери", description: artist.tags.slice(0, 4).join(", ") },
-      { name: "Автор концепції", description: artist.artistName },
-      { name: "Формат", description: artist.artSubCategory },
-      { name: "Статус", description: artist.id % 2 === 0 ? "Публічний показ" : "Завершений цикл" },
-    ],
-  };
-}
-
-function buildProjectDescriptionData(artist: ArtistData, usernameSlug: string): ProjectDescriptionData {
-  const slides = [
-    "/gallery/ship.png",
-    "/gallery/samurai.png",
-    "/gallery/whale.png",
-    "/gallery/mountain_landscape.png",
-  ].map((img, i) => artist.photos[i % artist.photos.length]?.image ?? img);
-  return {
-    slides,
-    tags: [...artist.tags, artist.artistType].slice(0, 5),
-    date: `${String(artist.id).padStart(2, "0")} 04 2026`,
-    title: `Нотатки до серії «${artist.tags[0] ?? "Робочий цикл"}»`,
-    aboutAuthor: {
-      avatar: artist.artistPhoto,
-      name: artist.artistName,
-      description: `${artist.artistType}. ${artist.tags.slice(0, 4).join(", ")}.`,
-      artUaLink: `art-ua.info/${usernameSlug}`,
-      saveArtLink: `save-art.in.ua/${usernameSlug}`,
-    },
-    socialLinks: [
-      { icon: "/socials/deviantart_yellow.svg", alt: "DeviantArt" },
-      { icon: "/socials/facebook_yellow.svg", alt: "Facebook" },
-      { icon: "/socials/x_yellow.svg", alt: "X" },
-      { icon: "/socials/pinterest_yellow.svg", alt: "Pinterest" },
-      { icon: "/socials/linked_in_yellow.svg", alt: "LinkedIn" },
-    ],
-    descriptionText: [
-      `Цей матеріал розкриває підхід ${artist.artistName} до теми ${artist.artistType.toLowerCase()} та роботи з тегами: ${artist.tags.join(", ")}.`,
-      "Культурна спадщина України в контексті нових історичних подій набуває особливої актуальності; образотворче мистецтво фіксує злам епохи.",
-      "У серії поєднані документальні деталі та вільна інтерпретація — аби зберегти живий настрій процесу.",
-      `${artist.artistName.split(" ")[0]} підкреслює важливість співпраці з глядачем і відкритості матеріалу для подальших прочитань.`,
-    ],
-  };
-}
-
-function buildServiceDetailsData(artist: ArtistData): ServiceDetailsData {
-  const photo = artist.photos[1 % artist.photos.length].image;
-  return {
-    photo,
-    breadcrumb: {
-      authorName: artist.artistName,
-      section: "Послуги",
-    },
-    title: `Пакет послуг: ${artist.artistType} · індивідуальний формат`,
-    priceLabel: artist.id % 3 === 0 ? "Ціна договірна" : `Від ${40 + artist.id * 5} 000 ₴`,
-    description: [
-      `Пропозиція для тих, хто шукає глибоку співпрацю з ${artist.artistName} у напрямі «${artist.artistType}».`,
-      `У фокусі — ${artist.tags.slice(0, 3).join(", ")}; можливі як разові консультації, так і повний супровід.`,
-      "Формат обговорюється індивідуально: від ескізу до публічної презентації.",
-    ],
-    options: [
-      { id: `opt-a-${artist.id}`, label: `Стандартний блок · ${artist.tags[0] ?? "база"}` },
-      { id: `opt-b-${artist.id}`, label: `Розширений супровід · ${artist.tags[1] ?? "преміум"}` },
-    ],
-    formFields: SERVICE_FORM_FIELDS.map((f) => ({ ...f })),
-    submitButtonLabel: "Відправити запит",
-  };
-}
-
 export interface AuthorProfileBundle {
   id: number;
   slug: string;
@@ -454,21 +260,23 @@ export interface AuthorProfileBundle {
   profileTeams: ProfileTeam[];
   projectDetails: ProjectDetails;
   projectDescriptionData: ProjectDescriptionData;
-  serviceDetailsData: ServiceDetailsData;
 }
 
 function buildAuthorProfile(artist: ArtistData): AuthorProfileBundle {
-  const usernameSlug =
-    AUTHOR_USERNAME_SLUGS[artist.id - 1] ?? `artist-${artist.id}`;
+  const usernameSlug = artist.slug;
+  const authorProjects = getProjectsByAuthorId(artist.id);
+  const fallbackProject = authorProjects[0] ?? getProjectsByAuthorId(1)[0];
+  if (!fallbackProject) {
+    throw new Error("projectsData має містити хоча б один проєкт");
+  }
   return {
     id: artist.id,
     slug: usernameSlug,
     aboutMe: buildAboutMe(artist, usernameSlug),
     profileInfo: buildProfileInfo(artist, usernameSlug),
-    profileTeams: buildProfileTeams(),
-    projectDetails: buildProjectDetails(artist),
-    projectDescriptionData: buildProjectDescriptionData(artist, usernameSlug),
-    serviceDetailsData: buildServiceDetailsData(artist),
+    profileTeams: buildProfileTeams(artist.id),
+    projectDetails: fallbackProject.projectDetails,
+    projectDescriptionData: fallbackProject.projectDescriptionData,
   };
 }
 
@@ -478,7 +286,7 @@ export const authorProfiles: AuthorProfileBundle[] = artistsData.map((a) =>
 );
 
 export const DEFAULT_AUTHOR_PROFILE_ID = 1;
-export const DEFAULT_AUTHOR_PROFILE_SLUG = AUTHOR_USERNAME_SLUGS[0] ?? "olena-kravets";
+export const DEFAULT_AUTHOR_PROFILE_SLUG = artistsData[0]?.slug ?? "olena-kravets";
 
 export function getAuthorProfileById(
   id: number | string | null | undefined,
@@ -521,4 +329,3 @@ export const profileInfo = defaultEditorProfile.profileInfo;
 export const profileTeams = defaultEditorProfile.profileTeams;
 export const projectDetails = defaultEditorProfile.projectDetails;
 export const projectDescriptionData = defaultEditorProfile.projectDescriptionData;
-export const serviceDetailsData = defaultEditorProfile.serviceDetailsData;

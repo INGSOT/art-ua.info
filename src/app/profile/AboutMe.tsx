@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
-import { teamData } from "../../data/teamData";
 import { profileTexts } from "../../data/profileData";
 import { withTeamId } from "../../lib/authorQuery";
 import { useProfileView } from "./ProfileViewContext";
@@ -34,9 +33,9 @@ export default function AboutMe() {
           {aboutMeData.name}
         </h2>
 
-        {/* Description */}
+        {/* Artist type */}
         <p className="text-white text-center mb-8">
-          {aboutMeData.description}
+          {aboutMeData.artistType}
         </p>
 
         {/* Teams */}
@@ -44,7 +43,7 @@ export default function AboutMe() {
           {aboutMeData.teams.map((team, index) => (
             <Link
               key={index}
-              href={withTeamId("/team/projects", teamData[index]?.username ?? teamData[0].username)}
+              href={withTeamId("/team/projects", team.slug)}
               className="flex items-center gap-3 bg-[#414141] px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
             >
               <div className="w-8 h-8 flex-shrink-0 rounded-full overflow-hidden">

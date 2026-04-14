@@ -7,7 +7,6 @@ import { Card, CardContent } from "../../../../components/ui/card";
 import { projectFilterButtons, projectEmptyState } from "../../../../data/profileData";
 import { getMyProjectsByAuthorId } from "../../../../data/projectsData";
 import { useProfileView } from "../../ProfileViewContext";
-import { withProfileId } from "../../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
@@ -47,7 +46,7 @@ export default function Projects() {
               {myProjects.map((project) => (
                 <Link
                   key={project.id}
-                  href={withProfileId("/profile/projects/project", slug)}
+                  href={`/projects/${project.slug}`}
                   className="block group"
                 >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">

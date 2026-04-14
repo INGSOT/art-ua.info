@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const DEFAULT_ORDER_LABEL = "Замовити послугу";
 const DEFAULT_EDIT_LABEL = "Редагувати послугу";
-const DEFAULT_ORDER_HREF = "/author/olena-kravets/services/service";
+const DEFAULT_ORDER_HREF = "/services";
 
 export type ServiceCardFooter =
   | { variant: "order"; href?: string; label?: string }

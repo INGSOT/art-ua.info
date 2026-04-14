@@ -9,32 +9,20 @@ export default function Participants() {
   const team = useCurrentTeam();
 
   const members = useMemo((): ArtistData[] => {
-    // Унікальні аватари учасників команди (у `members` теоретично можуть бути дублікати).
-    const uniquePhotoPaths: string[] = [];
-    const seen = new Set<string>();
+    const uniqueArtistIds: number[] = [];
+    const seen = new Set<number>();
     for (const m of team.members) {
-      if (seen.has(m.avatar)) continue;
-      seen.add(m.avatar);
-      uniquePhotoPaths.push(m.avatar);
+      if (seen.has(m.artistId)) continue;
+      seen.add(m.artistId);
+      uniqueArtistIds.push(m.artistId);
     }
 
-    const photoToArtist = new Map(artistsData.map((artist) => [artist.artistPhoto, artist] as const));
+    const artistById = new Map(artistsData.map((artist) => [artist.id, artist] as const));
 
-    // Разрешаем аватар-URL из `teamMembers` в карточки художников из `artistsData`.
-    const resolved = uniquePhotoPaths
-      .map((photoPath) => photoToArtist.get(photoPath))
+    const resolved = uniqueArtistIds
+      .map((artistId) => artistById.get(artistId))
       .filter((artist): artist is ArtistData => Boolean(artist));
-
-    // Дополнительный защитный дедуп (на случай совпадений `artistPhoto`).
-    const uniqueById: ArtistData[] = [];
-    const seenIds = new Set<number>();
-    for (const artist of resolved) {
-      if (seenIds.has(artist.id)) continue;
-      seenIds.add(artist.id);
-      uniqueById.push(artist);
-    }
-
-    return uniqueById;
+    return resolved;
   }, [team]);
 
   if (members.length === 0) {
@@ -51,6 +39,7 @@ export default function Participants() {
         {members.map((artist) => (
           <Participant
             key={artist.id}
+            artistId={artist.id}
             artistPhoto={artist.artistPhoto}
             artistName={artist.artistName}
             artistType={artist.artistType}
