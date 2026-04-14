@@ -4,17 +4,31 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../../components/ui/accordion";
-import { faqData } from "../../data/faqData";
+import { FAQItem } from "../../data/faqData";
 
-export default function ListOfFAQ() {
+interface ListOfFAQProps {
+  items: FAQItem[];
+}
+
+export default function ListOfFAQ({ items }: ListOfFAQProps) {
+  if (items.length === 0) {
+    return (
+      <div className="w-full bg-[#343434] border border-solid border-[#272727] p-6">
+        <p className="text-white font-p1">
+          За обраною категорією поки немає запитань.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Accordion
       type="single"
       collapsible
-      defaultValue="item-1"
+      defaultValue={items[0]?.id}
       className="w-full flex flex-col bg-[#343434]"
     >
-      {faqData.map((faq) => (
+      {items.map((faq) => (
         <AccordionItem key={faq.id} value={faq.id} className="border-none">
           <div className="flex flex-col w-full bg-[#343434] border border-solid border-[#272727]">
             <div className="flex items-stretch w-full border-b border-[#272727]">
