@@ -1,18 +1,56 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import SearchSection from './SearchSection';
 import {
   buildSearchUrl,
   getGlobalSearchResults,
+  getGlobalSearchSuggestions,
   type GlobalSearchCategoryResult,
+  type GlobalSearchSuggestion,
 } from '../lib/globalSearch';
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+function SuggestionsList({
+  items,
+  onPick,
+  listId,
+}: {
+  items: GlobalSearchSuggestion[];
+  onPick: (href: string) => void;
+  listId: string;
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <div className="flex w-full max-w-[600px] flex-col">
+      <ul
+        id={listId}
+        role="listbox"
+        aria-label="Підказки пошуку"
+        className="font-wix m-0 max-h-[min(360px,42vh)] list-none overflow-y-auto rounded-none border border-[#5a5a5a] bg-[#343434] p-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {items.map((s) => (
+          <li key={s.id} role="option" className="border-b border-[#4a4a4a] last:border-b-0">
+            <button
+              type="button"
+              className="flex w-full cursor-pointer flex-col items-start gap-0.5 px-4 py-3 text-left text-white transition-colors hover:bg-[#3d3d3d] focus-visible:bg-[#3d3d3d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FECC39] focus-visible:ring-inset"
+              onClick={() => onPick(s.href)}
+            >
+              <span className="text-[15px] leading-snug">{s.primary}</span>
+              <span className="text-[12px] text-[#A0A0A0]">{s.categoryLabel}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
@@ -21,6 +59,8 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [categories, setCategories] = useState<GlobalSearchCategoryResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+
+  const suggestions = useMemo(() => getGlobalSearchSuggestions(value), [value]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -40,6 +80,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, onClose]);
+
+  const openSuggestion = (href: string) => {
+    router.push(href);
+    onClose();
+  };
 
   const runSearch = () => {
     const trimmed = value.trim();
@@ -68,6 +113,18 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   const withHits = categories.filter((c) => c.count > 0);
   const nothingFound = hasSearched && withHits.length === 0 && submittedQuery;
+
+  const searchBlock = (
+    <div className="w-full shrink-0 [&_section]:bg-transparent [&_section]:p-0">
+      <SearchSection
+        placeholder="Пошук учасників, проєктів, послуг, каталогів, новин…"
+        value={value}
+        onChange={setValue}
+        onSearch={runSearch}
+        maxWidthPx={600}
+      />
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 z-[1000]">
@@ -105,29 +162,29 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
         <div className="mt-4 flex min-h-0 flex-1 flex-col overflow-hidden">
           {!hasSearched ? (
             <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-0 py-2">
-              <div className="w-full shrink-0 [&_section]:bg-transparent [&_section]:p-0">
-                <SearchSection
-                  placeholder="Пошук учасників, проєктів, послуг, каталогів, новин…"
-                  value={value}
-                  onChange={setValue}
-                  onSearch={runSearch}
-                  maxWidthPx={600}
+              <div className="mx-auto flex w-full max-w-[600px] flex-col items-center gap-4">
+                {searchBlock}
+                <SuggestionsList
+                  items={suggestions}
+                  onPick={openSuggestion}
+                  listId="search-modal-suggestions-initial"
                 />
               </div>
             </div>
           ) : (
             <>
               <div className="w-full shrink-0 pt-2 [&_section]:bg-transparent [&_section]:p-0">
-                <SearchSection
-                  placeholder="Пошук учасників, проєктів, послуг, каталогів, новин…"
-                  value={value}
-                  onChange={setValue}
-                  onSearch={runSearch}
-                  maxWidthPx={600}
-                />
+                <div className="mx-auto flex w-full max-w-[600px] flex-col gap-4">
+                  {searchBlock}
+                  <SuggestionsList
+                    items={suggestions}
+                    onPick={openSuggestion}
+                    listId="search-modal-suggestions-after"
+                  />
+                </div>
               </div>
 
-              <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
+              <div className="mt-4 min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {nothingFound && (
                   <p className="font-wix text-center text-white text-[16px] leading-relaxed px-2">
                     За запитом «{submittedQuery}» нічого не знайдено. Спробуйте інші ключові слова.
