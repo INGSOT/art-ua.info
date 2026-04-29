@@ -255,9 +255,9 @@ export default function AuthorsPage() {
                                             artistName={participant.name}
                                             artistType={participant.category}
                                             tags={participant.tags}
-                                            photos={participant.projects.map((p) => ({
-                                                image: p.image,
-                                                likes: p.likes,
+                                            photos={(participant.services ?? []).map((service) => ({
+                                                image: service.image,
+                                                likes: 0,
                                             }))}
                                             catalogButtonText=""
                                             isTeam

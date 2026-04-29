@@ -1,12 +1,6 @@
 import { artistsData } from "./artistsData";
 
 // Публічна сторінка команди (/team/*). Масив команд відповідає «Команда 1»…«Команда 4» на /author та /profile.
-export interface TeamProject {
-  id: number;
-  image: string;
-  title: string;
-  likes: number;
-}
 
 export interface TeamMember {
   artistId: number;
@@ -45,7 +39,6 @@ export interface TeamProfile {
   /** Теги для каталогу /authors (фільтр і пошук). */
   tags: string[];
   avatar: string;
-  projects: TeamProject[];
   members: TeamMember[];
   services: TeamService[];
   info: TeamInfo;
@@ -79,15 +72,9 @@ export const teamData: TeamProfile[] = [
     id: "1",
     username: "komanda-1",
     name: "Команда 1",
-    category: "Музичний гурт · інді та електроніка",
+    category: "Музичний гурт",
     tags: ["Інді", "Електроніка", "Живі виступи"],
     avatar: "/teams/team-photo-1.png",
-    projects: [
-      { id: 101, image: "/projects/project-photo-1.png", title: "Альбом «Нічні мости»", likes: 124 },
-      { id: 102, image: "/gallery/big_lebovski.png", title: "Кліп «Світло в вікнах»", likes: 89 },
-      { id: 103, image: "/projects/project-photo-3.png", title: "Живий сет на фестивалі", likes: 256 },
-      { id: 104, image: "/gallery/autumn.png", title: "Саундтрек до короткометражки", likes: 41 },
-    ],
     members: resolveTeamMembers([1, 2, 3]),
     services: [
       {
@@ -132,14 +119,9 @@ export const teamData: TeamProfile[] = [
     id: "2",
     username: "komanda-2",
     name: "Команда 2",
-    category: "Театральна трупа · сучасна драма",
+    category: "Театральна трупа",
     tags: ["Драма", "Перформанс", "Постановка"],
     avatar: "/teams/team-photo-2.png",
-    projects: [
-      { id: 201, image: "/projects/project-photo-2.png", title: "Вистава «Кімната без дверей»", likes: 312 },
-      { id: 202, image: "/gallery/pulp_fiction.png", title: "Читка п'єси у просторі галереї", likes: 67 },
-      { id: 203, image: "/gallery/mountain_landscape.png", title: "Вуличний перформанс «Лінія»", likes: 198 },
-    ],
     members: resolveTeamMembers([4, 5, 6, 7]),
     services: [
       {
@@ -180,12 +162,6 @@ export const teamData: TeamProfile[] = [
     category: "Студія візуального мистецтва та брендингу",
     tags: ["Брендинг", "Айдентика", "Графіка"],
     avatar: "/teams/team-photo-3.png",
-    projects: [
-      { id: 301, image: "/projects/project-photo-3.png", title: "Айдентика культурного центру", likes: 445 },
-      { id: 302, image: "/gallery/abstractionism.png", title: "Серія постерів до бієнале", likes: 178 },
-      { id: 303, image: "/gallery/whale.png", title: "3D-інсталяція для публічного простору", likes: 92 },
-      { id: 304, image: "/projects/project-photo-4.png", title: "Каталог виставки «Межі»", likes: 63 },
-    ],
     members: resolveTeamMembers([2, 3]),
     services: [
       {
@@ -233,11 +209,6 @@ export const teamData: TeamProfile[] = [
     category: "Документальне кіно та відеопродакшн",
     tags: ["Документалістика", "Зйомка", "Монтаж"],
     avatar: "/teams/team-photo-4.png",
-    projects: [
-      { id: 401, image: "/projects/project-photo-4.png", title: "Фільм «Східний коридор» (короткий метр)", likes: 521 },
-      { id: 402, image: "/gallery/ship.png", title: "Цикл інтерв'ю про ремесло", likes: 134 },
-      { id: 403, image: "/gallery/big_lebovski.png", title: "Відеоінсталяція для музею", likes: 88 },
-    ],
     members: resolveTeamMembers([8, 9, 10, 11, 12]),
     services: [
       {

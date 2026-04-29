@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
@@ -25,31 +25,19 @@ interface ParticipantProps {
 }
 
 function TagBadge({ label }: { label: string }) {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <Badge
       variant="secondary"
-      className="inline-flex items-center justify-center gap-1 px-1 py-0.5 cursor-pointer transition-colors rounded-none"
+      className="inline-flex items-center justify-center px-1 py-0.5 rounded-none bg-[#272727]"
       style={{
-        backgroundColor: isHovered ? "#FECC39" : "#272727",
         borderRadius: 0,
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <span
-        className="font-wix font-p3 font-[number:var(--p3-font-weight)] text-[length:var(--p3-font-size)] text-center tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)] transition-colors"
-        style={{ color: isHovered ? "#272727" : "white" }}
+        className="font-wix font-p3 font-[number:var(--p3-font-weight)] text-[length:var(--p3-font-size)] text-center tracking-[var(--p3-letter-spacing)] leading-[var(--p3-line-height)] [font-style:var(--p3-font-style)] text-white"
       >
         {label}
       </span>
-      <Image
-        src={isHovered ? "/black_cross.svg" : "/white_cross.svg"}
-        alt="Remove"
-        width={20}
-        height={20}
-      />
     </Badge>
   );
 }

@@ -1,5 +1,6 @@
 export interface FAQItem {
   id: string;
+  category: string;
   question: string;
   answer: string[];
   isOpen: boolean;
@@ -8,101 +9,114 @@ export interface FAQItem {
 export const faqData: FAQItem[] = [
   {
     id: "item-1",
-    question: "Текст питання",
+    category: "Реєстрація та профіль",
+    question: "Як зареєструватися на платформі?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Натисніть кнопку «Приєднатися» у верхній частині сайту та оберіть формат участі: митець, команда або організація.",
+      "Після заповнення базових даних підтвердьте email, увійдіть до кабінету й додайте короткий опис діяльності, контакти та візуальні матеріали.",
     ],
     isOpen: true,
   },
   {
     id: "item-2",
-    question: "Текст питання",
+    category: "Реєстрація та профіль",
+    question: "Які дані обов’язково потрібно заповнити у профілі?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Мінімально потрібні: ім’я або назва, напрям діяльності, місто, контактний email і короткий опис.",
+      "Щоб профіль виглядав переконливо для партнерів, рекомендуємо додати фото/обкладинку, посилання на соцмережі та приклади робіт.",
     ],
     isOpen: false,
   },
   {
     id: "item-3",
-    question: "Текст питання",
+    category: "Проєкти",
+    question: "Як додати власний проєкт у каталог?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "У кабінеті відкрийте розділ «Проєкти» та натисніть «Створити проєкт».",
+      "Вкажіть назву, опис, категорію, формат співпраці та додайте медіа. Після збереження проєкт одразу з’явиться у вашому профілі.",
     ],
     isOpen: false,
   },
   {
     id: "item-4",
-    question: "Текст питання",
+    category: "Проєкти",
+    question: "Чи можна редагувати проєкт після публікації?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Так, ви можете змінювати текст, зображення, контакти та статус проєкту у будь-який час.",
+      "Усі зміни зберігаються одразу, тому радимо перевіряти інформацію перед публікацією важливих оновлень.",
     ],
     isOpen: false,
   },
   {
     id: "item-5",
-    question: "Текст питання",
+    category: "Послуги та співпраця",
+    question: "Як працює розділ послуг?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "У розділі послуг митці й команди можуть розміщувати свої пропозиції: консультації, виступи, продакшн, дизайн тощо.",
+      "Користувачі знаходять потрібні послуги через фільтри й зв’язуються з виконавцем напряму через контакти у профілі.",
     ],
     isOpen: false,
   },
   {
     id: "item-6",
-    question: "Текст питання",
+    category: "Послуги та співпраця",
+    question: "Чи є комісія платформи за замовлення?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Наразі платформа не утримує комісію за контакт між сторонами.",
+      "Фінальні умови співпраці, оплату та документи сторони погоджують самостійно поза платформою.",
     ],
     isOpen: false,
   },
   {
     id: "item-7",
-    question: "Текст питання",
+    category: "Модерація та безпека",
+    question: "Чому мій матеріал може не пройти модерацію?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Причини зазвичай пов’язані з неповним описом, відсутністю контактів, неякісними медіа або контентом, що порушує правила спільноти.",
+      "Після виправлення зауважень ви можете повторно опублікувати матеріал без створення нового запису.",
     ],
     isOpen: false,
   },
   {
     id: "item-8",
-    question: "Текст питання",
+    category: "Модерація та безпека",
+    question: "Як повідомити про порушення або підозрілий контент?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Скористайтеся кнопкою скарги у відповідному профілі або проєкті, або напишіть нам через форму зворотного зв’язку.",
+      "У повідомленні вкажіть посилання на контент і коротко опишіть проблему - це пришвидшить перевірку модераторами.",
     ],
     isOpen: false,
   },
   {
     id: "item-9",
-    question: "Текст питання",
+    category: "Оплата та підписка",
+    question: "Які можливості доступні безкоштовно?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Безкоштовно доступні реєстрація, створення профілю, публікація базової інформації про проєкти та перегляд каталогу учасників.",
+      "Додаткові промо-можливості або розширене просування можуть надаватися за окремими умовами.",
     ],
     isOpen: false,
   },
   {
     id: "item-10",
-    question: "Текст питання",
+    category: "Оплата та підписка",
+    question: "Як дізнатися про зміни тарифів або нові платні функції?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Ми публікуємо оновлення у розділі новин платформи та надсилаємо важливі повідомлення на email, вказаний у профілі.",
+      "Рекомендуємо періодично перевіряти новини, щоб першими дізнаватися про нові інструменти для просування.",
     ],
     isOpen: false,
   },
   {
     id: "item-11",
-    question: "Текст питання",
+    category: "Технічна підтримка",
+    question: "Що робити, якщо не вдається увійти в акаунт?",
     answer: [
-      "Текст відповіді Р1.",
-      "We generate revenue by facilitating successful transactions between our users. The primary objective of everything we do – every new feature, policy, and campaign – is to maximize the number of users searching, interacting, and, ultimately, transacting through our platform.",
+      "Спробуйте відновити пароль через форму входу та перевірте папку «Спам», якщо лист не прийшов протягом кількох хвилин.",
+      "Якщо проблема не зникла, зверніться до підтримки й вкажіть email акаунта та короткий опис помилки.",
     ],
     isOpen: false,
   },
 ];
+
+export const faqCategories = Array.from(new Set(faqData.map((item) => item.category)));

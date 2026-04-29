@@ -8,15 +8,17 @@ import {
   teamProjectFilterButtons,
   teamProjectEmptyState,
 } from "../../../../data/teamData";
-import { DEFAULT_AUTHOR_PROFILE_SLUG } from "../../../../data/profileData";
+import { getAuthorSlugById } from "../../../../data/profileData";
+import { projectsData } from "../../../../data/projectsData";
 import { useCurrentTeam } from "../../useCurrentTeam";
 import { withAuthorId } from "../../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
   const team = useCurrentTeam();
+  const memberIds = team.members.map((member) => member.artistId);
 
-  const projects = team.projects;
+  const projects = projectsData.filter((project) => memberIds.includes(project.authorId));
   const hasProjects = projects.length > 0;
 
   return (
@@ -49,7 +51,7 @@ export default function Projects() {
               {projects.map((project) => (
                 <Link
                   key={project.id}
-                  href={withAuthorId("/author/projects/project", DEFAULT_AUTHOR_PROFILE_SLUG)}
+                  href={withAuthorId("/author/projects", getAuthorSlugById(project.authorId))}
                   className="block group"
                 >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
