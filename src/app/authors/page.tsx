@@ -13,6 +13,7 @@ import Participant from "../../components/Participant";
 import SortingControls from "./SortingControls";
 import PaginationSection from "../../components/PaginationSection";
 import { artistsData, type ArtistData } from "../../data/artistsData";
+import { organizationsData } from "../../data/organizationsData";
 import { teamData, type TeamProfile } from "../../data/teamData";
 
 const ITEMS_PER_PAGE = 10;
@@ -32,11 +33,13 @@ export default function AuthorsPage() {
         .getAll("art_subcategory")
         .filter((value) => allowedArtCategoryIds.has(value));
 
-    type ParticipantFilter = "artist" | "team" | "all";
+    type ParticipantFilter = "artist" | "organization" | "team" | "all";
 
     const currentParticipantFilter: ParticipantFilter =
         participantParam === "artist"
             ? "artist"
+            : participantParam === "organization"
+                ? "organization"
             : participantParam === "team"
                 ? "team"
                 : "all";
@@ -58,6 +61,8 @@ export default function AuthorsPage() {
 
         if (currentParticipantFilter === "artist") {
             base.artists = true;
+        } else if (currentParticipantFilter === "organization") {
+            base.organizations = true;
         } else if (currentParticipantFilter === "team") {
             base.teams = true;
         } else {
@@ -75,14 +80,17 @@ export default function AuthorsPage() {
         setCurrentPage(1);
 
         const artistsSelected = !!filters["artists"];
+        const organizationsSelected = !!filters["organizations"];
         const teamsSelected = !!filters["teams"];
         const allSelected = !!filters["all"];
 
         let nextFilter: ParticipantFilter = "all";
 
-        if (artistsSelected && !teamsSelected && !allSelected) {
+        if (artistsSelected && !organizationsSelected && !teamsSelected && !allSelected) {
             nextFilter = "artist";
-        } else if (teamsSelected && !artistsSelected && !allSelected) {
+        } else if (organizationsSelected && !artistsSelected && !teamsSelected && !allSelected) {
+            nextFilter = "organization";
+        } else if (teamsSelected && !artistsSelected && !organizationsSelected && !allSelected) {
             nextFilter = "team";
         } else {
             nextFilter = "all";
@@ -96,6 +104,8 @@ export default function AuthorsPage() {
 
         if (nextFilter === "artist") {
             params.set("participant", "artist");
+        } else if (nextFilter === "organization") {
+            params.set("participant", "organization");
         } else if (nextFilter === "team") {
             params.set("participant", "team");
         } else {
@@ -115,10 +125,12 @@ export default function AuthorsPage() {
 
     if (currentParticipantFilter === "artist") {
         activeData = artistsData;
+    } else if (currentParticipantFilter === "organization") {
+        activeData = organizationsData;
     } else if (currentParticipantFilter === "team") {
         activeData = teamData;
     } else {
-        activeData = [...artistsData, ...teamData];
+        activeData = [...artistsData, ...organizationsData, ...teamData];
     }
 
     const filteredDataByCategory = selectedArtCategoryIds.length

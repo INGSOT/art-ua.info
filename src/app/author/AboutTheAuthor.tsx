@@ -22,7 +22,7 @@ export default function AboutTheAuthor() {
               alt="Author Avatar"
               width={160}
               height={160}
-              className="object-cover"
+              className="object-cover w-full h-full"
             />
           </div>
         </div>

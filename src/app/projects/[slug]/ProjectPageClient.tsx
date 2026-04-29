@@ -144,12 +144,12 @@ export default function ProjectPageClient({ project }: ProjectPageClientProps) {
                     alt="Author Avatar"
                     width={60}
                     height={60}
-                    className="object-cover"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
               </div>
 
-              <h3 className="text-white text-2xl md:text-3xl font-bold mb-4 whitespace-normal md:whitespace-nowrap">
+              <h3 className="text-white text-2xl md:text-3xl font-bold mb-4 whitespace-normal break-words">
                 {projectDescriptionData.aboutAuthor.name}
               </h3>
 

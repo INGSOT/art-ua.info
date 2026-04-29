@@ -82,7 +82,7 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
                   alt={catalog.authorName}
                   width={32}
                   height={32}
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
               </div>
               <span className="font-wix text-white text-xs md:text-sm font-bold">{catalog.authorName}</span>

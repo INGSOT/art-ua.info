@@ -100,7 +100,7 @@ export default function ListOfProjects({ projects, disableInteractions = false }
                   alt={project.authorName}
                   width={32}
                   height={32}
-                  className="object-cover"
+                  className="w-full h-full object-cover object-center"
                 />
               </div>
               <span className="font-wix text-white text-xs md:text-sm font-bold">{project.authorName}</span>

@@ -1,5 +1,6 @@
 import type { ArtistData } from "./artistsData";
 import { artistsData } from "./artistsData";
+import { organizationsData } from "./organizationsData";
 import {
   getProjectsByAuthorId,
   type ProjectDescriptionData,
@@ -280,8 +281,10 @@ function buildAuthorProfile(artist: ArtistData): AuthorProfileBundle {
   };
 }
 
-/** Повний публічний профіль автора (відповідає запису в artistsData). */
-export const authorProfiles: AuthorProfileBundle[] = artistsData.map((a) =>
+const authorParticipantsData: ArtistData[] = [...artistsData, ...organizationsData];
+
+/** Повний публічний профіль автора (відповідає запису в artistsData та organizationsData). */
+export const authorProfiles: AuthorProfileBundle[] = authorParticipantsData.map((a) =>
   buildAuthorProfile(a),
 );
 

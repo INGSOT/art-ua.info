@@ -1,4 +1,5 @@
 import { artistsData } from "./artistsData";
+import { organizationsData } from "./organizationsData";
 import { getTeamById, teamData } from "./teamData";
 
 export type CurrencyCode = "UAH" | "USD" | "EUR";
@@ -50,6 +51,9 @@ export interface ServicePageData {
 }
 
 const artistById = new Map(artistsData.map((artist) => [artist.id, artist]));
+const organizationById = new Map(
+    organizationsData.map((organization) => [organization.id, organization])
+);
 
 const teamServiceLegacyKeyToProfileId: Record<number, string> = Object.fromEntries(
     teamData.map((team, index) => [index + 1, team.id] as const)
@@ -74,6 +78,17 @@ const getTeamServiceAuthor = (legacyTeamKey: number) => {
         authorName: team.name,
         authorAvatar: team.avatar,
         performerType: "team" as const,
+    };
+};
+
+const getOrganizationServiceAuthor = (organizationId: number) => {
+    const organization = organizationById.get(organizationId);
+
+    return {
+        authorId: organizationId,
+        authorName: organization?.artistName ?? "",
+        authorAvatar: organization?.artistPhoto ?? "",
+        performerType: "artist" as const,
     };
 };
 
@@ -457,6 +472,261 @@ export const servicesData: ServiceItemData[] = [
             { id: "opt-20-interview", label: "Інтерв'ю та бекстейдж-зйомка" },
             { id: "opt-20-film", label: "Основний фільм до 3 хв" },
             { id: "opt-20-cuts", label: "Короткі версії для соцмереж" },
+        ],
+    },
+    // organizations
+    {
+        id: 21,
+        ...getOrganizationServiceAuthor(101),
+        serviceImage: "/services.jpg",
+        title: "Гастрольна театральна постановка під подію",
+        slug: "hastrolna-teatralna-postanovka-pid-podiyu",
+        description: "Організація готує театральну постановку під формат вашої події: адаптація сценарію, сценографія та повний супровід показу.",
+        artSubCategory: "acting",
+        location: "Київ",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-21-script", label: "Адаптація постановки під майданчик" },
+            { id: "opt-21-cast", label: "Професійний акторський склад" },
+            { id: "opt-21-show", label: "Проведення вистави під ключ" },
+        ],
+    },
+    {
+        id: 22,
+        ...getOrganizationServiceAuthor(102),
+        serviceImage: "/services.jpg",
+        title: "Режисерська лабораторія камерних вистав",
+        slug: "rezhyserska-laboratoriya-kamernykh-vystav",
+        description: "Камерна сцена проводить режисерські лабораторії для молодих команд: від драматургічного аналізу до фінального показу етюдів.",
+        artSubCategory: "directing",
+        location: "Львів",
+        price: 82000,
+        currency: "UAH",
+        priceNegotiable: false,
+        options: [
+            { id: "opt-22-analysis", label: "Аналіз драматургічного матеріалу" },
+            { id: "opt-22-practice", label: "Практичні режисерські сесії" },
+            { id: "opt-22-pitch", label: "Пітчинг фінальних рішень" },
+        ],
+    },
+    {
+        id: 23,
+        ...getOrganizationServiceAuthor(103),
+        serviceImage: "/services.jpg",
+        title: "Оперна програма для фестивалів",
+        slug: "operna-prohrama-dlya-festyvaliv",
+        description: "Команда підготує концертну оперну програму для фестивалю або урочистої події з оркестровим та вокальним супроводом.",
+        artSubCategory: "music",
+        location: "Одеса",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-23-program", label: "Кураторська музична програма" },
+            { id: "opt-23-soloists", label: "Залучення солістів і ансамблю" },
+            { id: "opt-23-tech", label: "Сценічно-технічний супровід" },
+        ],
+    },
+    {
+        id: 24,
+        ...getOrganizationServiceAuthor(104),
+        serviceImage: "/services.jpg",
+        title: "Хореографічний перформанс для брендів",
+        slug: "khoreohrafichnyy-performans-dlya-brendiv",
+        description: "Центр танцю створює авторські хореографічні перформанси для презентацій, форумів та культурних подій.",
+        artSubCategory: "choreography",
+        location: "Харків",
+        price: 140000,
+        currency: "UAH",
+        priceNegotiable: false,
+        options: [
+            { id: "opt-24-concept", label: "Розробка концепції номера" },
+            { id: "opt-24-ensemble", label: "Трупа до 8 виконавців" },
+            { id: "opt-24-stage", label: "Постановка під сцену замовника" },
+        ],
+    },
+    {
+        id: 25,
+        ...getOrganizationServiceAuthor(105),
+        serviceImage: "/services.jpg",
+        title: "Кураторство живописних виставок",
+        slug: "kuratorstvo-zhyvopysnykh-vystavok",
+        description: "Організація надає кураторський супровід виставок живопису: концепція, підбір робіт, монтаж і комунікація з аудиторією.",
+        artSubCategory: "painting",
+        location: "Дніпро",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-25-curation", label: "Кураторська концепція виставки" },
+            { id: "opt-25-selection", label: "Відбір робіт і експозиційний план" },
+            { id: "opt-25-opening", label: "Супровід відкриття" },
+        ],
+    },
+    {
+        id: 26,
+        ...getOrganizationServiceAuthor(106),
+        serviceImage: "/services.jpg",
+        title: "Фотопроєкт і виставка під ключ",
+        slug: "fotoproyekt-i-vystavka-pid-klyuch",
+        description: "Фотоклуб організовує повний цикл фотопроєкту: зйомки, кураторський відбір, друк і публічну презентацію експозиції.",
+        artSubCategory: "art-photography",
+        location: "Вінниця",
+        price: 2600,
+        currency: "USD",
+        priceNegotiable: false,
+        options: [
+            { id: "opt-26-photo", label: "Серія тематичних фотозйомок" },
+            { id: "opt-26-edit", label: "Відбір і постобробка кадрів" },
+            { id: "opt-26-expo", label: "Організація виставкової події" },
+        ],
+    },
+    {
+        id: 27,
+        ...getOrganizationServiceAuthor(107),
+        serviceImage: "/services.jpg",
+        title: "Кіноклуб та тематичні кінопокази",
+        slug: "kinoklub-ta-tematychni-kinopokazy",
+        description: "Команда проводить добірні кінопокази з модерацією дискусій для освітніх, міських та корпоративних програм.",
+        artSubCategory: "cinema",
+        location: "Полтава",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-27-curation", label: "Підбір тематичної програми" },
+            { id: "opt-27-moderation", label: "Модерація обговорення після показу" },
+            { id: "opt-27-licensing", label: "Координація прав на публічний показ" },
+        ],
+    },
+    {
+        id: 28,
+        ...getOrganizationServiceAuthor(108),
+        serviceImage: "/services.jpg",
+        title: "Графічна айдентика для культурних подій",
+        slug: "hrafichna-aydyentyka-dlya-kulturnykh-podiy",
+        description: "Арт-простір розробляє візуальну айдентику подій: афіші, цифрові макети, навігацію та презентаційні матеріали.",
+        artSubCategory: "graphics",
+        location: "Чернігів",
+        price: 73000,
+        currency: "UAH",
+        priceNegotiable: false,
+        options: [
+            { id: "opt-28-style", label: "Візуальна концепція та стиль" },
+            { id: "opt-28-prints", label: "Пакет матеріалів для друку" },
+            { id: "opt-28-digital", label: "Digital-адаптації для соцмереж" },
+        ],
+    },
+    {
+        id: 29,
+        ...getOrganizationServiceAuthor(109),
+        serviceImage: "/services.jpg",
+        title: "Літературні читання з кураторською програмою",
+        slug: "literaturni-chytannya-z-kuratorskoyu-prohramoyu",
+        description: "Клуб сучасної прози проводить тематичні літературні вечори з модеруванням, запрошеними авторами та відкритими читаннями.",
+        artSubCategory: "prose",
+        location: "Івано-Франківськ",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-29-theme", label: "Формування теми та драматургії вечора" },
+            { id: "opt-29-authors", label: "Підбір авторів і спікерів" },
+            { id: "opt-29-host", label: "Модерація події" },
+        ],
+    },
+    {
+        id: 30,
+        ...getOrganizationServiceAuthor(110),
+        serviceImage: "/services.jpg",
+        title: "Поетичний слем для міських подій",
+        slug: "poetychnyy-slem-dlya-miskykh-podiy",
+        description: "Поетична лабораторія організовує слем-події та творчі читання з інтерактивним форматом для молодіжних і публічних просторів.",
+        artSubCategory: "poetry",
+        location: "Тернопіль",
+        price: 49000,
+        currency: "UAH",
+        priceNegotiable: false,
+        options: [
+            { id: "opt-30-format", label: "Сценарій та правила слему" },
+            { id: "opt-30-lineup", label: "Лайнап поетів і ведучий" },
+            { id: "opt-30-prize", label: "Фінальне оцінювання та нагородження" },
+        ],
+    },
+    {
+        id: 31,
+        ...getOrganizationServiceAuthor(111),
+        serviceImage: "/services.jpg",
+        title: "Медіаарт-інсталяція для виставок",
+        slug: "mediaart-instalyatsiya-dlya-vystavok",
+        description: "Центр медіаарту створює інтерактивні відеоінсталяції для галерей, конференцій і публічних культурних просторів.",
+        artSubCategory: "video-editing",
+        location: "Ужгород",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-31-concept", label: "Концепція та драматургія інсталяції" },
+            { id: "opt-31-production", label: "Виробництво відеоконтенту" },
+            { id: "opt-31-install", label: "Монтаж і запуск на локації" },
+        ],
+    },
+    {
+        id: 32,
+        ...getOrganizationServiceAuthor(112),
+        serviceImage: "/services.jpg",
+        title: "Імерсивний перформанс для бренду",
+        slug: "imersyvnyy-performans-dlya-brendu",
+        description: "Імерсивна сцена розробляє перформанс, де глядач стає частиною дії: сценарій, акторські маршрути та просторова взаємодія.",
+        artSubCategory: "original-genre",
+        location: "Суми",
+        price: 3200,
+        currency: "USD",
+        priceNegotiable: false,
+        options: [
+            { id: "opt-32-script", label: "Сценарій імерсивної взаємодії" },
+            { id: "opt-32-cast", label: "Акторський склад і репетиції" },
+            { id: "opt-32-run", label: "Проведення серії показів" },
+        ],
+    },
+    {
+        id: 33,
+        ...getOrganizationServiceAuthor(113),
+        serviceImage: "/services.jpg",
+        title: "AR-активація для публічного простору",
+        slug: "ar-aktyvatsiya-dlya-publichnoho-prostoru",
+        description: "Фундація створює AR-рішення для виставок і міських подій: від концепції досвіду до запуску інтерактивного контенту.",
+        artSubCategory: "ar",
+        location: "Черкаси",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-33-prototype", label: "AR-прототип і тест сценарію" },
+            { id: "opt-33-content", label: "Розробка 3D/візуального контенту" },
+            { id: "opt-33-launch", label: "Запуск і супровід події" },
+        ],
+    },
+    {
+        id: 34,
+        ...getOrganizationServiceAuthor(114),
+        serviceImage: "/services.jpg",
+        title: "Скульптурний об'єкт для міста",
+        slug: "skulpturnyy-obyekt-dlya-mista",
+        description: "Скульптурний двір пропонує розробку та виготовлення публічних арт-об'єктів для парків, площ і культурних центрів.",
+        artSubCategory: "sculpture",
+        location: "Запоріжжя",
+        price: 98000,
+        currency: "EUR",
+        priceNegotiable: false,
+        options: [
+            { id: "opt-34-design", label: "Ескіз і 3D-модель об'єкта" },
+            { id: "opt-34-fabrication", label: "Виготовлення у майстерні" },
+            { id: "opt-34-installation", label: "Монтаж на локації" },
+        ],
+    },
+    {
+        id: 35,
+        ...getOrganizationServiceAuthor(115),
+        serviceImage: "/services.jpg",
+        title: "Театральна програма для культурного центру",
+        slug: "teatralna-prohrama-dlya-kulturnoho-tsentru",
+        description: "Культурний театр формує репертуарну програму для сезонних подій: постановки, гастролі та освітні зустрічі з трупою.",
+        artSubCategory: "acting",
+        location: "Кривий Ріг",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-35-repertoire", label: "Підбір репертуару" },
+            { id: "opt-35-tour", label: "Організація гастрольного показу" },
+            { id: "opt-35-workshop", label: "Творча зустріч і майстер-клас" },
         ],
     },
 ];
