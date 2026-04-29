@@ -41,6 +41,12 @@ export default function SearchSection({
                     className="font-wix w-full h-full bg-[#343434] text-white placeholder-[#A0A0A0] px-6 pr-16 rounded-none"
                     value={value ?? ''}
                     onChange={(event) => onChange?.(event.target.value)}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            onSearch?.();
+                        }
+                    }}
                 />
                 <button
                     type="button"
