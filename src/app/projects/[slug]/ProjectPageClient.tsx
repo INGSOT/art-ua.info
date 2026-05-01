@@ -105,26 +105,22 @@ export default function ProjectPageClient({ project }: ProjectPageClientProps) {
             </button>
           </div>
 
-          <div className="w-full mb-6">
-            <h2 className="text-white font-bold text-xl mb-6">{projectDetails.characteristicsTitle}</h2>
+          <div className="w-full min-w-0 mb-6">
+            <h2 className="text-white font-bold text-lg mb-4">{projectDetails.characteristicsTitle}</h2>
 
-            <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-white font-bold">{projectDetails.tableHeaders.name}</span>
-                </div>
-                <div>
-                  <span className="text-white font-bold">{projectDetails.tableHeaders.description}</span>
-                </div>
-              </div>
+            <div className="grid grid-cols-2 gap-4 mb-2">
+              <span className="font-wix text-white text-sm">{projectDetails.tableHeaders.name}</span>
+              <span className="font-wix text-white text-sm">{projectDetails.tableHeaders.description}</span>
+            </div>
 
+            <div className="flex flex-col gap-[2px]">
               {projectDetails.characteristics.map((item, index) => (
-                <div key={index} className="grid grid-cols-2 gap-2 md:gap-4">
-                  <div className="bg-[#343434] px-3 md:px-6 py-3 md:py-4">
-                    <span className="text-white font-bold text-sm md:text-base">{item.name}</span>
+                <div key={index} className="grid grid-cols-2 gap-[2px]">
+                  <div className="font-wix bg-[#343434] px-6 py-4 text-white text-base break-words min-w-0">
+                    {item.name}
                   </div>
-                  <div className="bg-[#343434] px-3 md:px-6 py-3 md:py-4">
-                    <span className="text-white text-sm md:text-base">{item.description}</span>
+                  <div className="font-wix bg-[#343434] px-6 py-4 text-white text-base break-words min-w-0">
+                    {item.description}
                   </div>
                 </div>
               ))}

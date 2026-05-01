@@ -21,25 +21,40 @@ const menuItems: { id: NewProjectTab; label: string }[] = [
 
 interface NewProjectMenuProps {
   activeTab: NewProjectTab;
+  unlockedTabs: NewProjectTab[];
   onTabChange: (tab: NewProjectTab) => void;
 }
 
-export default function NewProjectMenu({ activeTab, onTabChange }: NewProjectMenuProps) {
+export default function NewProjectMenu({
+  activeTab,
+  unlockedTabs,
+  onTabChange,
+}: NewProjectMenuProps) {
   return (
     <div className="w-full max-w-[1440px] h-[80px] bg-[#343434] flex items-center justify-start px-6 overflow-x-auto">
       <nav className="flex items-center gap-6 md:gap-[30px] min-w-max">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => onTabChange(item.id)}
-            className={`font-bold text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors ${
-              activeTab === item.id ? "text-[#FECC39]" : "text-white hover:text-[#FECC39]"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
+        {menuItems.map((item) => {
+          const isUnlocked = unlockedTabs.includes(item.id);
+          const isActive = activeTab === item.id;
+
+          return (
+            <button
+              key={item.id}
+              type="button"
+              disabled={!isUnlocked}
+              onClick={() => onTabChange(item.id)}
+              className={`font-bold text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors ${
+                isActive
+                  ? "text-[#FECC39]"
+                  : isUnlocked
+                    ? "text-white hover:text-[#FECC39]"
+                    : "text-[#A0A0A0] cursor-not-allowed"
+              }`}
+            >
+              {item.label}
+            </button>
+          );
+        })}
       </nav>
     </div>
   );

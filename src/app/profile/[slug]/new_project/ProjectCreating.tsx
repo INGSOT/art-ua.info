@@ -20,6 +20,7 @@ import ParametersSection, {
 } from "./ParametersSection";
 import CharacteristicsSection from "./CharacteristicsSection";
 import SoldProject from "./SoldProject";
+import PublicationPreviewSection from "./PublicationPreviewSection";
 import ProjectPublication from "./ProjectPublication";
 
 interface Characteristic {
@@ -62,6 +63,7 @@ export default function ProjectCreating() {
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
   const [isArtFormModalOpen, setIsArtFormModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<NewProjectTab>("owner");
+  const [unlockedTabs, setUnlockedTabs] = useState<NewProjectTab[]>(["owner"]);
   const [selectedArtField, setSelectedArtField] = useState<{
     id: string;
     label: string;
@@ -188,7 +190,15 @@ export default function ProjectCreating() {
   const handleNextTab = () => {
     const currentIndex = tabOrder.indexOf(activeTab);
     if (currentIndex < tabOrder.length - 1) {
-      setActiveTab(tabOrder[currentIndex + 1]);
+      const nextTab = tabOrder[currentIndex + 1];
+      setUnlockedTabs((prev) => (prev.includes(nextTab) ? prev : [...prev, nextTab]));
+      setActiveTab(nextTab);
+    }
+  };
+
+  const handleTabChange = (tab: NewProjectTab) => {
+    if (unlockedTabs.includes(tab)) {
+      setActiveTab(tab);
     }
   };
 
@@ -215,17 +225,42 @@ export default function ProjectCreating() {
 
   return (
     <div
-      className={`flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-[75px] bg-[#414141] ${
-        activeTab === "additional" || activeTab === "name" || activeTab === "owner" ? "" : "min-h-screen"
+      className={`flex flex-col items-center gap-8 ${
+        activeTab === "publication" ? "px-0 overflow-x-hidden" : "px-4 md:px-10 lg:px-[75px]"
+      } bg-[#414141] ${
+        activeTab === "publication" ? "pt-10 pb-0" : "py-10"
+      } ${
+        activeTab === "additional" ||
+        activeTab === "name" ||
+        activeTab === "owner" ||
+        activeTab === "parameters" ||
+        activeTab === "publication"
+          ? ""
+          : "min-h-screen"
       }`}
     >
-      <div className="flex flex-col items-center gap-8 w-full">
+      <div className="flex flex-col items-center gap-8 w-full min-w-0">
       {/* Title */}
       <h1 className="text-[#A0A0A0] text-[32px] md:text-[40px] font-bold text-center">
         {newProjectTexts.title}
       </h1>
 
-      <NewProjectMenu activeTab={activeTab} onTabChange={setActiveTab} />
+      <NewProjectMenu
+        activeTab={activeTab}
+        unlockedTabs={unlockedTabs}
+        onTabChange={handleTabChange}
+      />
+
+      {activeTab === "publication" && (
+        <div className="w-full flex flex-col items-center gap-6">
+          <div className="w-full max-w-[1440px] flex justify-center">
+            <p className="font-wix text-white text-[18px] font-semibold text-center">
+              Так буде виглядати ваш проект
+            </p>
+          </div>
+          <div className="w-full max-w-none self-stretch h-[2px] bg-[#343434]" />
+        </div>
+      )}
 
       {activeTab === "owner" && (
         <OwnerSelectionSection
@@ -318,7 +353,20 @@ export default function ProjectCreating() {
       )}
 
       {activeTab === "additional" && <SoldProject />}
-      {activeTab === "publication" && <ProjectPublication />}
+      {activeTab === "publication" && (
+        <>
+          <PublicationPreviewSection
+            projectNameUa={projectNameUa}
+            selectedArtFieldLabel={selectedArtField?.label || null}
+            workImage={workImage}
+            workVideoUrl={workVideoUrl}
+            galleryImages={galleryImages}
+            descriptionUa={descriptionUa}
+            characteristics={characteristics}
+          />
+          <ProjectPublication />
+        </>
+      )}
 
       {activeTab !== "publication" && (
         <div className="w-full max-w-[1000px] flex justify-center">

@@ -99,7 +99,7 @@ export default function ProjectPublication() {
   };
 
   return (
-    <section className="w-full bg-[#FFFCF5] flex flex-col items-center py-10 px-4 md:px-10 lg:px-[75px] border-b border-black">
+    <section className="w-full bg-[#FFFCF5] flex flex-col items-center py-10 border-b-[2px] border-[#343434]">
       {notification && (
         <Message
           type={notification.type}
@@ -107,7 +107,7 @@ export default function ProjectPublication() {
           onClose={() => setNotification(null)}
         />
       )}
-      <form onSubmit={handlePublish} className="flex flex-col items-center w-full">
+      <form onSubmit={handlePublish} className="flex flex-col items-center w-full max-w-[1000px] px-4 md:px-10 lg:px-[75px]">
       {/* Accept Terms Checkbox */}
       <button
         type="button"

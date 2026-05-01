@@ -96,7 +96,7 @@ export const projectsData: Project[] = [
     title: "Ранкове світло",
     slug: "rankove-svitlo",
     date: "12.01.2026",
-    artSubCategory: "painting",
+    artSubCategory: "Живопис",
     likes: 17,
     ...getProjectAuthor(1),
     projectDetails: {
@@ -149,7 +149,7 @@ export const projectsData: Project[] = [
     title: "Політ кольору",
     slug: "polit-koloru",
     date: "18.01.2026",
-    artSubCategory: "painting",
+    artSubCategory: "Живопис",
     likes: 17,
     ...getProjectAuthor(2),
     projectDetails: {
@@ -202,7 +202,7 @@ export const projectsData: Project[] = [
     title: "«Камінний подих»",
     slug: "kaminnyi-podykh",
     date: "25.01.2026",
-    artSubCategory: "sculpture",
+    artSubCategory: "Скульптура",
     likes: 35,
     ...getProjectAuthor(3),
     projectDetails: {
@@ -255,7 +255,7 @@ export const projectsData: Project[] = [
     title: "«Форма тиші»",
     slug: "forma-tyshi",
     date: "02.02.2026",
-    artSubCategory: "sculpture",
+    artSubCategory: "Скульптура",
     likes: 17,
     ...getProjectAuthor(4),
     projectDetails: {
@@ -308,7 +308,7 @@ export const projectsData: Project[] = [
     title: "Контур міста",
     slug: "kontur-mista",
     date: "09.02.2026",
-    artSubCategory: "graphics",
+    artSubCategory: "Графіка",
     likes: 22,
     ...getProjectAuthor(5),
     projectDetails: {
@@ -361,7 +361,7 @@ export const projectsData: Project[] = [
     title: "Графічний імпульс",
     slug: "hrafichnyi-impuls",
     date: "16.02.2026",
-    artSubCategory: "graphics",
+    artSubCategory: "Графіка",
     likes: 19,
     ...getProjectAuthor(6),
     projectDetails: {
@@ -414,7 +414,7 @@ export const projectsData: Project[] = [
     title: "Світло в об'єктиві",
     slug: "svitlo-v-obiektyvi",
     date: "23.02.2026",
-    artSubCategory: "art-photography",
+    artSubCategory: "Художня фотографія",
     likes: 28,
     ...getProjectAuthor(7),
     projectDetails: {
@@ -467,7 +467,7 @@ export const projectsData: Project[] = [
     title: "Мовчання кадру",
     slug: "movchannia-kadru",
     date: "01.03.2026",
-    artSubCategory: "art-photography",
+    artSubCategory: "Художня фотографія",
     likes: 31,
     ...getProjectAuthor(8),
     projectDetails: {
@@ -520,7 +520,7 @@ export const projectsData: Project[] = [
     title: "Монтаж ритму",
     slug: "montazh-rytmu",
     date: "07.03.2026",
-    artSubCategory: "video-editing",
+    artSubCategory: "Відеозйомка та монтаж",
     likes: 15,
     ...getProjectAuthor(9),
     projectDetails: {
@@ -573,7 +573,7 @@ export const projectsData: Project[] = [
     title: "Кадр за кадром",
     slug: "kadr-za-kadrom",
     date: "10.03.2026",
-    artSubCategory: "video-editing",
+    artSubCategory: "Відеозйомка та монтаж",
     likes: 24,
     ...getProjectAuthor(10),
     projectDetails: {
@@ -626,7 +626,7 @@ export const projectsData: Project[] = [
     title: "Після заходу",
     slug: "pislia-zakhodu",
     date: "14.03.2026",
-    artSubCategory: "cinema",
+    artSubCategory: "Повнометражний кінематограф",
     likes: 18,
     ...getProjectAuthor(11),
     projectDetails: {
@@ -679,7 +679,7 @@ export const projectsData: Project[] = [
     title: "Остання сцена",
     slug: "ostannia-stsena",
     date: "18.03.2026",
-    artSubCategory: "cinema",
+    artSubCategory: "Повнометражний кінематограф",
     likes: 26,
     ...getProjectAuthor(12),
     projectDetails: {
@@ -732,7 +732,7 @@ export const projectsData: Project[] = [
     title: "AR-міраж",
     slug: "ar-mirazh",
     date: "21.03.2026",
-    artSubCategory: "ar",
+    artSubCategory: "Доповнена реальність",
     likes: 20,
     ...getProjectAuthor(13),
     projectDetails: {
@@ -785,7 +785,7 @@ export const projectsData: Project[] = [
     title: "Доповнена реальність: Портал",
     slug: "dopovnena-realnist-portal",
     date: "24.03.2026",
-    artSubCategory: "ar",
+    artSubCategory: "Доповнена реальність",
     likes: 33,
     ...getProjectAuthor(14),
     projectDetails: {
@@ -838,7 +838,7 @@ export const projectsData: Project[] = [
     title: "Пластика сцени",
     slug: "plastyka-stseny",
     date: "27.03.2026",
-    artSubCategory: "directing",
+    artSubCategory: "Режисура",
     likes: 29,
     ...getProjectAuthor(15),
     projectDetails: {
@@ -891,7 +891,7 @@ export const projectsData: Project[] = [
     title: "Код міської сцени",
     slug: "kod-miskoi-stseny",
     date: "29.03.2026",
-    artSubCategory: "acting",
+    artSubCategory: "Акторське мистецтво",
     likes: 34,
     ...getProjectAuthor(101),
     projectDetails: {
@@ -942,7 +942,7 @@ export const projectsData: Project[] = [
     title: "Камерна траєкторія",
     slug: "kamerna-traiektoriia",
     date: "30.03.2026",
-    artSubCategory: "directing",
+    artSubCategory: "Режисура",
     likes: 22,
     ...getProjectAuthor(102),
     projectDetails: {
@@ -993,7 +993,7 @@ export const projectsData: Project[] = [
     title: "Оперний модуль",
     slug: "opernyi-modul",
     date: "31.03.2026",
-    artSubCategory: "music",
+    artSubCategory: "Музичне мистецтво",
     likes: 27,
     ...getProjectAuthor(103),
     projectDetails: {
@@ -1044,7 +1044,7 @@ export const projectsData: Project[] = [
     title: "Рух і простір",
     slug: "rukh-i-prostir",
     date: "01.04.2026",
-    artSubCategory: "choreography",
+    artSubCategory: "Хореографічне мистецтво",
     likes: 25,
     ...getProjectAuthor(104),
     projectDetails: {
@@ -1095,7 +1095,7 @@ export const projectsData: Project[] = [
     title: "Дніпровська палітра",
     slug: "dniprovska-palitra",
     date: "02.04.2026",
-    artSubCategory: "painting",
+    artSubCategory: "Живопис",
     likes: 30,
     ...getProjectAuthor(105),
     projectDetails: {
@@ -1146,7 +1146,7 @@ export const projectsData: Project[] = [
     title: "Фокус громади",
     slug: "fokus-hromady",
     date: "03.04.2026",
-    artSubCategory: "art-photography",
+    artSubCategory: "Художня фотографія",
     likes: 23,
     ...getProjectAuthor(106),
     projectDetails: {
@@ -1197,7 +1197,7 @@ export const projectsData: Project[] = [
     title: "Документальний вектор",
     slug: "dokumentalnyi-vektor",
     date: "04.04.2026",
-    artSubCategory: "cinema",
+    artSubCategory: "Повнометражний кінематограф",
     likes: 21,
     ...getProjectAuthor(107),
     projectDetails: {
@@ -1248,7 +1248,7 @@ export const projectsData: Project[] = [
     title: "Графічна резиденція",
     slug: "hrafichna-rezydentsiia",
     date: "05.04.2026",
-    artSubCategory: "graphics",
+    artSubCategory: "Графіка",
     likes: 26,
     ...getProjectAuthor(108),
     projectDetails: {
@@ -1299,7 +1299,7 @@ export const projectsData: Project[] = [
     title: "Прозові маршрути",
     slug: "prozovi-marshruty",
     date: "06.04.2026",
-    artSubCategory: "prose",
+    artSubCategory: "Проза",
     likes: 19,
     ...getProjectAuthor(109),
     projectDetails: {
@@ -1350,7 +1350,7 @@ export const projectsData: Project[] = [
     title: "Поетичний радар",
     slug: "poetychnyi-radar",
     date: "07.04.2026",
-    artSubCategory: "poetry",
+    artSubCategory: "Поезія",
     likes: 24,
     ...getProjectAuthor(110),
     projectDetails: {
@@ -1401,7 +1401,7 @@ export const projectsData: Project[] = [
     title: "Медіа-шар",
     slug: "media-shar",
     date: "08.04.2026",
-    artSubCategory: "video-editing",
+    artSubCategory: "Відеозйомка та монтаж",
     likes: 28,
     ...getProjectAuthor(111),
     projectDetails: {
@@ -1452,7 +1452,7 @@ export const projectsData: Project[] = [
     title: "Імерсивний маршрут",
     slug: "imersyvnyi-marshrut",
     date: "09.04.2026",
-    artSubCategory: "original-genre",
+    artSubCategory: "Оригінальний жанр",
     likes: 20,
     ...getProjectAuthor(112),
     projectDetails: {
@@ -1503,7 +1503,7 @@ export const projectsData: Project[] = [
     title: "AR-архів міста",
     slug: "ar-arkhiv-mista",
     date: "10.04.2026",
-    artSubCategory: "ar",
+    artSubCategory: "Доповнена реальність",
     likes: 29,
     ...getProjectAuthor(113),
     projectDetails: {
@@ -1554,7 +1554,7 @@ export const projectsData: Project[] = [
     title: "Публічна пластика",
     slug: "publichna-plastyka",
     date: "11.04.2026",
-    artSubCategory: "sculpture",
+    artSubCategory: "Скульптура",
     likes: 32,
     ...getProjectAuthor(114),
     projectDetails: {
@@ -1605,7 +1605,7 @@ export const projectsData: Project[] = [
     title: "Сцена діалогу",
     slug: "stsena-dialohu",
     date: "12.04.2026",
-    artSubCategory: "acting",
+    artSubCategory: "Акторське мистецтво",
     likes: 27,
     ...getProjectAuthor(115),
     projectDetails: {
