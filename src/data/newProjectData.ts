@@ -83,10 +83,10 @@ export const newProjectTexts = {
   artFieldModalTitle: 'Оберіть галузь мистецтва',
   coverUploadText: 'Додайте обкладинку',
   workUploadText: 'Додайте роботу',
-  tagsLabel: 'Додайте теги',
-  tagsPlaceholder: 'Через кому, наприклад: картина, масло, пейзаж',
-  tagsPlaceholderEn: 'Comma separated, for example: painting, oil, landscape',
-  tagsHint: 'По цих тегах інші користувачі зможуть знайти вашу роботу.',
+  tagsLabel: 'Додайте теги для зручності пошуку',
+  tagsPlaceholder: 'Додайте теги',
+  tagsPlaceholderEn: 'Add tags',
+  tagsHint: 'Поле не є обов’язковим.',
   characteristicsTitle: 'Характеристики проекту',
   characteristicsDescription: `Таблиця характеристик проєкту.
 Якщо ви малюєте картину — якого розміру вона буде? Знімаєте фільм — хто напише сценарій?
