@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
-import type { Catalog } from "../../data/catalogsData";
+import { getCatalogPdfUrl, type Catalog } from "../../data/catalogsData";
 import { getAuthorSlugById } from "../../data/profileData";
 import { withAuthorId } from "../../lib/authorQuery";
 
@@ -28,49 +28,81 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
         disableInteractions ? "pointer-events-none" : ""
       }`}
     >
-      {catalogs.map((catalog) => (
+      {catalogs.map((catalog) => {
+        const pdfHref = getCatalogPdfUrl(catalog.pdfFile);
+        const openable = Boolean(pdfHref) && !disableInteractions;
+
+        return (
         <Card
           key={catalog.id}
           className={`bg-transparent border-0 outline-none shadow-none rounded-none ${
-            disableInteractions ? "" : "group cursor-pointer"
-          }`}
+            !disableInteractions ? "group " : ""
+          }${openable ? "cursor-pointer" : ""}`}
         >
           <CardContent className="p-0 flex flex-col gap-2 md:gap-3">
-            {/* Catalog image with likes overlay */}
-            <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
-              <Image
-                src={catalog.image}
-                alt={catalog.title}
-                fill
-                className="object-cover"
-              />
-              {/* Darkening overlay on hover */}
-              <div
-                className={`absolute inset-0 opacity-0 transition-opacity duration-300 ${
-                  disableInteractions ? "bg-black/0" : "bg-black group-hover:opacity-50"
-                }`}
-              ></div>
-              
-              {/* Centered arrow on hover */}
-              <div
-                className={`absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 z-10 ${
-                  disableInteractions ? "" : "group-hover:opacity-100"
-                }`}
+            {pdfHref && !disableInteractions ? (
+              <a
+                href={pdfHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col gap-2 md:gap-3 no-underline text-inherit"
               >
-                <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
-              </div>
-              
-              <div className="absolute right-2 bottom-2 md:right-3 md:bottom-3 flex items-center gap-1 md:gap-2 z-10">
-                <span className="font-button font-bold text-white text-sm md:text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
-                  {catalog.likes}
-                </span>
-                <Image src="/like.svg" alt="Like" width={24} height={24} className="md:w-8 md:h-8" />
-              </div>
-            </div>
-            {/* Catalog title */}
-            <h3 className="font-h6 font-bold text-white text-base md:text-lg lg:text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
-              {catalog.title}
-            </h3>
+                {/* Catalog image with likes overlay */}
+                <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
+                  <Image
+                    src={catalog.image}
+                    alt={catalog.title}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 opacity-0 transition-opacity duration-300 bg-black group-hover:opacity-50"></div>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 z-10 group-hover:opacity-100">
+                    <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
+                  </div>
+                  <div className="absolute right-2 bottom-2 md:right-3 md:bottom-3 flex items-center gap-1 md:gap-2 z-10">
+                    <span className="font-button font-bold text-white text-sm md:text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
+                      {catalog.likes}
+                    </span>
+                    <Image src="/like.svg" alt="Like" width={24} height={24} className="md:w-8 md:h-8" />
+                  </div>
+                </div>
+                <h3 className="font-h6 font-bold text-white text-base md:text-lg lg:text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
+                  {catalog.title}
+                </h3>
+              </a>
+            ) : (
+              <>
+                <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
+                  <Image
+                    src={catalog.image}
+                    alt={catalog.title}
+                    fill
+                    className="object-cover"
+                  />
+                  <div
+                    className={`absolute inset-0 opacity-0 transition-opacity duration-300 ${
+                      disableInteractions ? "bg-black/0" : "bg-black group-hover:opacity-50"
+                    }`}
+                  ></div>
+                  <div
+                    className={`absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 z-10 ${
+                      disableInteractions ? "" : "group-hover:opacity-100"
+                    }`}
+                  >
+                    <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
+                  </div>
+                  <div className="absolute right-2 bottom-2 md:right-3 md:bottom-3 flex items-center gap-1 md:gap-2 z-10">
+                    <span className="font-button font-bold text-white text-sm md:text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
+                      {catalog.likes}
+                    </span>
+                    <Image src="/like.svg" alt="Like" width={24} height={24} className="md:w-8 md:h-8" />
+                  </div>
+                </div>
+                <h3 className="font-h6 font-bold text-white text-base md:text-lg lg:text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
+                  {catalog.title}
+                </h3>
+              </>
+            )}
             {/* Author info */}
             <Link
               href={withAuthorId("/author/projects", getAuthorSlugById(catalog.authorId))}
@@ -89,7 +121,8 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
             </Link>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }

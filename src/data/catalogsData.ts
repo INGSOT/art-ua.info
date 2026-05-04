@@ -11,6 +11,15 @@ export interface Catalog {
   likes: number;
   authorAvatar: string;
   authorName: string;
+  /** Ім'я файлу PDF у каталозі `public/catalogs` (без шляху). */
+  pdfFile?: string;
+}
+
+/** URL для відкриття PDF у переглядачі браузера. */
+export function getCatalogPdfUrl(pdfFile?: string): string | undefined {
+  const name = pdfFile?.trim();
+  if (!name) return undefined;
+  return `/catalogs/${encodeURIComponent(name)}`;
 }
 
 const authorById = new Map([...artistsData, ...organizationsData].map((author) => [author.id, author]));
@@ -118,6 +127,7 @@ export const catalogsData: Catalog[] = [
     date: "04.05.2026",
     artSubCategory: "graphics",
     likes: 31,
+    pdfFile: "ID_Art UA. Laushkin UA Album.pdf",
     ...getCatalogAuthorById(16),
   },
 ];

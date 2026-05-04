@@ -2,13 +2,19 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { getCatalogPdfUrl } from "../../../../data/catalogsData";
 
 interface CatalogProps {
   title: string;
+  pdfFile?: string;
 }
 
-export default function Catalog({ title }: CatalogProps) {
+export default function Catalog({ title, pdfFile }: CatalogProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const pdfHref = getCatalogPdfUrl(pdfFile);
+  const buttonClass = `group flex items-stretch h-[60px] w-full md:w-[220px] lg:w-[240px] transition-colors duration-300 rounded-none overflow-hidden ${
+    isHovered ? "bg-white" : "bg-[#FECC39]"
+  }`;
 
   return (
     <div className="w-full bg-[#343434] flex flex-col md:flex-row items-start md:items-center justify-between p-3 gap-3 md:gap-0">
@@ -19,26 +25,47 @@ export default function Catalog({ title }: CatalogProps) {
         </h3>
       </div>
 
-      {/* Right side - Button */}
-      <button
-        className={`group flex items-stretch h-[60px] w-full md:w-[220px] lg:w-[240px] transition-colors duration-300 rounded-none overflow-hidden ${
-          isHovered ? "bg-white" : "bg-[#FECC39]"
-        }`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <span className="flex items-center justify-center flex-1 px-4 sm:px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] whitespace-nowrap">
-          Відкрити
-        </span>
-        <div className="flex items-center justify-center w-[60px] border-l border-[#343434]">
-          <Image
-            src="/grey_triangle_right.svg"
-            alt="Arrow"
-            width={24}
-            height={24}
-          />
-        </div>
-      </button>
+      {/* Right side - open PDF in a new tab (browser viewer) */}
+      {pdfHref ? (
+        <a
+          href={pdfHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonClass}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <span className="flex items-center justify-center flex-1 px-4 sm:px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] whitespace-nowrap">
+            Відкрити
+          </span>
+          <div className="flex items-center justify-center w-[60px] border-l border-[#343434]">
+            <Image
+              src="/grey_triangle_right.svg"
+              alt="Arrow"
+              width={24}
+              height={24}
+            />
+          </div>
+        </a>
+      ) : (
+        <button
+          type="button"
+          disabled
+          className="group flex items-stretch h-[60px] w-full md:w-[220px] lg:w-[240px] rounded-none overflow-hidden bg-[#FECC39] opacity-40 cursor-not-allowed"
+        >
+          <span className="flex items-center justify-center flex-1 px-4 sm:px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] whitespace-nowrap">
+            Відкрити
+          </span>
+          <div className="flex items-center justify-center w-[60px] border-l border-[#343434]">
+            <Image
+              src="/grey_triangle_right.svg"
+              alt="Arrow"
+              width={24}
+              height={24}
+            />
+          </div>
+        </button>
+      )}
     </div>
   );
 }
