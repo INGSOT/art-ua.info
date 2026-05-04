@@ -1,6 +1,7 @@
 import type { ArtistData } from "./artistsData";
 import { artistsData } from "./artistsData";
 import { organizationsData } from "./organizationsData";
+import { authorProfileInfoData } from "./profileInfoData";
 import {
   getProjectsByAuthorId,
   type ProjectDescriptionData,
@@ -173,41 +174,35 @@ export interface ProfileTeam {
   members: TeamMember[];
 }
 
-const DEFAULT_SOCIAL_LINKS: ProfileSocialLink[] = [
-  { icon: "/socials/deviantart_yellow.svg", alt: "DeviantArt", url: "https://deviantart.com" },
-  { icon: "/socials/pinterest_yellow.svg", alt: "Pinterest", url: "https://pinterest.com" },
-  { icon: "/socials/youtube_yellow.svg", alt: "YouTube", url: "https://youtube.com" },
-  { icon: "/socials/instagram_yellow.svg", alt: "Instagram", url: "https://instagram.com" },
-  { icon: "/socials/facebook_yellow.svg", alt: "Facebook", url: "https://facebook.com" },
-  { icon: "/socials/linked_in_yellow.svg", alt: "LinkedIn", url: "https://linkedin.com" },
-  { icon: "/socials/x_yellow.svg", alt: "X", url: "https://x.com" },
-];
+/** Колекція текстів і локацій для вкладки «Інформація» (по authorId), див. `profileInfoData.ts`. */
+export { authorProfileInfoData };
 
-const LAUSHKIN_PROFILE_SLUG = "serhii-laushkin";
+const profileInfoByAuthorId = new Map<number, ProfileInfo>(
+  authorProfileInfoData.map((row) => [
+    row.authorId,
+    {
+      website: row.website,
+      location: { ...row.location },
+      description: [...row.description],
+      socialLinks: row.socialLinks.map((l) => ({ ...l })),
+    },
+  ]),
+);
 
-const LAUSHKIN_INFO_DESCRIPTION: string[] = [
-  "Пан Сергій відомий як майстер графіки, Він створює жанрові символікоалегоричні картини, пейзажі, інсталяції. Для творчості Сергія Павловича характерні узагальнено-символічний характер образів, ліризм, м'яка розкута мальовнича манера.",
-  "Нерідко у центрі уваги — людина, її внутрішній світ, складні емоційні переживання та філософські роздуми.",
-  "Творчість Сергія Лаушкіна, має за підмурівок напрацьовані традиції багатьох поколінь, творчо переосмислені митцем, та є цілком індивідуальною, тобто справжньою.",
-];
-
-const LOCATIONS: ReadonlyArray<{ country: string; city: string }> = [
-  { country: "Україна", city: "Київ" },
-  { country: "Україна", city: "Львів" },
-  { country: "Україна", city: "Одеса" },
-  { country: "Україна", city: "Харків" },
-  { country: "Україна", city: "Дніпро" },
-  { country: "Україна", city: "Кривий Ріг" },
-  { country: "Україна", city: "Запоріжжя" },
-  { country: "Україна", city: "Вінниця" },
-  { country: "Україна", city: "Полтава" },
-  { country: "Україна", city: "Чернігів" },
-  { country: "Україна", city: "Івано-Франківськ" },
-  { country: "Україна", city: "Тернопіль" },
-  { country: "Україна", city: "Ужгород" },
-  { country: "Україна", city: "Суми" },
-  { country: "Україна", city: "Черкаси" },
-];
+function getProfileInfoForAuthor(artistId: number): ProfileInfo {
+  const info = profileInfoByAuthorId.get(artistId);
+  if (!info) {
+    throw new Error(
+      `profileInfoData: немає запису для authorId=${artistId}. Додайте відповідний об'єкт у authorProfileInfoData.`,
+    );
+  }
+  return {
+    website: info.website,
+    location: { ...info.location },
+    description: [...info.description],
+    socialLinks: info.socialLinks.map((l) => ({ ...l })),
+  };
+}
 
 function getTeamsForArtist(artistId: number) {
   return teamData.filter((team) => team.members.some((member) => member.artistId === artistId));
@@ -245,29 +240,6 @@ function buildProfileTeams(artistId: number): ProfileTeam[] {
   }));
 }
 
-function buildProfileInfo(artist: ArtistData, usernameSlug: string): ProfileInfo {
-  const loc =
-    artist.slug === LAUSHKIN_PROFILE_SLUG
-      ? { country: "Україна", city: "Кам'янське" }
-      : LOCATIONS[(artist.id - 1) % LOCATIONS.length];
-  const t = artist.artistType.toLowerCase();
-  const description =
-    artist.slug === LAUSHKIN_PROFILE_SLUG
-      ? LAUSHKIN_INFO_DESCRIPTION
-      : [
-          `${artist.artistName} — ${t}, працює з темами: ${artist.tags.join(", ")}.`,
-          `У портфоліо — серії, створені в різних містах України; місто ${loc.city} залишається одним із робочих центрів.`,
-          "Культурна спадщина України в контексті нових історичних подій набуває особливої актуальності; мистецтво фіксує злам епохи та глибину емоційного фону.",
-          `Зараз ${artist.artistName.split(" ")[0]} зосереджується на проєктах, де ${artist.artSubCategory} перетинається з публічною розмовою та документуванням сучасності.`,
-        ];
-  return {
-    website: `${usernameSlug}.studio`,
-    socialLinks: DEFAULT_SOCIAL_LINKS.map((l) => ({ ...l })),
-    location: { ...loc },
-    description,
-  };
-}
-
 export interface AuthorProfileBundle {
   id: number;
   slug: string;
@@ -289,7 +261,7 @@ function buildAuthorProfile(artist: ArtistData): AuthorProfileBundle {
     id: artist.id,
     slug: usernameSlug,
     aboutMe: buildAboutMe(artist, usernameSlug),
-    profileInfo: buildProfileInfo(artist, usernameSlug),
+    profileInfo: getProfileInfoForAuthor(artist.id),
     profileTeams: buildProfileTeams(artist.id),
     projectDetails: fallbackProject.projectDetails,
     projectDescriptionData: fallbackProject.projectDescriptionData,
