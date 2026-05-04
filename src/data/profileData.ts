@@ -183,6 +183,14 @@ const DEFAULT_SOCIAL_LINKS: ProfileSocialLink[] = [
   { icon: "/socials/x_yellow.svg", alt: "X", url: "https://x.com" },
 ];
 
+const LAUSHKIN_PROFILE_SLUG = "serhii-laushkin";
+
+const LAUSHKIN_INFO_DESCRIPTION: string[] = [
+  "Пан Сергій відомий як майстер графіки, Він створює жанрові символікоалегоричні картини, пейзажі, інсталяції. Для творчості Сергія Павловича характерні узагальнено-символічний характер образів, ліризм, м'яка розкута мальовнича манера.",
+  "Нерідко у центрі уваги — людина, її внутрішній світ, складні емоційні переживання та філософські роздуми.",
+  "Творчість Сергія Лаушкіна, має за підмурівок напрацьовані традиції багатьох поколінь, творчо переосмислені митцем, та є цілком індивідуальною, тобто справжньою.",
+];
+
 const LOCATIONS: ReadonlyArray<{ country: string; city: string }> = [
   { country: "Україна", city: "Київ" },
   { country: "Україна", city: "Львів" },
@@ -238,18 +246,25 @@ function buildProfileTeams(artistId: number): ProfileTeam[] {
 }
 
 function buildProfileInfo(artist: ArtistData, usernameSlug: string): ProfileInfo {
-  const loc = LOCATIONS[(artist.id - 1) % LOCATIONS.length];
+  const loc =
+    artist.slug === LAUSHKIN_PROFILE_SLUG
+      ? { country: "Україна", city: "Кам'янське" }
+      : LOCATIONS[(artist.id - 1) % LOCATIONS.length];
   const t = artist.artistType.toLowerCase();
+  const description =
+    artist.slug === LAUSHKIN_PROFILE_SLUG
+      ? LAUSHKIN_INFO_DESCRIPTION
+      : [
+          `${artist.artistName} — ${t}, працює з темами: ${artist.tags.join(", ")}.`,
+          `У портфоліо — серії, створені в різних містах України; місто ${loc.city} залишається одним із робочих центрів.`,
+          "Культурна спадщина України в контексті нових історичних подій набуває особливої актуальності; мистецтво фіксує злам епохи та глибину емоційного фону.",
+          `Зараз ${artist.artistName.split(" ")[0]} зосереджується на проєктах, де ${artist.artSubCategory} перетинається з публічною розмовою та документуванням сучасності.`,
+        ];
   return {
     website: `${usernameSlug}.studio`,
     socialLinks: DEFAULT_SOCIAL_LINKS.map((l) => ({ ...l })),
     location: { ...loc },
-    description: [
-      `${artist.artistName} — ${t}, працює з темами: ${artist.tags.join(", ")}.`,
-      `У портфоліо — серії, створені в різних містах України; місто ${loc.city} залишається одним із робочих центрів.`,
-      "Культурна спадщина України в контексті нових історичних подій набуває особливої актуальності; мистецтво фіксує злам епохи та глибину емоційного фону.",
-      `Зараз ${artist.artistName.split(" ")[0]} зосереджується на проєктах, де ${artist.artSubCategory} перетинається з публічною розмовою та документуванням сучасності.`,
-    ],
+    description,
   };
 }
 

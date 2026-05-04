@@ -729,6 +729,42 @@ export const servicesData: ServiceItemData[] = [
             { id: "opt-35-workshop", label: "Творча зустріч і майстер-клас" },
         ],
     },
+    {
+        id: 36,
+        ...getServiceAuthor(16),
+        serviceImage: "/services.jpg",
+        title: "Символіко-алегорична картина на замовлення",
+        slug: "symvoliko-alehorichna-kartyna-na-zamovlennya",
+        description:
+            "Розробляю композицію під вашу ідею, референси та інтер'єр: від ескізу й графічного рішення до фінального полотна. Узгоджую настрій, символіку та колорит, аби робота звучала як цілісна авторська історія, а не лише декор.",
+        artSubCategory: "graphics",
+        location: "Кам'янське",
+        priceNegotiable: true,
+        options: [
+            { id: "opt-36-sketch", label: "Ескіз і символічна структура" },
+            { id: "opt-36-format", label: "Підбір формату полотна" },
+            { id: "opt-36-color", label: "Кольорове рішення та фактура" },
+        ],
+    },
+    {
+        id: 37,
+        ...getServiceAuthor(16),
+        serviceImage: "/services.jpg",
+        title: "Мистецька інсталяція для галереї чи публічного простору",
+        slug: "mystetska-instalyatsiya-dlya-halereyi",
+        description:
+            "Концепція просторової роботи з урахуванням освітлення, маршруту глядача та змістових акцентів. Супроводжую проєкт від ідеї та візуалізації до монтажу на локації; можливе поєднання живопису, графіки та об'єктів.",
+        artSubCategory: "graphics",
+        location: "Кам'янське",
+        price: 185000,
+        currency: "UAH",
+        priceNegotiable: false,
+        options: [
+            { id: "opt-37-concept", label: "Концепт і план зонування" },
+            { id: "opt-37-objects", label: "Виготовлення ключових об'єктів" },
+            { id: "opt-37-install", label: "Монтаж і авторський нагляд" },
+        ],
+    },
 ];
 
 export interface MyServiceCard {

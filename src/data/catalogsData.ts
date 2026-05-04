@@ -108,6 +108,18 @@ export const catalogsData: Catalog[] = [
   // prose
   { id: 55, authorId: 109, image: "/projects/project-photo-3.png", title: "Клубне читання", date: "27.06.2026", artSubCategory: "prose", likes: 25, ...getCatalogAuthorById(109) },
   { id: 56, authorId: 109, image: "/projects/project-photo-4.png", title: "Нова проза ІФ", date: "29.06.2026", artSubCategory: "prose", likes: 18, ...getCatalogAuthorById(109) },
+
+  // graphics — Сергій Лаушкін
+  {
+    id: 57,
+    authorId: 16,
+    image: "/projects/project-photo-1.png",
+    title: "Мистецтво допомоги - найсучасніше з мистецтв",
+    date: "04.05.2026",
+    artSubCategory: "graphics",
+    likes: 31,
+    ...getCatalogAuthorById(16),
+  },
 ];
 
 export interface MyCatalogCard {

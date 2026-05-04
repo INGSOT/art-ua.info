@@ -271,4 +271,21 @@ export const artistsData: ArtistData[] = [
       { image: "/gallery/autumn.png", likes: 23 },
     ],
   },
+  {
+    id: 16,
+    slug: "serhii-laushkin",
+    artistPhoto: "/artists/laushkin.webp",
+    artistName: "Сергій Лаушкін",
+    artistType: "Художник",
+    artSubCategory: "graphics",
+    tags: ["Графіка", "Живопис", "Символіка", "Інсталяція"],
+    catalogButtonText: "До каталогу робіт",
+    photos: [
+      { image: "/gallery/turquoise-blue_painting.png", likes: 24 },
+      { image: "/gallery/big_lebovski.png", likes: 19 },
+      { image: "/gallery/autumn.png", likes: 27 },
+      { image: "/gallery/ship.png", likes: 21 },
+      { image: "/gallery/pulp_fiction.png", likes: 18 },
+    ],
+  },
 ];
