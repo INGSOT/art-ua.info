@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import ImageGallerySlider from "./ImageGallerySlider";
+import WorkVideoEmbed from "./WorkVideoEmbed";
 import { getVideoInfo } from "../../../../utils/videoUtils";
 
 interface MediaSectionProps {
@@ -93,32 +96,12 @@ export default function MediaSection({
           {galleryImages.length > 0 ? (
             <ImageGallerySlider images={galleryImages} onEditClick={onOpenGalleryModal} />
           ) : workVideoUrl ? (
-            (() => {
-              const videoInfo = getVideoInfo(workVideoUrl);
-              return videoInfo ? (
-                <div className="relative w-full aspect-[4/3] bg-[#343434]">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${videoInfo.videoId}`}
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
-                  <button
-                    onClick={onClearWorkVideo}
-                    className="absolute top-2 right-2 w-10 h-10 bg-[#343434] hover:bg-[#FECC39] flex items-center justify-center transition-colors group z-10"
-                  >
-                    <Image
-                      src="/yellow_cross.svg"
-                      alt="Remove"
-                      width={24}
-                      height={24}
-                      className="group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[0.2] transition-all"
-                    />
-                  </button>
-                </div>
-              ) : null;
-            })()
+            getVideoInfo(workVideoUrl) ? (
+              <WorkVideoEmbed
+                workVideoUrl={workVideoUrl}
+                onClearWorkVideo={onClearWorkVideo}
+              />
+            ) : null
           ) : workImage ? (
             <div className="relative w-full aspect-[4/3] bg-[#343434]">
               <Image src={workImage} alt="Work image" fill className="object-cover" />

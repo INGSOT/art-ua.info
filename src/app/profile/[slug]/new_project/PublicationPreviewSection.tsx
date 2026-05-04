@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { getVideoInfo } from "../../../../utils/videoUtils";
+import WorkVideoEmbed from "./WorkVideoEmbed";
 
 interface Characteristic {
   id: string;
@@ -31,13 +32,17 @@ export default function PublicationPreviewSection({
 }: PublicationPreviewSectionProps) {
   const [activeSlide, setActiveSlide] = useState(0);
   const videoInfo = workVideoUrl ? getVideoInfo(workVideoUrl) : null;
+  const hasVideoOnlyPreview =
+    Boolean(videoInfo) &&
+    galleryImages.length === 0 &&
+    !workImage &&
+    Boolean(workVideoUrl);
 
   const mediaSlides = useMemo(() => {
     if (galleryImages.length > 0) return galleryImages;
     if (workImage) return [workImage];
-    if (videoInfo?.thumbnail) return [videoInfo.thumbnail];
     return [];
-  }, [galleryImages, workImage, videoInfo]);
+  }, [galleryImages, workImage]);
 
   const safeSlideIndex = Math.min(activeSlide, Math.max(mediaSlides.length - 1, 0));
   const previewTitle = projectNameUa.trim() || "«Назва проєкту»";
@@ -46,6 +51,9 @@ export default function PublicationPreviewSection({
   const previewCharacteristics = characteristics.filter(
     (item) => item.name.trim() || item.description.trim()
   );
+
+  const showImageMedia = mediaSlides.length > 0;
+  const showMediaBlock = showImageMedia || hasVideoOnlyPreview;
 
   return (
     <section className="w-full max-w-[1000px] min-w-0 flex flex-col items-center gap-6 px-4 md:px-0">
@@ -57,22 +65,25 @@ export default function PublicationPreviewSection({
         <p className="text-white text-sm md:text-base">{previewGenre}</p>
       </div>
 
-      {mediaSlides.length > 0 ? (
+      {showMediaBlock ? (
         <div className="w-full flex flex-col items-center gap-4">
-          <div className="relative w-full aspect-video bg-[#343434]">
-            <Image
-              src={mediaSlides[safeSlideIndex]}
-              alt="Project media"
-              fill
-              className="object-cover"
-            />
-            {videoInfo && galleryImages.length === 0 && !workImage && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                <div className="w-20 h-20 rounded-full bg-black/60 flex items-center justify-center">
-                  <div className="w-0 h-0 border-y-[14px] border-y-transparent border-l-[22px] border-l-white ml-1" />
-                </div>
-              </div>
-            )}
+          <div
+            className={`relative w-full bg-[#343434] ${
+              hasVideoOnlyPreview && workVideoUrl ? "" : "aspect-video"
+            }`}
+          >
+            {hasVideoOnlyPreview && workVideoUrl ? (
+              <WorkVideoEmbed workVideoUrl={workVideoUrl} />
+            ) : showImageMedia ? (
+              <>
+                <Image
+                  src={mediaSlides[safeSlideIndex]}
+                  alt="Project media"
+                  fill
+                  className="object-cover"
+                />
+              </>
+            ) : null}
           </div>
 
           {mediaSlides.length > 1 && (

@@ -56,14 +56,62 @@ export function isYouTubeUrl(url: string): boolean {
 }
 
 /**
- * Gets video thumbnail and ID from URL
+ * Extracts Vimeo numeric video ID from common URL shapes.
  */
-export function getVideoInfo(url: string): { thumbnail: string; videoId: string } | null {
-  const videoId = extractYouTubeId(url);
-  if (!videoId) return null;
-  
-  return {
-    thumbnail: getYouTubeThumbnail(videoId),
-    videoId
-  };
+export function extractVimeoId(url: string): string | null {
+  try {
+    const urlObj = new URL(url.trim());
+    const host = urlObj.hostname.replace(/^www\./, "");
+
+    if (host === "player.vimeo.com") {
+      const match = urlObj.pathname.match(/^\/video\/(\d+)/);
+      return match?.[1] ?? null;
+    }
+
+    if (host === "vimeo.com" || host === "vimeopro.com") {
+      const path = urlObj.pathname;
+      const direct = path.match(/^\/(\d+)\/?$/);
+      if (direct) return direct[1];
+      const trailing = path.match(/\/(?:videos\/)?(\d+)\/?$/);
+      if (trailing) return trailing[1];
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export type VideoProvider = "youtube" | "vimeo";
+
+export type VideoInfo = {
+  provider: VideoProvider;
+  videoId: string;
+  /** YouTube: always set. Vimeo: fetch via oEmbed where thumbnails are needed. */
+  thumbnail: string;
+};
+
+/**
+ * Gets video thumbnail and ID from URL (YouTube or Vimeo).
+ */
+export function getVideoInfo(url: string): VideoInfo | null {
+  const youtubeId = extractYouTubeId(url);
+  if (youtubeId) {
+    return {
+      provider: "youtube",
+      videoId: youtubeId,
+      thumbnail: getYouTubeThumbnail(youtubeId),
+    };
+  }
+
+  const vimeoId = extractVimeoId(url);
+  if (vimeoId) {
+    return {
+      provider: "vimeo",
+      videoId: vimeoId,
+      thumbnail: "",
+    };
+  }
+
+  return null;
 }
