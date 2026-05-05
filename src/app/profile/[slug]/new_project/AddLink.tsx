@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../../data/newProjectData";
+import { getVideoInfo } from "../../../../utils/videoUtils";
 
 interface AddLinkProps {
   isOpen: boolean;
@@ -22,23 +23,25 @@ export default function AddLink({
   if (!isOpen) return null;
 
   const handleAdd = () => {
-    if (url.trim()) {
-      onAdd(url);
-      setUrl("");
-      onClose();
-    }
+    const trimmed = url.trim();
+    if (!trimmed || !getVideoInfo(trimmed)) return;
+    onAdd(trimmed);
+    setUrl("");
+    onClose();
   };
+
+  const canSubmit = Boolean(url.trim() && getVideoInfo(url.trim()));
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 z-40"
+        className="fixed inset-0 bg-black/40 z-[55]"
         onClick={onClose}
       />
 
       {/* Slide-in Panel */}
-      <div className="fixed right-0 top-0 h-full w-full md:w-[600px] bg-[#414141] z-50 flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-full md:w-[600px] bg-[#414141] z-[56] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6">
           {/* Back Button */}
@@ -92,7 +95,7 @@ export default function AddLink({
         <div className="p-6 flex justify-center">
           <button
             onClick={handleAdd}
-            disabled={!url.trim()}
+            disabled={!canSubmit}
             className="w-full md:w-[320px] h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[18px] hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {newProjectTexts.addLinkButton}

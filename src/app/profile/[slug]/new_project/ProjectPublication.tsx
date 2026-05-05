@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../../data/newProjectData";
 import Message from "../../../../components/Message";
+import { normalizeWorkGalleryItems } from "./projectWorkMedia";
 
 export default function ProjectPublication() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -60,7 +61,15 @@ export default function ProjectPublication() {
       }
 
       // Validation 5: Check if at least one work element is added
-      const hasWorkContent = projectData.workImage || projectData.workVideoUrl || (projectData.galleryImages && projectData.galleryImages.length > 0);
+      const galleryCount = normalizeWorkGalleryItems(
+        projectData.workGalleryItems
+      ).length;
+      const hasWorkContent =
+        galleryCount > 0 ||
+        Boolean(projectData.workImage) ||
+        Boolean(projectData.workVideoUrl) ||
+        (Array.isArray(projectData.galleryImages) &&
+          projectData.galleryImages.length > 0);
       if (!hasWorkContent) {
         setNotification({ type: "error", text: "Додайте роботу" });
         return;

@@ -140,6 +140,9 @@ export const newProjectTexts = {
   addImageGalleryTitle: 'Додайте галерею зображень',
   addImageGallerySubtitle: 'Добре будуть виглядати зображення зі співвідношенням 4x3',
   addImageGalleryUploadButton: 'Завантажте зображення',
-  addImageGalleryHint: 'До 10 зображень. Формати .jpg, .jpeg, .png та .webp до 15 мб кожна.',
+  addImageGalleryHint:
+    'До 10 елементів (фото або відео за посиланням). Зображення: .jpg, .jpeg, .png та .webp до 15 мб кожна.',
+  addImageGalleryMixedHint:
+    ' Можна чергувати світлини з роликами YouTube або Vimeo.',
   addImageGalleryAddButton: 'Додати',
 };

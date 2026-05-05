@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { getVideoInfo } from "../../../../utils/videoUtils";
 import WorkVideoEmbed from "./WorkVideoEmbed";
+import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 
 interface Characteristic {
   id: string;
@@ -14,9 +14,7 @@ interface Characteristic {
 interface PublicationPreviewSectionProps {
   projectNameUa: string;
   selectedArtFieldLabel: string | null;
-  workImage: string | null;
-  workVideoUrl: string | null;
-  galleryImages: string[];
+  workGalleryItems: ProjectWorkMediaItem[];
   descriptionUa: string;
   characteristics: Characteristic[];
 }
@@ -24,36 +22,29 @@ interface PublicationPreviewSectionProps {
 export default function PublicationPreviewSection({
   projectNameUa,
   selectedArtFieldLabel,
-  workImage,
-  workVideoUrl,
-  galleryImages,
+  workGalleryItems,
   descriptionUa,
   characteristics,
 }: PublicationPreviewSectionProps) {
   const [activeSlide, setActiveSlide] = useState(0);
-  const videoInfo = workVideoUrl ? getVideoInfo(workVideoUrl) : null;
-  const hasVideoOnlyPreview =
-    Boolean(videoInfo) &&
-    galleryImages.length === 0 &&
-    !workImage &&
-    Boolean(workVideoUrl);
 
-  const mediaSlides = useMemo(() => {
-    if (galleryImages.length > 0) return galleryImages;
-    if (workImage) return [workImage];
-    return [];
-  }, [galleryImages, workImage]);
+  const slides = useMemo(() => workGalleryItems, [workGalleryItems]);
 
-  const safeSlideIndex = Math.min(activeSlide, Math.max(mediaSlides.length - 1, 0));
+  useEffect(() => {
+    if (activeSlide >= slides.length && slides.length > 0) {
+      setActiveSlide(slides.length - 1);
+    }
+  }, [slides.length, activeSlide]);
+
+  const safeSlideIndex = Math.min(activeSlide, Math.max(slides.length - 1, 0));
   const previewTitle = projectNameUa.trim() || "«Назва проєкту»";
   const previewGenre = selectedArtFieldLabel || "Жанр не обрано";
-  const previewDescription = descriptionUa.trim() || "Текст опису проєкту";
+  const previewDescription = descriptionUa.trim() || "Текст опису проекту";
   const previewCharacteristics = characteristics.filter(
     (item) => item.name.trim() || item.description.trim()
   );
 
-  const showImageMedia = mediaSlides.length > 0;
-  const showMediaBlock = showImageMedia || hasVideoOnlyPreview;
+  const current = slides[safeSlideIndex];
 
   return (
     <section className="w-full max-w-[1000px] min-w-0 flex flex-col items-center gap-6 px-4 md:px-0">
@@ -65,46 +56,44 @@ export default function PublicationPreviewSection({
         <p className="text-white text-sm md:text-base">{previewGenre}</p>
       </div>
 
-      {showMediaBlock ? (
+      {slides.length > 0 ? (
         <div className="w-full flex flex-col items-center gap-4">
           <div
             className={`relative w-full bg-[#343434] ${
-              hasVideoOnlyPreview && workVideoUrl ? "" : "aspect-video"
+              current?.kind === "image" ? "aspect-video" : ""
             }`}
           >
-            {hasVideoOnlyPreview && workVideoUrl ? (
-              <WorkVideoEmbed workVideoUrl={workVideoUrl} />
-            ) : showImageMedia ? (
-              <>
-                <Image
-                  src={mediaSlides[safeSlideIndex]}
-                  alt="Project media"
-                  fill
-                  className="object-cover"
-                />
-              </>
+            {current?.kind === "image" ? (
+              <Image
+                src={current.src}
+                alt="Медіа проєкту"
+                fill
+                className="object-cover"
+              />
+            ) : current?.kind === "video" ? (
+              <WorkVideoEmbed workVideoUrl={current.url} />
             ) : null}
           </div>
 
-          {mediaSlides.length > 1 && (
+          {slides.length > 1 ? (
             <div className="flex items-center justify-center gap-4 min-w-0 flex-wrap max-w-full">
               <button
                 type="button"
                 onClick={() =>
                   setActiveSlide((prev) =>
-                    prev === 0 ? mediaSlides.length - 1 : prev - 1
+                    prev === 0 ? slides.length - 1 : prev - 1
                   )
                 }
               >
                 <Image
                   src="/white-arrow-left-slider.svg"
-                  alt="Previous"
+                  alt="Попередній"
                   width={32}
                   height={32}
                 />
               </button>
               <div className="flex gap-2">
-                {mediaSlides.map((_, index) => (
+                {slides.map((_, index) => (
                   <Image
                     key={index}
                     src={
@@ -122,19 +111,19 @@ export default function PublicationPreviewSection({
                 type="button"
                 onClick={() =>
                   setActiveSlide((prev) =>
-                    prev === mediaSlides.length - 1 ? 0 : prev + 1
+                    prev === slides.length - 1 ? 0 : prev + 1
                   )
                 }
               >
                 <Image
                   src="/white-arrow-right-slider.svg"
-                  alt="Next"
+                  alt="Наступний"
                   width={32}
                   height={32}
                 />
               </button>
             </div>
-          )}
+          ) : null}
         </div>
       ) : (
         <div className="w-full aspect-video bg-[#343434]" />
@@ -153,11 +142,13 @@ export default function PublicationPreviewSection({
       </div>
 
       <div className="w-full min-w-0">
-        <p className="font-wix text-white text-base whitespace-pre-line break-words">{previewDescription}</p>
+        <p className="font-wix text-white text-base whitespace-pre-line break-words">
+          {previewDescription}
+        </p>
       </div>
 
       <div className="w-full min-w-0">
-        <h3 className="text-white font-bold text-lg mb-4">Характеристики проєкту:</h3>
+        <h3 className="text-white font-bold text-lg mb-4">Характеристики проекту:</h3>
 
         <div className="grid grid-cols-2 gap-4 mb-2">
           <span className="font-wix text-white text-sm">Назва</span>

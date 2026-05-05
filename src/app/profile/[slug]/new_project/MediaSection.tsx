@@ -1,15 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import ImageGallerySlider from "./ImageGallerySlider";
-import WorkVideoEmbed from "./WorkVideoEmbed";
-import { getVideoInfo } from "../../../../utils/videoUtils";
+import WorkMediaSlider from "./WorkMediaSlider";
+import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 
 interface MediaSectionProps {
   projectCover: string | null;
-  galleryImages: string[];
-  workVideoUrl: string | null;
-  workImage: string | null;
+  workGalleryItems: ProjectWorkMediaItem[];
   tagsUa: string;
   tagsEn: string;
   addCoverText: string;
@@ -21,8 +18,6 @@ interface MediaSectionProps {
   tagsHint: string;
   onOpenCoverModal: () => void;
   onOpenGalleryModal: () => void;
-  onClearWorkVideo: () => void;
-  onOpenWorkImageModal: () => void;
   onOpenWorkModal: () => void;
   onTagsUaChange: (value: string) => void;
   onTagsEnChange: (value: string) => void;
@@ -30,9 +25,7 @@ interface MediaSectionProps {
 
 export default function MediaSection({
   projectCover,
-  galleryImages,
-  workVideoUrl,
-  workImage,
+  workGalleryItems,
   tagsUa,
   tagsEn,
   addCoverText,
@@ -44,8 +37,6 @@ export default function MediaSection({
   tagsHint,
   onOpenCoverModal,
   onOpenGalleryModal,
-  onClearWorkVideo,
-  onOpenWorkImageModal,
   onOpenWorkModal,
   onTagsUaChange,
   onTagsEnChange,
@@ -93,31 +84,8 @@ export default function MediaSection({
       <div className="w-full max-w-[1000px] flex flex-col gap-2">
         <label className="font-wix text-white text-sm">Робота</label>
         <div className="flex justify-center">
-          {galleryImages.length > 0 ? (
-            <ImageGallerySlider images={galleryImages} onEditClick={onOpenGalleryModal} />
-          ) : workVideoUrl ? (
-            getVideoInfo(workVideoUrl) ? (
-              <WorkVideoEmbed
-                workVideoUrl={workVideoUrl}
-                onClearWorkVideo={onClearWorkVideo}
-              />
-            ) : null
-          ) : workImage ? (
-            <div className="relative w-full aspect-[4/3] bg-[#343434]">
-              <Image src={workImage} alt="Work image" fill className="object-cover" />
-              <button
-                onClick={onOpenWorkImageModal}
-                className="absolute top-2 right-2 w-10 h-10 bg-[#343434] hover:bg-[#FECC39] flex items-center justify-center transition-colors group z-10"
-              >
-                <Image
-                  src="/yellow_cross.svg"
-                  alt="Remove"
-                  width={24}
-                  height={24}
-                  className="group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[0.2] transition-all"
-                />
-              </button>
-            </div>
+          {workGalleryItems.length > 0 ? (
+            <WorkMediaSlider items={workGalleryItems} onEditClick={onOpenGalleryModal} />
           ) : (
             <div
               onClick={onOpenWorkModal}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../../data/newProjectData";
+import { getVideoInfo } from "../../../../utils/videoUtils";
 import { useProfileView } from "../../ProfileViewContext";
 import AddProjectCover from "./AddProjectCover";
 import AddWork from "./AddWork";
@@ -22,6 +23,7 @@ import CharacteristicsSection from "./CharacteristicsSection";
 import SoldProject from "./SoldProject";
 import PublicationPreviewSection from "./PublicationPreviewSection";
 import ProjectPublication from "./ProjectPublication";
+import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 
 interface Characteristic {
   id: string;
@@ -54,12 +56,10 @@ export default function ProjectCreating() {
   ]);
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
   const [projectCover, setProjectCover] = useState<string | null>(null);
-  const [workImage, setWorkImage] = useState<string | null>(null);
-  const [workVideoUrl, setWorkVideoUrl] = useState<string | null>(null);
+  const [workGalleryItems, setWorkGalleryItems] = useState<ProjectWorkMediaItem[]>([]);
   const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
   const [isWorkLinkModalOpen, setIsWorkLinkModalOpen] = useState(false);
   const [isWorkImageModalOpen, setIsWorkImageModalOpen] = useState(false);
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
   const [isArtFormModalOpen, setIsArtFormModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<NewProjectTab>("owner");
@@ -83,14 +83,12 @@ export default function ProjectCreating() {
       tagsEn,
       selectedArtField,
       projectCover,
-      workImage,
-      workVideoUrl,
-      galleryImages,
+      workGalleryItems,
       characteristics,
       parameterSelections,
     };
     localStorage.setItem('projectData', JSON.stringify(projectData));
-  }, [selectedOwner, projectNameUa, projectNameEn, descriptionUa, descriptionEn, tagsUa, tagsEn, selectedArtField, projectCover, workImage, workVideoUrl, galleryImages, characteristics, parameterSelections]);
+  }, [selectedOwner, projectNameUa, projectNameEn, descriptionUa, descriptionEn, tagsUa, tagsEn, selectedArtField, projectCover, workGalleryItems, characteristics, parameterSelections]);
 
   // Check if projectData was deleted from localStorage (after successful submit) and clear form
   useEffect(() => {
@@ -107,9 +105,7 @@ export default function ProjectCreating() {
         setTagsEn("");
         setSelectedArtField(null);
         setProjectCover(null);
-        setWorkImage(null);
-        setWorkVideoUrl(null);
-        setGalleryImages([]);
+        setWorkGalleryItems([]);
         setCharacteristics([{ id: "1", name: "", description: "" }]);
         setParameterSelections({});
         clearInterval(checkIfCleared);
@@ -181,10 +177,13 @@ export default function ProjectCreating() {
     setIsWorkModalOpen(true);
   };
 
-  const handleAddWorkLink = (url: string) => {
-    setWorkVideoUrl(url);
-    setWorkImage(null);
-    setGalleryImages([]);
+  const handleAddWorkVideo = (url: string) => {
+    const trimmed = url.trim();
+    if (!trimmed || !getVideoInfo(trimmed)) return;
+    setWorkGalleryItems((prev) =>
+      prev.length >= 10 ? prev : [...prev, { kind: "video", url: trimmed }]
+    );
+    setIsGalleryModalOpen(true);
   };
 
   const handleNextTab = () => {
@@ -292,9 +291,7 @@ export default function ProjectCreating() {
       {activeTab === "media" && (
         <MediaSection
           projectCover={projectCover}
-          galleryImages={galleryImages}
-          workVideoUrl={workVideoUrl}
-          workImage={workImage}
+          workGalleryItems={workGalleryItems}
           tagsUa={tagsUa}
           tagsEn={tagsEn}
           addCoverText={newProjectTexts.addCoverText}
@@ -306,8 +303,6 @@ export default function ProjectCreating() {
           tagsHint={newProjectTexts.tagsHint}
           onOpenCoverModal={() => setIsCoverModalOpen(true)}
           onOpenGalleryModal={() => setIsGalleryModalOpen(true)}
-          onClearWorkVideo={() => setWorkVideoUrl(null)}
-          onOpenWorkImageModal={() => setIsWorkImageModalOpen(true)}
           onOpenWorkModal={() => setIsWorkModalOpen(true)}
           onTagsUaChange={setTagsUa}
           onTagsEnChange={setTagsEn}
@@ -358,9 +353,7 @@ export default function ProjectCreating() {
           <PublicationPreviewSection
             projectNameUa={projectNameUa}
             selectedArtFieldLabel={selectedArtField?.label || null}
-            workImage={workImage}
-            workVideoUrl={workVideoUrl}
-            galleryImages={galleryImages}
+            workGalleryItems={workGalleryItems}
             descriptionUa={descriptionUa}
             characteristics={characteristics}
           />
@@ -409,11 +402,15 @@ export default function ProjectCreating() {
         isOpen={isWorkImageModalOpen}
         onClose={() => setIsWorkImageModalOpen(false)}
         onImageSelect={(imageUrl) => {
-          setWorkImage(imageUrl);
+          setWorkGalleryItems([{ kind: "image", src: imageUrl }]);
           setIsWorkImageModalOpen(false);
         }}
-        onImageRemove={() => setWorkImage(null)}
-        currentImage={workImage}
+        onImageRemove={() => setWorkGalleryItems([])}
+        currentImage={
+          workGalleryItems.length === 1 && workGalleryItems[0]?.kind === "image"
+            ? workGalleryItems[0].src
+            : null
+        }
         customTitle={newProjectTexts.addImageModalTitle}
         noAnimation={true}
         onBack={() => {
@@ -434,14 +431,12 @@ export default function ProjectCreating() {
       <AddImageGallery
         isOpen={isGalleryModalOpen}
         onClose={() => setIsGalleryModalOpen(false)}
-        onImagesSelect={(images) => {
-          setGalleryImages(images);
+        onItemsSelect={(items) => {
+          setWorkGalleryItems(items);
           setIsGalleryModalOpen(false);
         }}
-        onImagesUpdate={(images) => {
-          setGalleryImages(images);
-        }}
-        currentImages={galleryImages}
+        onItemsUpdate={(items) => setWorkGalleryItems(items)}
+        currentItems={workGalleryItems}
         noAnimation={true}
         onBack={() => {
           setIsGalleryModalOpen(false);
@@ -454,7 +449,7 @@ export default function ProjectCreating() {
         isOpen={isWorkLinkModalOpen}
         onClose={() => setIsWorkLinkModalOpen(false)}
         onBack={handleWorkLinkBack}
-        onAdd={handleAddWorkLink}
+        onAdd={handleAddWorkVideo}
       />
       </div>
     </div>

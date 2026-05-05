@@ -7,6 +7,7 @@ import { Card, CardContent } from "../../../../components/ui/card";
 import { projectFilterButtons, projectEmptyState } from "../../../../data/profileData";
 import { getMyProjectsByAuthorId } from "../../../../data/projectsData";
 import { useProfileView } from "../../ProfileViewContext";
+import { withProfileId } from "../../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
