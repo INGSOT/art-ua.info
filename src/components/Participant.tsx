@@ -285,8 +285,14 @@ export default function Participant({
           onMouseLeave={handleMouseLeave}
         >
           {photos.map((photo, index) => (
-            <div
+            <Link
               key={index}
+              href={photo.slug ? `/projects/${photo.slug}` : "#"}
+              onClick={(event) => {
+                if (!photo.slug) {
+                  event.preventDefault();
+                }
+              }}
               className="flex-shrink-0 w-[280px] sm:w-[320px] lg:w-[365px] h-[210px] sm:h-[240px] lg:h-[274px] bg-cover bg-center bg-no-repeat relative group cursor-pointer overflow-hidden"
               style={{
                 backgroundImage: `url(${photo.image})`,
@@ -307,7 +313,7 @@ export default function Participant({
                 </span>
                 <Image src="/like.svg" alt="Like" width={32} height={32} />
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

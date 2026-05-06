@@ -7,6 +7,17 @@ import {Button} from "../../components/ui/button";
 import {Badge} from "../../components/ui/badge";
 import { featuredWorksData } from "../../data/mainData";
 
+export interface FeaturedWorkSlide {
+  slug: string;
+  title: string;
+  image: string;
+  likes: number;
+}
+
+interface FeaturedWorksProps {
+  artworks: FeaturedWorkSlide[];
+}
+
 interface TagBadgeProps {
   label: string;
 }
@@ -41,20 +52,20 @@ function TagBadge({ label }: TagBadgeProps) {
   );
 }
 
-export default function FeaturedWorks() {
+export default function FeaturedWorks({ artworks }: FeaturedWorksProps) {
 const scrollRef = useRef<HTMLDivElement>(null);
 
 // Дублируем массив для бесконечной прокрутки
-const duplicatedArtworks = [...featuredWorksData.artworks, ...featuredWorksData.artworks, ...featuredWorksData.artworks];
+const duplicatedArtworks = [...artworks, ...artworks, ...artworks];
 
 useEffect(() => {
   const scrollContainer = scrollRef.current;
-  if (!scrollContainer) return;
+  if (!scrollContainer || artworks.length === 0) return;
 
   let scrollPosition = 0;
   const scrollSpeed = 1; // пикселей за кадр
   const itemWidth = 400.5; // 400px ширина + 0.5px gap
-  const totalWidth = featuredWorksData.artworks.length * itemWidth;
+  const totalWidth = artworks.length * itemWidth;
 
   const scroll = () => {
     scrollPosition += scrollSpeed;
@@ -72,7 +83,7 @@ useEffect(() => {
   const animationId = requestAnimationFrame(scroll);
 
   return () => cancelAnimationFrame(animationId);
-}, []);
+}, [artworks.length]);
 
     return (
     <section className="flex flex-col items-center gap-[30px] px-0 py-10 md:py-20 w-full" style={{ backgroundColor: "#414141" }}>
@@ -102,20 +113,30 @@ useEffect(() => {
       >
         {duplicatedArtworks.map((artwork, index) => (
           <div
-            key={index}
+            key={`${artwork.slug}-${index}`}
             className="flex flex-col min-w-[400px] h-[300px] items-start justify-center gap-2.5 relative"
           >
-            <div
-              className="flex-1 w-full bg-cover bg-center bg-no-repeat relative"
+            <Link
+              href={`/projects/${artwork.slug}`}
+              aria-label={`Відкрити проєкт: ${artwork.title}`}
+              className="flex-1 w-full min-h-0 bg-cover bg-center bg-no-repeat relative group cursor-pointer overflow-hidden block shrink-0"
               style={{ backgroundImage: `url(${artwork.image})` }}
             >
-              <div className="inline-flex items-center justify-end gap-2 absolute right-3 bottom-3">
+              <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300 pointer-events-none" />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none">
+                <img
+                  src="/arrow-chevron-right-white.svg"
+                  alt=""
+                  className="w-12 h-12"
+                />
+              </div>
+              <div className="inline-flex items-center justify-end gap-2 absolute right-3 bottom-3 z-10 pointer-events-none">
                 <span className="font-button font-[number:var(--button-font-weight)] text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)]">
                   {artwork.likes}
                 </span>
                 <Image src="/like.svg" alt="Like" width={32} height={32} />
               </div>
-            </div>
+            </Link>
           </div>
         ))}
       </div>

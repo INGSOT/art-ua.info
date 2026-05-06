@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import Participant from "../../../../components/Participant";
 import { useCurrentTeam } from "../../useCurrentTeam";
 import { artistsData, type ArtistData } from "../../../../data/artistsData";
+import { projectsData } from "../../../../data/projectsData";
 
 export default function Participants() {
   const team = useCurrentTeam();
@@ -44,7 +45,13 @@ export default function Participants() {
             artistName={artist.artistName}
             artistType={artist.artistType}
             tags={artist.tags}
-            photos={artist.photos}
+            photos={projectsData
+              .filter((project) => project.authorId === artist.id)
+              .map((project) => ({
+                image: project.image,
+                likes: project.likes,
+                slug: project.slug,
+              }))}
             catalogButtonText={artist.catalogButtonText}
           />
         ))}

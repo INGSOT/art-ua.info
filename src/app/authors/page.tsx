@@ -15,6 +15,7 @@ import PaginationSection from "../../components/PaginationSection";
 import { artistsData, type ArtistData } from "../../data/artistsData";
 import { organizationsData } from "../../data/organizationsData";
 import { teamData, type TeamProfile } from "../../data/teamData";
+import { projectsData } from "../../data/projectsData";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -257,7 +258,13 @@ export default function AuthorsPage() {
                                             artistName={participant.artistName}
                                             artistType={participant.artistType}
                                             tags={participant.tags}
-                                            photos={participant.photos}
+                                            photos={projectsData
+                                                .filter((project) => project.authorId === participant.id)
+                                                .map((project) => ({
+                                                    image: project.image,
+                                                    likes: project.likes,
+                                                    slug: project.slug,
+                                                }))}
                                             catalogButtonText={participant.catalogButtonText}
                                         />
                                     ) : (
@@ -267,10 +274,17 @@ export default function AuthorsPage() {
                                             artistName={participant.name}
                                             artistType={participant.category}
                                             tags={participant.tags}
-                                            photos={(participant.services ?? []).map((service) => ({
-                                                image: service.image,
-                                                likes: 0,
-                                            }))}
+                                            photos={projectsData
+                                                .filter((project) =>
+                                                    participant.members.some(
+                                                        (member) => member.artistId === project.authorId
+                                                    )
+                                                )
+                                                .map((project) => ({
+                                                    image: project.image,
+                                                    likes: project.likes,
+                                                    slug: project.slug,
+                                                }))}
                                             catalogButtonText=""
                                             isTeam
                                             teamSlug={participant.username}

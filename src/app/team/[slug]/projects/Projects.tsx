@@ -8,10 +8,8 @@ import {
   teamProjectFilterButtons,
   teamProjectEmptyState,
 } from "../../../../data/teamData";
-import { getAuthorSlugById } from "../../../../data/profileData";
 import { projectsData } from "../../../../data/projectsData";
 import { useCurrentTeam } from "../../useCurrentTeam";
-import { withAuthorId } from "../../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
@@ -51,7 +49,7 @@ export default function Projects() {
               {projects.map((project) => (
                 <Link
                   key={project.id}
-                  href={withAuthorId("/author/projects", getAuthorSlugById(project.authorId))}
+                  href={`/projects/${project.slug}`}
                   className="block group"
                 >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">

@@ -1,6 +1,7 @@
 export interface PhotoData {
   image: string;
   likes: number;
+  slug?: string;
 }
 
 export interface ArtistData {

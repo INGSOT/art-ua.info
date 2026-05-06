@@ -54,16 +54,6 @@ export const featuredWorksData = {
     { label: "Тег" },
     { label: "Показуємо до 5 тегів" },
   ],
-  artworks: [
-    { image: "/gallery/autumn.png", likes: 17 },
-    { image: "/gallery/big_lebovski.png", likes: 17 },
-    { image: "/gallery/pulp_fiction.png", likes: 17 },
-    { image: "/gallery/ship.png", likes: 17 },
-    { image: "/gallery/mountain_landscape.png", likes: 17 },
-    { image: "/gallery/whale.png", likes: 17 },
-    { image: "/gallery/rain.png", likes: 17 },
-    { image: "/gallery/abstractionism.png", likes: 17 },
-  ],
 };
 
 // Support Artists Data
