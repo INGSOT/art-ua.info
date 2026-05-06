@@ -8,9 +8,14 @@ interface TeamCardProps {
   team: ProfileTeam;
   /** Приховати кнопки редагування / меню (публічний перегляд автора). */
   readOnly?: boolean;
+  onLeaveTeamClick?: (team: ProfileTeam) => void;
 }
 
-export default function TeamCard({ team, readOnly = false }: TeamCardProps) {
+export default function TeamCard({
+  team,
+  readOnly = false,
+  onLeaveTeamClick,
+}: TeamCardProps) {
   const isOwnTeam = team.type === "own";
   const router = useRouter();
   const { slug } = useProfileView();
@@ -49,12 +54,19 @@ export default function TeamCard({ team, readOnly = false }: TeamCardProps) {
                 <Image src="/edit_yellow.svg" alt="" width={24} height={24} />
               </button>
             ) : (
-              <Image
-                src="/three_dots.svg"
-                alt="Дії команди"
-                width={24}
-                height={24}
-              />
+              <button
+                type="button"
+                onClick={() => onLeaveTeamClick?.(team)}
+                aria-label={`Дії команди ${team.name}`}
+                className="p-1 -m-1"
+              >
+                <Image
+                  src="/three_dots.svg"
+                  alt="Дії команди"
+                  width={24}
+                  height={24}
+                />
+              </button>
             )}
           </div>
         )}
