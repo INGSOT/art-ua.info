@@ -1,7 +1,7 @@
 // Hero Banner Data
 export const heroBannerData = {
   heroText: "Мистецтво допомоги —\nнайсучасніше з мистецтв",
-  backgroundImage: "/hero.png",
+  backgroundVideo: "/main_hero.mp4",
 };
 
 // Main Navigation Data
