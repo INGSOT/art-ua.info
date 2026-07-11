@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['art-ua-info.ddev.site'],
   images: {
     remotePatterns: [
       {
