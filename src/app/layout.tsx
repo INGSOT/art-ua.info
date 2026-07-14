@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Unbounded, Wix_Madefor_Display } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 import Footer from "../components/Footer";
+import Toast from "../components/Toast";
+import { AuthProvider } from "../context/AuthContext";
+import { ToastProvider } from "../context/ToastContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,8 +43,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${unbounded.variable} ${wixMadeforDisplay.variable} antialiased`}
         suppressHydrationWarning
       >
-        {children}
-        <Footer />
+        <NextTopLoader color="#FECC39" showSpinner={false} height={3} />
+        <ToastProvider>
+          <AuthProvider>
+            {children}
+            <Footer />
+            <Toast />
+          </AuthProvider>
+        </ToastProvider>
       </body>
     </html>
   );

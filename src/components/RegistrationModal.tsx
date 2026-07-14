@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { getApiErrorMessage, getApiFieldErrors } from "../lib/apiError";
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -23,6 +26,41 @@ export default function RegistrationModal({
   const [repeatPasswordValue, setRepeatPasswordValue] = useState("");
   const [isAgreementHovered, setIsAgreementHovered] = useState(false);
   const [isAgreementAccepted, setIsAgreementAccepted] = useState(false);
+  const { register } = useAuth();
+  const { showToast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!isAgreementAccepted) {
+      setError("Потрібно прийняти умови використання платформи");
+      return;
+    }
+
+    if (passwordValue !== repeatPasswordValue) {
+      setError("Паролі не співпадають");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+    try {
+      await register(nameValue, emailValue, passwordValue, repeatPasswordValue);
+      showToast("Реєстрація успішна! Вітаємо у спільноті.", "green");
+      onClose();
+    } catch (err) {
+      const fieldErrors = getApiFieldErrors(err);
+      if (fieldErrors?.email) {
+        setError("Користувач з таким email вже існує. Спробуйте увійти або відновити пароль.");
+      } else {
+        setError(getApiErrorMessage(err, "Не вдалося зареєструватися"));
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -105,9 +143,11 @@ export default function RegistrationModal({
             </button>
           </div>
 
+          <form onSubmit={handleSubmit}>
           <div className="mt-8 flex flex-col gap-2">
             <input
               type="text"
+              required
               value={nameValue}
               onChange={(e) => setNameValue(e.target.value)}
               placeholder="Ваше ім'я"
@@ -115,7 +155,8 @@ export default function RegistrationModal({
             />
 
             <input
-              type="text"
+              type="email"
+              required
               value={emailValue}
               onChange={(e) => setEmailValue(e.target.value)}
               placeholder="Електронна пошта"
@@ -125,6 +166,7 @@ export default function RegistrationModal({
             <div className="relative w-full h-[60px]">
               <input
                 type={isPasswordVisible ? "text" : "password"}
+                required
                 value={passwordValue}
                 onChange={(e) => setPasswordValue(e.target.value)}
                 placeholder="Пароль"
@@ -147,6 +189,7 @@ export default function RegistrationModal({
             <div className="relative w-full h-[60px]">
               <input
                 type={isRepeatPasswordVisible ? "text" : "password"}
+                required
                 value={repeatPasswordValue}
                 onChange={(e) => setRepeatPasswordValue(e.target.value)}
                 placeholder="Повторіть пароль"
@@ -204,24 +247,34 @@ export default function RegistrationModal({
             </span>
           </button>
 
-          <button
-            type="button"
-            className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[16px] hover:bg-white transition-colors"
-          >
-            Зареєструватись
-          </button>
-
-          <div className="mt-8 w-full border-t border-[#343434]" />
+          {error && (
+            <p className="mt-4 font-wix text-sm text-[#FECC39] whitespace-pre-line">{error}</p>
+          )}
 
           <button
-            type="button"
-            className="mt-8 w-full flex items-center justify-center gap-3 text-white hover:text-[#FECC39] transition-colors"
+            type="submit"
+            disabled={isSubmitting}
+            className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[16px] hover:bg-white transition-colors disabled:opacity-60"
           >
-            <img src="/google.svg" alt="Google" className="w-7 h-7" />
-            <span className="font-bold text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
-              Продовжити з Google
-            </span>
+            {isSubmitting ? "Зачекайте..." : "Зареєструватись"}
           </button>
+          </form>
+
+          {process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true" && (
+            <>
+              <div className="mt-8 w-full border-t border-[#343434]" />
+
+              <button
+                type="button"
+                className="mt-8 w-full flex items-center justify-center gap-3 text-white hover:text-[#FECC39] transition-colors"
+              >
+                <img src="/google.svg" alt="Google" className="w-7 h-7" />
+                <span className="font-bold text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
+                  Продовжити з Google
+                </span>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </>

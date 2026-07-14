@@ -8,15 +8,27 @@ import SearchModal from "./SearchModal";
 import LoginModal from "./LoginModal";
 import RegistrationModal from "./RegistrationModal";
 import ResetPassModal from "./ResetPassModal";
+import ProfileMenuModal from "./ProfileMenuModal";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { getImageUrl } from "../lib/url";
 
 interface HeaderProps {
   isHomePage?: boolean;
 }
 
 export default function Header({ isHomePage = false }: HeaderProps) {
+    const { user, logout } = useAuth();
+    const { showToast } = useToast();
+
+    const handleLogout = async () => {
+      await logout();
+      showToast("Ви вийшли з акаунту", "green");
+    };
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
     const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
     const openLoginModal = () => {
       setDisableAuthAnimation(false);
@@ -27,6 +39,37 @@ export default function Header({ isHomePage = false }: HeaderProps) {
       setDisableAuthAnimation(false);
       setActiveAuthModal(null);
     };
+
+    const authButton = user ? (
+      <button
+        type="button"
+        onClick={() => setIsProfileMenuOpen(true)}
+        className="relative w-11 h-11 flex items-center justify-center shrink-0"
+        aria-label={user.name}
+      >
+        {getImageUrl(user.avatar_url) ? (
+          <img
+            src={getImageUrl(user.avatar_url)!}
+            alt={user.name}
+            className="w-9 h-9 rounded-full object-cover"
+          />
+        ) : (
+          <span className="w-9 h-9 rounded-full bg-[#FECC39] text-[#343434] font-bold text-[14px] flex items-center justify-center">
+            {user.name.charAt(0).toUpperCase()}
+          </span>
+        )}
+        <span className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-[#4CAF50] border-2 border-[#414141]" />
+      </button>
+    ) : (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="w-11 h-11 hover:bg-transparent"
+        onClick={openLoginModal}
+      >
+        <img className="w-6 h-6" alt="Login" src="/login.svg" />
+      </Button>
+    );
 
     return (
     <>
@@ -100,14 +143,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         </div>
 
         <div className="flex md:hidden flex-1 justify-end items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-11 h-11 hover:bg-transparent"
-            onClick={openLoginModal}
-          >
-            <img className="w-6 h-6" alt="Login" src="/login.svg" />
-          </Button>
+          {authButton}
 
           <Button
             variant="ghost"
@@ -120,14 +156,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         </div>
 
         <div className="hidden md:flex lg:hidden flex-1 justify-end items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-11 h-11 hover:bg-transparent"
-            onClick={openLoginModal}
-          >
-            <img className="w-6 h-6" alt="Login" src="/login.svg" />
-          </Button>
+          {authButton}
 
           <Button
             variant="ghost"
@@ -140,14 +169,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         </div>
 
         <div className="hidden lg:flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-11 h-11 hover:bg-transparent"
-            onClick={openLoginModal}
-          >
-            <img className="w-6 h-6" alt="Login" src="/login.svg" />
-          </Button>
+          {authButton}
 
           <Button
             variant="ghost"
@@ -160,6 +182,14 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         </div>
       </header>
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      {user && (
+        <ProfileMenuModal
+          isOpen={isProfileMenuOpen}
+          onClose={() => setIsProfileMenuOpen(false)}
+          user={user}
+          onLogout={handleLogout}
+        />
+      )}
       <LoginModal
         isOpen={activeAuthModal === "login"}
         onClose={closeAuthModal}

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { authAPI } from "../lib/api/auth";
+import { getApiErrorMessage } from "../lib/apiError";
 
 interface ResetPassModalProps {
   isOpen: boolean;
@@ -15,11 +17,10 @@ export default function ResetPassModal({
   onSwitchToLogin,
   disableAnimation = false,
 }: ResetPassModalProps) {
-  const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false);
-  const [isRepeatPasswordVisible, setIsRepeatPasswordVisible] = useState(false);
   const [emailValue, setEmailValue] = useState("");
-  const [newPasswordValue, setNewPasswordValue] = useState("");
-  const [repeatPasswordValue, setRepeatPasswordValue] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [isSent, setIsSent] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -33,6 +34,20 @@ export default function ResetPassModal({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+    try {
+      await authAPI.forgotPassword(emailValue.trim());
+      setIsSent(true);
+    } catch (err) {
+      setError(getApiErrorMessage(err, "Не вдалося надіслати лист"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -74,75 +89,39 @@ export default function ResetPassModal({
           </div>
 
           <div className="mt-8 font-bold text-white text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
-            Створіть новий пароль для свого облікового запису.
+            {isSent
+              ? "Перевірте вашу пошту — ми надіслали посилання для відновлення паролю."
+              : "Вкажіть email, і ми надішлемо посилання для встановлення нового паролю."}
           </div>
 
           <div className="mt-8 w-full border-t border-[#343434]" />
 
-          <div className="mt-8 flex flex-col gap-2">
-            <input
-              type="text"
-              value={emailValue}
-              onChange={(e) => setEmailValue(e.target.value)}
-              placeholder="Електронна пошта"
-              className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
-            />
-
-            <div className="relative w-full h-[60px]">
-              <input
-                type={isNewPasswordVisible ? "text" : "password"}
-                value={newPasswordValue}
-                onChange={(e) => setNewPasswordValue(e.target.value)}
-                placeholder="Новий пароль"
-                className="font-wix w-full h-full bg-[#343434] px-6 pr-16 text-white placeholder-[#A0A0A0]"
-              />
-              <button
-                type="button"
-                onClick={() => setIsNewPasswordVisible((prev) => !prev)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
-                aria-label={
-                  isNewPasswordVisible ? "Сховати пароль" : "Показати пароль"
-                }
-              >
-                <img
-                  src={isNewPasswordVisible ? "/visible.svg" : "/hidden.svg"}
-                  alt={isNewPasswordVisible ? "Visible" : "Hidden"}
-                  className="w-6 h-6"
+          {!isSent && (
+            <form onSubmit={handleSubmit}>
+              <div className="mt-8 flex flex-col gap-2">
+                <input
+                  type="email"
+                  required
+                  value={emailValue}
+                  onChange={(e) => setEmailValue(e.target.value)}
+                  placeholder="Електронна пошта"
+                  className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
                 />
-              </button>
-            </div>
+              </div>
 
-            <div className="relative w-full h-[60px]">
-              <input
-                type={isRepeatPasswordVisible ? "text" : "password"}
-                value={repeatPasswordValue}
-                onChange={(e) => setRepeatPasswordValue(e.target.value)}
-                placeholder="Повторіть новий пароль"
-                className="font-wix w-full h-full bg-[#343434] px-6 pr-16 text-white placeholder-[#A0A0A0]"
-              />
+              {error && (
+                <p className="mt-4 font-wix text-sm text-[#FECC39] whitespace-pre-line">{error}</p>
+              )}
+
               <button
-                type="button"
-                onClick={() => setIsRepeatPasswordVisible((prev) => !prev)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
-                aria-label={
-                  isRepeatPasswordVisible ? "Сховати пароль" : "Показати пароль"
-                }
+                type="submit"
+                disabled={isSubmitting}
+                className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[14px] hover:bg-white transition-colors disabled:opacity-60"
               >
-                <img
-                  src={isRepeatPasswordVisible ? "/visible.svg" : "/hidden.svg"}
-                  alt={isRepeatPasswordVisible ? "Visible" : "Hidden"}
-                  className="w-6 h-6"
-                />
+                {isSubmitting ? "Надсилаємо..." : "Надіслати посилання"}
               </button>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[14px] hover:bg-white transition-colors"
-          >
-            Увійти
-          </button>
+            </form>
+          )}
         </div>
       </div>
     </>
