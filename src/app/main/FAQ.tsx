@@ -6,9 +6,25 @@ import {
 } from "../../components/ui/accordion";
 import { Button } from "../../components/ui/button";
 import Link from "next/link";
-import { faqData } from "../../data/faqData";
+import { faqAPI } from "../../lib/api/faq";
 
-export default function FAQ() {
+export default async function FAQ() {
+  let categories: Awaited<ReturnType<typeof faqAPI.list>> = [];
+  try {
+    categories = await faqAPI.list();
+  } catch (error) {
+    console.error("Failed to load FAQ:", error);
+  }
+
+  const faqItems = categories
+    .flatMap((category) => category.questions)
+    .slice(0, 6)
+    .map((question) => ({
+      id: `item-${question.id}`,
+      question: question.question,
+      answer: question.answer.split("\n").filter(Boolean),
+    }));
+
   return (
     <section className="flex flex-col items-center gap-[30px] px-4 py-10 md:py-20 w-full bg-[#414141] border-b border-solid border-[#343434]">
       <div className="w-full max-w-[1440px] flex flex-col gap-[30px]">
@@ -19,10 +35,10 @@ export default function FAQ() {
         <Accordion
           type="single"
           collapsible
-          defaultValue="item-1"
+          defaultValue={faqItems[0]?.id}
           className="w-full flex flex-col bg-[#343434]"
         >
-        {faqData.slice(0, 6).map((faq) => (
+        {faqItems.map((faq) => (
           <AccordionItem key={faq.id} value={faq.id} className="border-none">
             <div className="flex flex-col w-full bg-[#343434] border border-solid border-[#272727]">
               <div className="flex items-stretch w-full border-b border-[#272727]">

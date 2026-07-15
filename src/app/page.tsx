@@ -10,9 +10,11 @@ import LatestNews from "../components/LatestNews";
 import FAQ from "./main/FAQ";
 import Partners from "./main/Partners";
 import JoinCommunityWrapper from "../components/JoinCommunityWrapper";
-import { projectsData } from "../data/projectsData";
+import { projectsAPI } from "../lib/api/projects";
 
 export const dynamic = "force-dynamic";
+
+const FALLBACK_PROJECT_IMAGE = "/projects/project-photo-1.png";
 
 function shuffleProjects<T>(items: T[]): T[] {
   const copy = [...items];
@@ -25,13 +27,20 @@ function shuffleProjects<T>(items: T[]): T[] {
   return copy;
 }
 
-export default function Home() {
+export default async function Home() {
   const seed = Date.now();
-  const featuredProjectSlides = shuffleProjects(projectsData).map((project) => ({
+  let projects: Awaited<ReturnType<typeof projectsAPI.list>> = [];
+  try {
+    projects = await projectsAPI.list({ per_page: 20, sort_by: "popular" });
+  } catch (error) {
+    console.error("Failed to load featured projects:", error);
+  }
+
+  const featuredProjectSlides = shuffleProjects(projects).map((project) => ({
     slug: project.slug,
     title: project.title,
-    image: project.image,
-    likes: project.likes,
+    image: project.cover_url ?? FALLBACK_PROJECT_IMAGE,
+    likes: project.likes_count,
   }));
 
   return (
