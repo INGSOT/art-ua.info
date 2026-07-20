@@ -180,7 +180,6 @@ export const projectsFilters: FilterSection[] = [
         title: 'Продаж',
         type: 'simple',
         items: [
-            { id: 'all', label: 'Усі', type: 'checkbox' },
             { id: 'for-sale', label: 'Для продажу', type: 'checkbox' },
             { id: 'sold', label: 'Продані', type: 'checkbox' },
             { id: 'reserved', label: 'Зарезервовані', type: 'checkbox' },

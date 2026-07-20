@@ -11,7 +11,7 @@ import { projectsFilters } from "../../components/filters/filterConfig";
 import ListOfProjects from "./ListOfProjects";
 import PaginationSection from "../../components/PaginationSection";
 import Image from "next/image";
-import { projectsData } from "../../data/projectsData";
+import { projectsData, type SalesStatus } from "../../data/projectsData";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -35,10 +35,20 @@ export default function ProjectsPage() {
     const artItems =
         artFieldsSection?.subsections?.flatMap((sub) => sub.items ?? []) ?? [];
 
+    const salesSection = projectsFilters.find((section) => section.id === "sales");
+    const salesItems = salesSection?.items ?? [];
+
     const allowedArtCategoryIds = new Set(artItems.map((item) => item.id));
     const selectedArtCategoryIds = searchParams
         .getAll("art_subcategory")
         .filter((value) => allowedArtCategoryIds.has(value));
+
+    const allowedSalesStatusIds = new Set(salesItems.map((item) => item.id));
+    const salesStatusParam = searchParams.get("sales_status");
+    const selectedSalesStatus =
+        salesStatusParam && allowedSalesStatusIds.has(salesStatusParam)
+            ? (salesStatusParam as SalesStatus)
+            : null;
 
     const [searchInput, setSearchInput] = useState(searchQueryParam);
 
@@ -46,9 +56,14 @@ export default function ProjectsPage() {
         setSearchInput(searchQueryParam);
     }, [searchQueryParam]);
 
-    const initialSelectedFilters: Record<string, boolean> = Object.fromEntries(
-        artItems.map((item) => [item.id, selectedArtCategoryIds.includes(item.id)])
-    );
+    const initialSelectedFilters: Record<string, boolean> = {
+        ...Object.fromEntries(
+            artItems.map((item) => [item.id, selectedArtCategoryIds.includes(item.id)])
+        ),
+        ...Object.fromEntries(
+            salesItems.map((item) => [item.id, selectedSalesStatus === item.id])
+        ),
+    };
 
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
 
@@ -56,13 +71,17 @@ export default function ProjectsPage() {
         ? projectsData.filter((project) => selectedArtCategoryIds.includes(project.artSubCategory))
         : projectsData;
 
+    const filteredProjectsBySales = selectedSalesStatus
+        ? filteredProjectsByCategory.filter((project) => project.salesStatus === selectedSalesStatus)
+        : filteredProjectsByCategory;
+
     const filteredProjects = normalizedSearchQuery
-        ? filteredProjectsByCategory.filter((project) => {
+        ? filteredProjectsBySales.filter((project) => {
             const titleMatch = project.title.toLowerCase().includes(normalizedSearchQuery);
             const authorMatch = project.authorName.toLowerCase().includes(normalizedSearchQuery);
             return titleMatch || authorMatch;
         })
-        : filteredProjectsByCategory;
+        : filteredProjectsBySales;
 
     const sortedProjects = [...filteredProjects].sort((a, b) => {
         if (sortOption === "Популярні") {
@@ -98,16 +117,25 @@ export default function ProjectsPage() {
     const handleFilterChange = (filters: Record<string, boolean>) => {
         setCurrentPage(1);
 
-        const selectedIds = artItems
+        const selectedArtIds = artItems
             .map((item) => item.id)
             .filter((id) => !!filters[id]);
 
+        const selectedSalesId = salesItems
+            .map((item) => item.id)
+            .find((id) => !!filters[id]);
+
         const params = new URLSearchParams(searchParams.toString());
         params.delete("art_subcategory");
+        params.delete("sales_status");
 
-        selectedIds.forEach((id) => {
+        selectedArtIds.forEach((id) => {
             params.append("art_subcategory", id);
         });
+
+        if (selectedSalesId) {
+            params.set("sales_status", selectedSalesId);
+        }
 
         const search = params.toString();
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
@@ -172,7 +200,7 @@ export default function ProjectsPage() {
                         <div className="flex flex-col lg:flex-row gap-6">
                             {/* Left Side - Filter */}
                             <FilterSection
-                                key={`projects-filters-${selectedArtCategoryIds.slice().sort().join(",") || "all"}`}
+                                key={`projects-filters-${selectedArtCategoryIds.slice().sort().join(",") || "all"}-${selectedSalesStatus ?? "all-sales"}`}
                                 filters={projectsFilters}
                                 onFilterChange={handleFilterChange}
                                 initialSelectedFilters={initialSelectedFilters}
