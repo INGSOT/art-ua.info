@@ -6,8 +6,10 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import SearchSection from '../../components/SearchSection';
 import ServicesFilterSection from './ServicesFilterSection';
+import FiltersButton from '../../components/filters/FiltersButton';
+import ServicesFiltersModal, { ServicesFilterDraft } from '../../components/filters/ServicesFiltersModal';
 import SelectedFiltersBar from '../../components/filters/SelectedFiltersBar';
-import { buildFilterChips, formatPriceRange, getClearedFiltersState, removeFilterFromState } from '../../components/filters/filterChipUtils';
+import { buildFilterChips, formatPriceRange, removeFilterFromState } from '../../components/filters/filterChipUtils';
 import { FilterChip } from '../../components/filters/filterChipUtils';
 import ListOfServices from './ListOfServices';
 import { CurrencyCode, ServicePerformerType, servicesData } from '../../data/servicesData';
@@ -20,6 +22,7 @@ export default function ServicesPage() {
     const MAX_PRICE = 1000000;
     type PerformerFilter = ServicePerformerType | 'all';
     const [currentPage, setCurrentPage] = useState(1);
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -85,19 +88,72 @@ export default function ServicesPage() {
         return base;
     })();
 
-    const handleFilterChange = (filters: Record<string, boolean>) => {
-        setCurrentPage(1);
+    const resolvePerformerFilter = (filters: Record<string, boolean>): PerformerFilter => {
         const artistsSelected = !!filters['artists'];
         const teamsSelected = !!filters['teams'];
         const allSelected = !!filters['all'];
 
-        let nextPerformerFilter: PerformerFilter = 'all';
-
         if (artistsSelected && !teamsSelected && !allSelected) {
-            nextPerformerFilter = 'artist';
-        } else if (teamsSelected && !artistsSelected && !allSelected) {
-            nextPerformerFilter = 'team';
+            return 'artist';
         }
+        if (teamsSelected && !artistsSelected && !allSelected) {
+            return 'team';
+        }
+        return 'all';
+    };
+
+    const countServicesForDraft = (draft: ServicesFilterDraft) => {
+        const performerFilter = resolvePerformerFilter(draft.filters);
+        const selectedIds = artItems
+            .map((item) => item.id)
+            .filter((id) => !!draft.filters[id]);
+
+        let result = performerFilter === 'all'
+            ? servicesData
+            : servicesData.filter((service) => service.performerType === performerFilter);
+
+        if (selectedIds.length) {
+            result = result.filter((service) => selectedIds.includes(service.artSubCategory));
+        }
+
+        if (draft.currency) {
+            result = result.filter((service) => service.currency === draft.currency);
+        }
+
+        if (draft.applyPrice) {
+            result = result.filter((service) => {
+                if (typeof service.price !== 'number') {
+                    return false;
+                }
+
+                return service.price >= draft.minPrice && service.price <= draft.maxPrice;
+            });
+        }
+
+        const normalizedLocation = draft.location.trim().toLowerCase();
+        if (normalizedLocation) {
+            result = result.filter((service) =>
+                service.location.toLowerCase().includes(normalizedLocation)
+            );
+        }
+
+        const normalizedQuery = searchQueryParam.trim().toLowerCase();
+        if (normalizedQuery) {
+            result = result.filter((service) => {
+                const titleMatch = service.title.toLowerCase().includes(normalizedQuery);
+                const descriptionMatch = service.description.toLowerCase().includes(normalizedQuery);
+                const authorOrTeamMatch = service.authorName.toLowerCase().includes(normalizedQuery);
+
+                return titleMatch || descriptionMatch || authorOrTeamMatch;
+            });
+        }
+
+        return result.length;
+    };
+
+    const handleFilterChange = (filters: Record<string, boolean>) => {
+        setCurrentPage(1);
+        const nextPerformerFilter = resolvePerformerFilter(filters);
 
         const selectedIds = artItems
             .map((item) => item.id)
@@ -160,6 +216,53 @@ export default function ServicesPage() {
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
+    const handleMobileFiltersApply = (draft: ServicesFilterDraft) => {
+        setCurrentPage(1);
+        const nextPerformerFilter = resolvePerformerFilter(draft.filters);
+        const selectedIds = artItems
+            .map((item) => item.id)
+            .filter((id) => !!draft.filters[id]);
+
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (nextPerformerFilter === 'artist') {
+            params.set('performer', 'artist');
+        } else if (nextPerformerFilter === 'team') {
+            params.set('performer', 'team');
+        } else {
+            params.delete('performer');
+        }
+
+        params.delete('art_subcategory');
+        selectedIds.forEach((id) => {
+            params.append('art_subcategory', id);
+        });
+
+        if (draft.currency) {
+            params.set('currency', draft.currency);
+        } else {
+            params.delete('currency');
+        }
+
+        if (draft.applyPrice) {
+            params.set('price_min', String(draft.minPrice));
+            params.set('price_max', String(draft.maxPrice));
+        } else {
+            params.delete('price_min');
+            params.delete('price_max');
+        }
+
+        const normalizedLocation = draft.location.trim();
+        if (normalizedLocation) {
+            params.set('location', normalizedLocation);
+        } else {
+            params.delete('location');
+        }
+
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    };
+
     const handleSearch = () => {
         setCurrentPage(1);
         const params = new URLSearchParams(searchParams.toString());
@@ -212,17 +315,7 @@ export default function ServicesPage() {
             params.delete('location');
         } else if (['all', 'artists', 'teams'].includes(chipId)) {
             const newFilters = removeFilterFromState(chipId, initialSelectedFilters, servicesFilters);
-            const artistsSelected = !!newFilters['artists'];
-            const teamsSelected = !!newFilters['teams'];
-            const allSelected = !!newFilters['all'];
-
-            let nextPerformerFilter: PerformerFilter = 'all';
-
-            if (artistsSelected && !teamsSelected && !allSelected) {
-                nextPerformerFilter = 'artist';
-            } else if (teamsSelected && !artistsSelected && !allSelected) {
-                nextPerformerFilter = 'team';
-            }
+            const nextPerformerFilter = resolvePerformerFilter(newFilters);
 
             if (nextPerformerFilter === 'artist') {
                 params.set('performer', 'artist');
@@ -322,35 +415,40 @@ export default function ServicesPage() {
             )}
 
             {!(normalizedSearchQuery && !hasResults) && (
-                <div className="flex flex-col gap-4 p-4 pl-8">
+                <div className="flex flex-col gap-4 p-4 md:px-6 lg:pl-8">
                     <SelectedFiltersBar
                         chips={selectedFilterChips}
                         onRemove={handleRemoveFilter}
                         onClearAll={handleClearAllFilters}
                     />
-                    <div className="flex gap-4">
-                    {/* Filters sidebar */}
-                    <ServicesFilterSection
-                        key={`services-filters-${selectedPerformerFilter}-${selectedArtCategoryIds.slice().sort().join(',') || 'all'}`}
-                        onFilterChange={handleFilterChange}
-                        initialSelectedFilters={initialSelectedFilters}
-                        selectedCurrency={selectedCurrency}
-                        onCurrencyChange={handleCurrencyChange}
-                        initialMinPrice={selectedPriceMin}
-                        initialMaxPrice={selectedPriceMax}
-                        onPriceApply={handlePriceApply}
-                        initialLocationSearch={selectedLocation}
-                        onLocationSearch={handleLocationSearch}
-                    />
-
-                    {/* Main content */}
-                    <div className="flex-1">
-                        <ListOfServices
-                            currentPage={currentPage}
-                            itemsPerPage={itemsPerPage}
-                            services={filteredBySearchServices}
+                    <div className="flex flex-col lg:flex-row gap-4">
+                        <ServicesFilterSection
+                            key={`services-filters-${selectedPerformerFilter}-${selectedArtCategoryIds.slice().sort().join(',') || 'all'}-${selectedCurrency ?? 'all-currency'}-${hasPriceFilter ? `${selectedPriceMin}-${selectedPriceMax}` : 'no-price'}-${selectedLocation || 'no-location'}`}
+                            onFilterChange={handleFilterChange}
+                            initialSelectedFilters={initialSelectedFilters}
+                            selectedCurrency={selectedCurrency}
+                            onCurrencyChange={handleCurrencyChange}
+                            initialMinPrice={selectedPriceMin}
+                            initialMaxPrice={selectedPriceMax}
+                            onPriceApply={handlePriceApply}
+                            initialLocationSearch={selectedLocation}
+                            onLocationSearch={handleLocationSearch}
                         />
-                    </div>
+
+                        <div className="flex-1 w-full">
+                            <div className="lg:hidden mb-4">
+                                <FiltersButton
+                                    onClick={() => setIsMobileFiltersOpen(true)}
+                                    isActive={isMobileFiltersOpen}
+                                    selectedCount={selectedFilterChips.length}
+                                />
+                            </div>
+                            <ListOfServices
+                                currentPage={currentPage}
+                                itemsPerPage={itemsPerPage}
+                                services={filteredBySearchServices}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
@@ -360,6 +458,21 @@ export default function ServicesPage() {
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={setCurrentPage}
+                />
+            )}
+
+            {isMobileFiltersOpen && (
+                <ServicesFiltersModal
+                    onClose={() => setIsMobileFiltersOpen(false)}
+                    initialSelectedFilters={initialSelectedFilters}
+                    selectedCurrency={selectedCurrency}
+                    initialMinPrice={selectedPriceMin}
+                    initialMaxPrice={selectedPriceMax}
+                    hasPriceFilter={hasPriceFilter}
+                    initialLocation={selectedLocation}
+                    getResultCount={countServicesForDraft}
+                    onApply={handleMobileFiltersApply}
+                    onCancel={handleClearAllFilters}
                 />
             )}
 

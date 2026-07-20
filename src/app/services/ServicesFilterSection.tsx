@@ -14,8 +14,11 @@ interface ServicesFilterSectionProps {
     initialMinPrice?: number;
     initialMaxPrice?: number;
     onPriceApply?: (minPrice: number, maxPrice: number) => void;
+    onPriceChange?: (minPrice: number, maxPrice: number) => void;
     initialLocationSearch?: string;
     onLocationSearch?: (location: string) => void;
+    onLocationChange?: (location: string) => void;
+    variant?: 'sidebar' | 'panel';
 }
 
 export default function ServicesFilterSection({
@@ -26,8 +29,11 @@ export default function ServicesFilterSection({
     initialMinPrice = 0,
     initialMaxPrice = 1000000,
     onPriceApply,
+    onPriceChange,
     initialLocationSearch = '',
     onLocationSearch,
+    onLocationChange,
+    variant = 'sidebar',
 }: ServicesFilterSectionProps) {
     const MAX_PRICE = 1000000;
     // Initialize expanded sections
@@ -57,6 +63,12 @@ export default function ServicesFilterSection({
         servicesFilters.find((section) => section.id === 'performer')?.items?.map((item) => item.id) ?? []
     );
 
+    const initialFiltersKey = JSON.stringify(initialSelectedFilters);
+
+    useEffect(() => {
+        setSelectedFilters(initialSelectedFilters);
+    }, [initialFiltersKey, initialSelectedFilters]);
+
     useEffect(() => {
         const nextMin = Math.max(0, Math.min(initialMinPrice, MAX_PRICE));
         const nextMax = Math.max(nextMin, Math.min(initialMaxPrice, MAX_PRICE));
@@ -75,6 +87,18 @@ export default function ServicesFilterSection({
     useEffect(() => {
         setLocationSearch(initialLocationSearch);
     }, [initialLocationSearch]);
+
+    const updateMinPrice = (value: number) => {
+        const nextMin = Math.min(value, maxPrice);
+        setMinPrice(nextMin);
+        onPriceChange?.(nextMin, maxPrice);
+    };
+
+    const updateMaxPrice = (value: number) => {
+        const nextMax = Math.max(value, minPrice);
+        setMaxPrice(nextMax);
+        onPriceChange?.(minPrice, nextMax);
+    };
 
     const toggleSection = (sectionId: string) => {
         setExpandedSections(prev => ({
@@ -105,11 +129,17 @@ export default function ServicesFilterSection({
 
         setMinPrice(nextMin);
         setMaxPrice(nextMax);
+        onPriceChange?.(nextMin, nextMax);
         onPriceApply?.(nextMin, nextMax);
     };
 
     const applyLocationSearch = () => {
         onLocationSearch?.(locationSearch);
+    };
+
+    const handleLocationInputChange = (value: string) => {
+        setLocationSearch(value);
+        onLocationChange?.(value);
     };
 
     const currencies = [
@@ -118,8 +148,13 @@ export default function ServicesFilterSection({
         { id: 'EUR' as CurrencyCode, defaultIcon: '/yellow_euro.svg', activeIcon: '/euro.svg', defaultIconWidth: 23, defaultIconHeight: 24 },
     ];
 
+    const containerClassName =
+        variant === 'panel'
+            ? 'flex w-full bg-[#414141] flex-col gap-4 px-0 pb-0'
+            : 'hidden lg:flex lg:w-[316px] bg-[#414141] flex-col gap-4 px-2 pb-4';
+
     return (
-        <div className="hidden lg:flex lg:w-[316px] bg-[#414141] flex-col gap-4 px-2 pb-4">
+        <div className={containerClassName}>
             {/* Regular filters */}
             {servicesFilters.map((section: FilterSectionType) => (
                 <div key={section.id}>
@@ -226,17 +261,17 @@ export default function ServicesFilterSection({
 
                                         const num = parseInt(rawValue, 10);
                                         const clamped = Math.min(num, MAX_PRICE);
-                                        setMinPrice(Math.min(clamped, maxPrice));
+                                        updateMinPrice(Math.min(clamped, maxPrice));
                                     }}
                                     onBlur={() => {
                                         if (minPriceInput === '') {
-                                            setMinPrice(0);
+                                            updateMinPrice(0);
                                             return;
                                         }
 
                                         const num = parseInt(minPriceInput, 10);
                                         const clamped = Math.min(num, MAX_PRICE);
-                                        setMinPrice(Math.min(clamped, maxPrice));
+                                        updateMinPrice(Math.min(clamped, maxPrice));
                                     }}
                                     className="font-wix w-full h-10 bg-[#343434] text-white px-3"
                                 />
@@ -256,17 +291,17 @@ export default function ServicesFilterSection({
 
                                         const num = parseInt(rawValue, 10);
                                         const clamped = Math.min(num, MAX_PRICE);
-                                        setMaxPrice(Math.max(clamped, minPrice));
+                                        updateMaxPrice(Math.max(clamped, minPrice));
                                     }}
                                     onBlur={() => {
                                         if (maxPriceInput === '') {
-                                            setMaxPrice(minPrice);
+                                            updateMaxPrice(minPrice);
                                             return;
                                         }
 
                                         const num = parseInt(maxPriceInput, 10);
                                         const clamped = Math.min(num, MAX_PRICE);
-                                        setMaxPrice(Math.max(clamped, minPrice));
+                                        updateMaxPrice(Math.max(clamped, minPrice));
                                     }}
                                     className="font-wix w-full h-10 bg-[#343434] text-white px-3"
                                 />
@@ -297,7 +332,7 @@ export default function ServicesFilterSection({
                                     onChange={(e) => {
                                         const value = Math.min(Number(e.target.value), MAX_PRICE);
                                         if (value <= maxPrice) {
-                                            setMinPrice(value);
+                                            updateMinPrice(value);
                                         }
                                     }}
                                     className="absolute w-full h-full opacity-0 cursor-pointer range-slider"
@@ -318,7 +353,7 @@ export default function ServicesFilterSection({
                                     onChange={(e) => {
                                         const value = Math.min(Number(e.target.value), MAX_PRICE);
                                         if (value >= minPrice) {
-                                            setMaxPrice(value);
+                                            updateMaxPrice(value);
                                         }
                                     }}
                                     className="absolute w-full h-full opacity-0 cursor-pointer range-slider"
@@ -394,7 +429,7 @@ export default function ServicesFilterSection({
                                 type="text"
                                 placeholder="Пошук"
                                 value={locationSearch}
-                                onChange={(e) => setLocationSearch(e.target.value)}
+                                onChange={(e) => handleLocationInputChange(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
                                         applyLocationSearch();
