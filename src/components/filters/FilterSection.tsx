@@ -62,7 +62,7 @@ export default function FilterSection({
 
     const containerClassName =
         variant === 'panel'
-            ? 'flex w-full bg-[#414141] flex-col gap-4 px-2 pb-4'
+            ? 'flex w-full bg-[#414141] flex-col gap-4 px-0 pb-0'
             : 'hidden lg:flex lg:w-[316px] bg-[#414141] flex-col gap-4 px-2 pb-4';
 
     return (

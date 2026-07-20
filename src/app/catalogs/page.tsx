@@ -8,6 +8,7 @@ import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
 import FiltersButton from "../../components/filters/FiltersButton";
+import FiltersModal from "../../components/filters/FiltersModal";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
 import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { catalogsFilters } from "../../components/filters/filterConfig";
@@ -84,6 +85,26 @@ export default function CatalogsPage() {
     };
 
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
+
+    const getModalResultCount = (filters: Record<string, boolean>) => {
+        const selectedIds = artItems
+            .map((item) => item.id)
+            .filter((id) => !!filters[id]);
+
+        let result = selectedIds.length
+            ? catalogsData.filter((catalog) => selectedIds.includes(catalog.artSubCategory))
+            : catalogsData;
+
+        if (normalizedSearchQuery) {
+            result = result.filter((catalog) => {
+                const titleMatch = catalog.title.toLowerCase().includes(normalizedSearchQuery);
+                const authorMatch = catalog.authorName.toLowerCase().includes(normalizedSearchQuery);
+                return titleMatch || authorMatch;
+            });
+        }
+
+        return result.length;
+    };
 
     const filteredCatalogsByCategory = selectedArtCategoryIds.length
         ? catalogsData.filter((catalog) => selectedArtCategoryIds.includes(catalog.artSubCategory))
@@ -216,7 +237,7 @@ export default function CatalogsPage() {
                                 <div className="relative z-30 flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6">
                                     <FiltersButton
                                         className="lg:hidden"
-                                        onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                                        onClick={() => setIsMobileFiltersOpen(true)}
                                         isActive={isMobileFiltersOpen}
                                         selectedCount={selectedFilterChips.length}
                                     />
@@ -255,18 +276,6 @@ export default function CatalogsPage() {
                                     </div>
                                 </div>
 
-                                {isMobileFiltersOpen && (
-                                    <div className="lg:hidden mb-4">
-                                        <FilterSection
-                                            key={`catalogs-filters-mobile-${selectedArtCategoryIds.slice().sort().join(",") || "all"}`}
-                                            filters={catalogsFilters}
-                                            onFilterChange={handleFilterChange}
-                                            initialSelectedFilters={initialSelectedFilters}
-                                            variant="panel"
-                                        />
-                                    </div>
-                                )}
-
                                 {/* Catalogs Grid */}
                                 <ListOfCatalogs catalogs={currentCatalogs} disableInteractions={isSortOpen} />
                             </div>
@@ -280,6 +289,16 @@ export default function CatalogsPage() {
                         />
                     )}
                 </>
+            )}
+            {isMobileFiltersOpen && (
+                <FiltersModal
+                    onClose={() => setIsMobileFiltersOpen(false)}
+                    filters={catalogsFilters}
+                    initialSelectedFilters={initialSelectedFilters}
+                    getResultCount={getModalResultCount}
+                    onApply={handleFilterChange}
+                    onCancel={handleClearAllFilters}
+                />
             )}
             <LatestNews />
             <JoinCommunityWrapper />

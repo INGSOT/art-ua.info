@@ -9,6 +9,7 @@ import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
 import FiltersButton from "../../components/filters/FiltersButton";
+import FiltersModal from "../../components/filters/FiltersModal";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
 import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { authorsFilters } from "../../components/filters/filterConfig";
@@ -136,17 +137,32 @@ export default function AuthorsPage() {
         handleFilterChange(getClearedFiltersState(authorsFilters));
     };
 
-    let activeData: (ArtistData | TeamProfile)[] = [];
+    const getAuthorsByParticipantFilter = (participantFilter: ParticipantFilter) => {
+        if (participantFilter === "artist") return artistsData;
+        if (participantFilter === "organization") return organizationsData;
+        if (participantFilter === "team") return teamData;
+        return [...artistsData, ...organizationsData, ...teamData];
+    };
 
-    if (currentParticipantFilter === "artist") {
-        activeData = artistsData;
-    } else if (currentParticipantFilter === "organization") {
-        activeData = organizationsData;
-    } else if (currentParticipantFilter === "team") {
-        activeData = teamData;
-    } else {
-        activeData = [...artistsData, ...organizationsData, ...teamData];
-    }
+    const resolveParticipantFilter = (filters: Record<string, boolean>): ParticipantFilter => {
+        const artistsSelected = !!filters["artists"];
+        const organizationsSelected = !!filters["organizations"];
+        const teamsSelected = !!filters["teams"];
+        const allSelected = !!filters["all"];
+
+        if (artistsSelected && !organizationsSelected && !teamsSelected && !allSelected) {
+            return "artist";
+        }
+        if (organizationsSelected && !artistsSelected && !teamsSelected && !allSelected) {
+            return "organization";
+        }
+        if (teamsSelected && !artistsSelected && !organizationsSelected && !allSelected) {
+            return "team";
+        }
+        return "all";
+    };
+
+    let activeData: (ArtistData | TeamProfile)[] = getAuthorsByParticipantFilter(currentParticipantFilter);
 
     const filteredDataByCategory = selectedArtCategoryIds.length
         ? activeData.filter(
@@ -156,6 +172,39 @@ export default function AuthorsPage() {
         : activeData;
 
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
+
+    const getModalResultCount = (filters: Record<string, boolean>) => {
+        const participantFilter = resolveParticipantFilter(filters);
+        const baseData = getAuthorsByParticipantFilter(participantFilter);
+        const selectedIds = artItems
+            .map((item) => item.id)
+            .filter((id) => !!filters[id]);
+
+        let result = selectedIds.length
+            ? baseData.filter(
+                (participant): participant is ArtistData =>
+                    "artSubCategory" in participant && selectedIds.includes(participant.artSubCategory)
+            )
+            : baseData;
+
+        if (normalizedSearchQuery) {
+            result = result.filter((participant) => {
+                const name =
+                    "artistName" in participant ? participant.artistName : participant.name;
+                const role =
+                    "artistType" in participant ? participant.artistType : participant.category;
+                const nameMatch = name.toLowerCase().includes(normalizedSearchQuery);
+                const typeMatch = role.toLowerCase().includes(normalizedSearchQuery);
+                const tagsMatch = participant.tags.some((tag) =>
+                    tag.toLowerCase().includes(normalizedSearchQuery)
+                );
+
+                return nameMatch || typeMatch || tagsMatch;
+            });
+        }
+
+        return result.length;
+    };
 
     const filteredData = normalizedSearchQuery
         ? filteredDataByCategory.filter((participant) => {
@@ -266,23 +315,12 @@ export default function AuthorsPage() {
                             <div className="relative z-30 flex items-center justify-between lg:justify-start gap-1 md:gap-2">
                                 <FiltersButton
                                     className="lg:hidden"
-                                    onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                                    onClick={() => setIsMobileFiltersOpen(true)}
                                     isActive={isMobileFiltersOpen}
                                     selectedCount={selectedFilterChips.length}
                                 />
                                 <SortingControls />
                             </div>
-                            {isMobileFiltersOpen && (
-                                <div className="lg:hidden">
-                                    <FilterSection
-                                        key={`authors-filters-mobile-${currentParticipantFilter}-${selectedArtCategoryIds.slice().sort().join(",") || "all"}`}
-                                        filters={authorsFilters}
-                                        onFilterChange={handleFilterChange}
-                                        initialSelectedFilters={initialSelectedFilters}
-                                        variant="panel"
-                                    />
-                                </div>
-                            )}
                             {filteredData.length === 0 ? (
                                 <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
                                     <p className="font-wix text-white text-lg md:text-2xl">Авторів не знайдено</p>
@@ -342,6 +380,16 @@ export default function AuthorsPage() {
                         onPageChange={handlePageChange}
                     />
                 </>
+            )}
+            {isMobileFiltersOpen && (
+                <FiltersModal
+                    onClose={() => setIsMobileFiltersOpen(false)}
+                    filters={authorsFilters}
+                    initialSelectedFilters={initialSelectedFilters}
+                    getResultCount={getModalResultCount}
+                    onApply={handleFilterChange}
+                    onCancel={handleClearAllFilters}
+                />
             )}
             <LatestNews />
             <JoinCommunityWrapper />

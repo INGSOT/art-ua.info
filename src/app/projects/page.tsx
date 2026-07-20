@@ -8,6 +8,7 @@ import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
 import FiltersButton from "../../components/filters/FiltersButton";
+import FiltersModal from "../../components/filters/FiltersModal";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
 import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { projectsFilters } from "../../components/filters/filterConfig";
@@ -155,6 +156,34 @@ export default function ProjectsPage() {
         handleFilterChange(getClearedFiltersState(projectsFilters));
     };
 
+    const getModalResultCount = (filters: Record<string, boolean>) => {
+        const selectedArtIds = artItems
+            .map((item) => item.id)
+            .filter((id) => !!filters[id]);
+
+        const selectedSalesId = salesItems
+            .map((item) => item.id)
+            .find((id) => !!filters[id]);
+
+        let result = selectedArtIds.length
+            ? projectsData.filter((project) => selectedArtIds.includes(project.artSubCategory))
+            : projectsData;
+
+        if (selectedSalesId) {
+            result = result.filter((project) => project.salesStatus === selectedSalesId);
+        }
+
+        if (normalizedSearchQuery) {
+            result = result.filter((project) => {
+                const titleMatch = project.title.toLowerCase().includes(normalizedSearchQuery);
+                const authorMatch = project.authorName.toLowerCase().includes(normalizedSearchQuery);
+                return titleMatch || authorMatch;
+            });
+        }
+
+        return result.length;
+    };
+
     const handleSearch = () => {
         const params = new URLSearchParams(searchParams.toString());
         const trimmedValue = searchInput.trim();
@@ -231,7 +260,7 @@ export default function ProjectsPage() {
                                 <div className="relative z-30 flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6">
                                     <FiltersButton
                                         className="lg:hidden"
-                                        onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                                        onClick={() => setIsMobileFiltersOpen(true)}
                                         isActive={isMobileFiltersOpen}
                                         selectedCount={selectedFilterChips.length}
                                     />
@@ -270,18 +299,6 @@ export default function ProjectsPage() {
                                     </div>
                                 </div>
 
-                                {isMobileFiltersOpen && (
-                                    <div className="lg:hidden mb-4">
-                                        <FilterSection
-                                            key={`projects-filters-mobile-${selectedArtCategoryIds.slice().sort().join(",") || "all"}-${selectedSalesStatus ?? "all-sales"}`}
-                                            filters={projectsFilters}
-                                            onFilterChange={handleFilterChange}
-                                            initialSelectedFilters={initialSelectedFilters}
-                                            variant="panel"
-                                        />
-                                    </div>
-                                )}
-
                                 {/* Projects Grid */}
                                 <ListOfProjects projects={currentProjects} disableInteractions={isSortOpen} />
                             </div>
@@ -295,6 +312,16 @@ export default function ProjectsPage() {
                         />
                     )}
                 </>
+            )}
+            {isMobileFiltersOpen && (
+                <FiltersModal
+                    onClose={() => setIsMobileFiltersOpen(false)}
+                    filters={projectsFilters}
+                    initialSelectedFilters={initialSelectedFilters}
+                    getResultCount={getModalResultCount}
+                    onApply={handleFilterChange}
+                    onCancel={handleClearAllFilters}
+                />
             )}
             <LatestNews />
             <JoinCommunityWrapper />
