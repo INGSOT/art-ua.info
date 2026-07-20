@@ -7,6 +7,8 @@ import Footer from "../../components/Footer";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
+import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
+import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { FilterSection as FilterSectionType } from "../../components/filters/filterConfig";
 import ListOfFAQ from "./ListOfFAQ";
 import { faqCategories, faqData } from "../../data/faqData";
@@ -69,6 +71,16 @@ export default function FAQPage() {
         router.replace(queryString ? `${pathname}?${queryString}` : pathname);
     };
 
+    const selectedFilterChips = buildFilterChips(faqFilters, initialSelectedFilters);
+
+    const handleRemoveFilter = (chipId: string) => {
+        handleFilterChange(removeFilterFromState(chipId, initialSelectedFilters, faqFilters));
+    };
+
+    const handleClearAllFilters = () => {
+        handleFilterChange(getClearedFiltersState(faqFilters));
+    };
+
     return (
         <>
             <Header isHomePage={false} />
@@ -83,6 +95,12 @@ export default function FAQPage() {
                         Часті питання
                     </h1>
                 </div>
+
+                <SelectedFiltersBar
+                    chips={selectedFilterChips}
+                    onRemove={handleRemoveFilter}
+                    onClearAll={handleClearAllFilters}
+                />
 
                 {/* Filters and FAQ Section */}
                 <div className="flex flex-col lg:flex-row gap-4 w-full">

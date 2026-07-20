@@ -8,6 +8,8 @@ import LatestNews from "../../components/LatestNews";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
+import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
+import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { authorsFilters } from "../../components/filters/filterConfig";
 import Participant from "../../components/Participant";
 import SortingControls from "./SortingControls";
@@ -122,6 +124,16 @@ export default function AuthorsPage() {
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
+    const selectedFilterChips = buildFilterChips(authorsFilters, initialSelectedFilters);
+
+    const handleRemoveFilter = (chipId: string) => {
+        handleFilterChange(removeFilterFromState(chipId, initialSelectedFilters, authorsFilters));
+    };
+
+    const handleClearAllFilters = () => {
+        handleFilterChange(getClearedFiltersState(authorsFilters));
+    };
+
     let activeData: (ArtistData | TeamProfile)[] = [];
 
     if (currentParticipantFilter === "artist") {
@@ -233,15 +245,22 @@ export default function AuthorsPage() {
             )}
             {!(normalizedSearchQuery && filteredData.length === 0) && (
                 <>
-                    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 bg-[#414141] max-w-full overflow-hidden">
-                        <div className="hidden lg:block">
-                            <FilterSection
-                                filters={authorsFilters}
-                                onFilterChange={handleFilterChange}
-                                initialSelectedFilters={initialSelectedFilters}
-                            />
-                        </div>
-                        <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-8 min-w-0">
+                    <div className="flex flex-col gap-4 lg:gap-8 px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 bg-[#414141] max-w-full overflow-hidden">
+                        <SelectedFiltersBar
+                            chips={selectedFilterChips}
+                            onRemove={handleRemoveFilter}
+                            onClearAll={handleClearAllFilters}
+                        />
+                        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+                            <div className="hidden lg:block">
+                                <FilterSection
+                                    key={`authors-filters-${currentParticipantFilter}-${selectedArtCategoryIds.slice().sort().join(",") || "all"}`}
+                                    filters={authorsFilters}
+                                    onFilterChange={handleFilterChange}
+                                    initialSelectedFilters={initialSelectedFilters}
+                                />
+                            </div>
+                            <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-8 min-w-0">
                             <SortingControls />
                             {filteredData.length === 0 ? (
                                 <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
@@ -293,6 +312,7 @@ export default function AuthorsPage() {
                                     )
                                 )
                             )}
+                            </div>
                         </div>
                     </div>
                     <PaginationSection

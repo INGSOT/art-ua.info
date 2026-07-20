@@ -6,6 +6,9 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import SearchSection from '../../components/SearchSection';
 import ServicesFilterSection from './ServicesFilterSection';
+import SelectedFiltersBar from '../../components/filters/SelectedFiltersBar';
+import { buildFilterChips, formatPriceRange, getClearedFiltersState, removeFilterFromState } from '../../components/filters/filterChipUtils';
+import { FilterChip } from '../../components/filters/filterChipUtils';
 import ListOfServices from './ListOfServices';
 import { CurrencyCode, ServicePerformerType, servicesData } from '../../data/servicesData';
 import { servicesFilters } from '../../components/filters/filterConfig';
@@ -182,6 +185,76 @@ export default function ServicesPage() {
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
+    const handleClearAllFilters = () => {
+        setCurrentPage(1);
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('art_subcategory');
+        params.delete('performer');
+        params.delete('currency');
+        params.delete('price_min');
+        params.delete('price_max');
+        params.delete('location');
+
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    };
+
+    const handleRemoveFilter = (chipId: string) => {
+        setCurrentPage(1);
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (chipId === 'currency') {
+            params.delete('currency');
+        } else if (chipId === 'price') {
+            params.delete('price_min');
+            params.delete('price_max');
+        } else if (chipId === 'location') {
+            params.delete('location');
+        } else if (['all', 'artists', 'teams'].includes(chipId)) {
+            const newFilters = removeFilterFromState(chipId, initialSelectedFilters, servicesFilters);
+            const artistsSelected = !!newFilters['artists'];
+            const teamsSelected = !!newFilters['teams'];
+            const allSelected = !!newFilters['all'];
+
+            let nextPerformerFilter: PerformerFilter = 'all';
+
+            if (artistsSelected && !teamsSelected && !allSelected) {
+                nextPerformerFilter = 'artist';
+            } else if (teamsSelected && !artistsSelected && !allSelected) {
+                nextPerformerFilter = 'team';
+            }
+
+            if (nextPerformerFilter === 'artist') {
+                params.set('performer', 'artist');
+            } else if (nextPerformerFilter === 'team') {
+                params.set('performer', 'team');
+            } else {
+                params.delete('performer');
+            }
+        } else {
+            const newFilters = removeFilterFromState(chipId, initialSelectedFilters, servicesFilters);
+            params.delete('art_subcategory');
+            artItems
+                .map((item) => item.id)
+                .filter((id) => !!newFilters[id])
+                .forEach((id) => {
+                    params.append('art_subcategory', id);
+                });
+        }
+
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    };
+
+    const selectedFilterChips: FilterChip[] = [
+        ...buildFilterChips(servicesFilters, initialSelectedFilters),
+        ...(selectedCurrency ? [{ id: 'currency', label: selectedCurrency }] : []),
+        ...(hasPriceFilter
+            ? [{ id: 'price', label: formatPriceRange(selectedPriceMin, selectedPriceMax) }]
+            : []),
+        ...(selectedLocation ? [{ id: 'location', label: selectedLocation }] : []),
+    ];
+
     const servicesByPerformer = selectedPerformerFilter === 'all'
         ? servicesData
         : servicesData.filter((service) => service.performerType === selectedPerformerFilter);
@@ -249,7 +322,13 @@ export default function ServicesPage() {
             )}
 
             {!(normalizedSearchQuery && !hasResults) && (
-                <div className="flex gap-4 p-4 pl-8">
+                <div className="flex flex-col gap-4 p-4 pl-8">
+                    <SelectedFiltersBar
+                        chips={selectedFilterChips}
+                        onRemove={handleRemoveFilter}
+                        onClearAll={handleClearAllFilters}
+                    />
+                    <div className="flex gap-4">
                     {/* Filters sidebar */}
                     <ServicesFilterSection
                         key={`services-filters-${selectedPerformerFilter}-${selectedArtCategoryIds.slice().sort().join(',') || 'all'}`}
@@ -271,6 +350,7 @@ export default function ServicesPage() {
                             itemsPerPage={itemsPerPage}
                             services={filteredBySearchServices}
                         />
+                    </div>
                     </div>
                 </div>
             )}

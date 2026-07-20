@@ -7,6 +7,8 @@ import LatestNews from "../../components/LatestNews";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
+import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
+import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { catalogsFilters } from "../../components/filters/filterConfig";
 import ListOfCatalogs from "./ListOfCatalogs";
 import { catalogsData } from "../../data/catalogsData";
@@ -67,6 +69,16 @@ export default function CatalogsPage() {
 
         const search = params.toString();
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    };
+
+    const selectedFilterChips = buildFilterChips(catalogsFilters, initialSelectedFilters);
+
+    const handleRemoveFilter = (chipId: string) => {
+        handleFilterChange(removeFilterFromState(chipId, initialSelectedFilters, catalogsFilters));
+    };
+
+    const handleClearAllFilters = () => {
+        handleFilterChange(getClearedFiltersState(catalogsFilters));
     };
 
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
@@ -179,6 +191,12 @@ export default function CatalogsPage() {
                                 Каталоги наших митців
                             </h1>
                         </div>
+
+                        <SelectedFiltersBar
+                            chips={selectedFilterChips}
+                            onRemove={handleRemoveFilter}
+                            onClearAll={handleClearAllFilters}
+                        />
 
                         {/* Filter and Content Section */}
                         <div className="flex flex-col lg:flex-row gap-6">

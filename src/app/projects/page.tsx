@@ -7,6 +7,8 @@ import LatestNews from "../../components/LatestNews";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
+import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
+import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { projectsFilters } from "../../components/filters/filterConfig";
 import ListOfProjects from "./ListOfProjects";
 import PaginationSection from "../../components/PaginationSection";
@@ -141,6 +143,16 @@ export default function ProjectsPage() {
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
+    const selectedFilterChips = buildFilterChips(projectsFilters, initialSelectedFilters);
+
+    const handleRemoveFilter = (chipId: string) => {
+        handleFilterChange(removeFilterFromState(chipId, initialSelectedFilters, projectsFilters));
+    };
+
+    const handleClearAllFilters = () => {
+        handleFilterChange(getClearedFiltersState(projectsFilters));
+    };
+
     const handleSearch = () => {
         const params = new URLSearchParams(searchParams.toString());
         const trimmedValue = searchInput.trim();
@@ -197,6 +209,11 @@ export default function ProjectsPage() {
                 <>
                     {/* Main Content Section */}
                     <section className="w-full bg-[#414141] py-8 px-4 sm:px-6 md:px-10 lg:px-20">
+                        <SelectedFiltersBar
+                            chips={selectedFilterChips}
+                            onRemove={handleRemoveFilter}
+                            onClearAll={handleClearAllFilters}
+                        />
                         <div className="flex flex-col lg:flex-row gap-6">
                             {/* Left Side - Filter */}
                             <FilterSection

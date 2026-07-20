@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { FilterSection as FilterSectionType, FilterItem } from './filterConfig';
 
@@ -19,6 +19,12 @@ export default function FilterSection({ filters, onFilterChange, initialSelected
 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(initialExpandedSections);
     const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean>>(initialSelectedFilters || {});
+
+    const initialFiltersKey = JSON.stringify(initialSelectedFilters ?? {});
+
+    useEffect(() => {
+        setSelectedFilters(initialSelectedFilters || {});
+    }, [initialFiltersKey, initialSelectedFilters]);
 
     const toggleSection = (sectionId: string) => {
         setExpandedSections(prev => ({
