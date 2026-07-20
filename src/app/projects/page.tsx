@@ -7,6 +7,7 @@ import LatestNews from "../../components/LatestNews";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
+import FiltersButton from "../../components/filters/FiltersButton";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
 import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { projectsFilters } from "../../components/filters/filterConfig";
@@ -28,6 +29,7 @@ export default function ProjectsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortOption, setSortOption] = useState<SortOption>("Популярні");
     const [isSortOpen, setIsSortOpen] = useState(false);
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -215,50 +217,70 @@ export default function ProjectsPage() {
                             onClearAll={handleClearAllFilters}
                         />
                         <div className="flex flex-col lg:flex-row gap-6">
-                            {/* Left Side - Filter */}
-                            <FilterSection
-                                key={`projects-filters-${selectedArtCategoryIds.slice().sort().join(",") || "all"}-${selectedSalesStatus ?? "all-sales"}`}
-                                filters={projectsFilters}
-                                onFilterChange={handleFilterChange}
-                                initialSelectedFilters={initialSelectedFilters}
-                            />
+                            <div className="hidden lg:block">
+                                <FilterSection
+                                    key={`projects-filters-${selectedArtCategoryIds.slice().sort().join(",") || "all"}-${selectedSalesStatus ?? "all-sales"}`}
+                                    filters={projectsFilters}
+                                    onFilterChange={handleFilterChange}
+                                    initialSelectedFilters={initialSelectedFilters}
+                                />
+                            </div>
 
                             {/* Right Side - Sorting and Projects */}
                             <div className="flex-1 w-full">
-                                {/* Sorting Dropdown */}
-                                <div className="relative mb-4 md:mb-6 inline-block">
-                                    <button
-                                        onClick={() => setIsSortOpen(!isSortOpen)}
-                                        className="flex items-center gap-2 text-white font-bold text-sm md:text-base bg-[#343434] px-3 md:px-4 py-2 md:py-3 hover:text-[#FECC39] transition-colors"
-                                    >
-                                        {sortOption}
-                                        <Image
-                                            src={isSortOpen ? "/yellow_triangle_up.svg" : "/white_triangle_down.svg"}
-                                            alt=""
-                                            width={24}
-                                            height={24}
-                                        />
-                                    </button>
+                                <div className="relative z-30 flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6">
+                                    <FiltersButton
+                                        className="lg:hidden"
+                                        onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                                        isActive={isMobileFiltersOpen}
+                                        selectedCount={selectedFilterChips.length}
+                                    />
+                                    <div className="relative ml-auto lg:ml-0">
+                                        <button
+                                            onClick={() => setIsSortOpen(!isSortOpen)}
+                                            className="flex items-center gap-1 md:gap-2 h-[44px] md:h-[48px] lg:h-auto px-2 md:px-3 lg:px-4 lg:py-3 text-white font-bold text-sm md:text-base bg-[#343434] hover:text-[#FECC39] transition-colors"
+                                        >
+                                            {sortOption}
+                                            <Image
+                                                src={isSortOpen ? "/yellow_triangle_up.svg" : "/white_triangle_down.svg"}
+                                                alt=""
+                                                width={24}
+                                                height={24}
+                                                className="w-[18px] h-[18px] lg:w-6 lg:h-6 flex-shrink-0"
+                                            />
+                                        </button>
 
-                                    {/* Dropdown Menu */}
-                                    {isSortOpen && (
-                                        <div className="absolute top-full left-0 mt-1 bg-[#343434] z-50 w-full border-2 border-[#1a1a1a]">
-                                            {(["Популярні", "Новіші", "Давніші"] as SortOption[]).map((option) => (
-                                                <button
-                                                    key={option}
-                                                    onClick={() => handleSortChange(option)}
-                                                    className={`w-full text-left px-3 md:px-4 py-2 md:py-3 font-bold text-sm md:text-base transition-colors border-b border-[#1a1a1a] last:border-b-0 ${
-                                                        sortOption === option
-                                                            ? "text-[#FECC39] bg-[#414141]"
-                                                            : "text-white hover:text-[#FECC39] hover:bg-[#414141]"
-                                                    }`}
-                                                >
-                                                    {option}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
+                                        {isSortOpen && (
+                                            <div className="absolute top-full right-0 lg:left-0 lg:right-auto min-w-full w-max z-50 mt-0 lg:mt-1 bg-[#343434] border-2 border-[#1a1a1a]">
+                                                {(["Популярні", "Новіші", "Давніші"] as SortOption[]).map((option) => (
+                                                    <button
+                                                        key={option}
+                                                        onClick={() => handleSortChange(option)}
+                                                        className={`block w-full text-left px-2 md:px-3 lg:px-4 py-2 md:py-3 font-bold text-sm md:text-base whitespace-nowrap transition-colors border-b border-[#1a1a1a] last:border-b-0 ${
+                                                            sortOption === option
+                                                                ? "text-[#FECC39] bg-[#414141]"
+                                                                : "text-white hover:text-[#FECC39] hover:bg-[#414141]"
+                                                        }`}
+                                                    >
+                                                        {option}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
+
+                                {isMobileFiltersOpen && (
+                                    <div className="lg:hidden mb-4">
+                                        <FilterSection
+                                            key={`projects-filters-mobile-${selectedArtCategoryIds.slice().sort().join(",") || "all"}-${selectedSalesStatus ?? "all-sales"}`}
+                                            filters={projectsFilters}
+                                            onFilterChange={handleFilterChange}
+                                            initialSelectedFilters={initialSelectedFilters}
+                                            variant="panel"
+                                        />
+                                    </div>
+                                )}
 
                                 {/* Projects Grid */}
                                 <ListOfProjects projects={currentProjects} disableInteractions={isSortOpen} />

@@ -8,6 +8,7 @@ import LatestNews from "../../components/LatestNews";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
 import FilterSection from "../../components/filters/FilterSection";
+import FiltersButton from "../../components/filters/FiltersButton";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
 import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { authorsFilters } from "../../components/filters/filterConfig";
@@ -49,6 +50,7 @@ export default function AuthorsPage() {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [searchInput, setSearchInput] = useState(searchQueryParam);
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
     useEffect(() => {
         setSearchInput(searchQueryParam);
@@ -245,7 +247,7 @@ export default function AuthorsPage() {
             )}
             {!(normalizedSearchQuery && filteredData.length === 0) && (
                 <>
-                    <div className="flex flex-col gap-4 lg:gap-8 px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 bg-[#414141] max-w-full overflow-hidden">
+                    <div className="flex flex-col gap-4 lg:gap-8 px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 bg-[#414141] max-w-full overflow-x-hidden">
                         <SelectedFiltersBar
                             chips={selectedFilterChips}
                             onRemove={handleRemoveFilter}
@@ -261,7 +263,26 @@ export default function AuthorsPage() {
                                 />
                             </div>
                             <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-8 min-w-0">
-                            <SortingControls />
+                            <div className="relative z-30 flex items-center justify-between lg:justify-start gap-1 md:gap-2">
+                                <FiltersButton
+                                    className="lg:hidden"
+                                    onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                                    isActive={isMobileFiltersOpen}
+                                    selectedCount={selectedFilterChips.length}
+                                />
+                                <SortingControls />
+                            </div>
+                            {isMobileFiltersOpen && (
+                                <div className="lg:hidden">
+                                    <FilterSection
+                                        key={`authors-filters-mobile-${currentParticipantFilter}-${selectedArtCategoryIds.slice().sort().join(",") || "all"}`}
+                                        filters={authorsFilters}
+                                        onFilterChange={handleFilterChange}
+                                        initialSelectedFilters={initialSelectedFilters}
+                                        variant="panel"
+                                    />
+                                </div>
+                            )}
                             {filteredData.length === 0 ? (
                                 <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
                                     <p className="font-wix text-white text-lg md:text-2xl">Авторів не знайдено</p>

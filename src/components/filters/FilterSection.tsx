@@ -8,9 +8,15 @@ interface FilterSectionProps {
     filters: FilterSectionType[];
     onFilterChange?: (filters: Record<string, boolean>) => void;
     initialSelectedFilters?: Record<string, boolean>;
+    variant?: 'sidebar' | 'panel';
 }
 
-export default function FilterSection({ filters, onFilterChange, initialSelectedFilters }: FilterSectionProps) {
+export default function FilterSection({
+    filters,
+    onFilterChange,
+    initialSelectedFilters,
+    variant = 'sidebar',
+}: FilterSectionProps) {
     // Initialize expanded sections - all sections expanded by default
     const initialExpandedSections = filters.reduce((acc, section) => {
         acc[section.id] = true;
@@ -54,8 +60,13 @@ export default function FilterSection({ filters, onFilterChange, initialSelected
         onFilterChange?.(newFilters);
     };
 
+    const containerClassName =
+        variant === 'panel'
+            ? 'flex w-full bg-[#414141] flex-col gap-4 px-2 pb-4'
+            : 'hidden lg:flex lg:w-[316px] bg-[#414141] flex-col gap-4 px-2 pb-4';
+
     return (
-        <div className="hidden lg:flex lg:w-[316px] bg-[#414141] flex-col gap-4 px-2 pb-4">
+        <div className={containerClassName}>
             {filters.map((section) => (
                 <div key={section.id}>
                     {/* Section Header */}
