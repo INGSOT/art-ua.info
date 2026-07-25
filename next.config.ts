@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['art-ua-info.ddev.site'],
   images: {
+    // save-art.ddev.site резолвиться у приватну docker-мережу в DDEV-середовищі,
+    // тож серверний оптимізатор next/image блокує його як потенційний SSRF.
+    // Вимикаємо оптимізацію, щоб зображення з бекенду завантажувались напряму (як у Partners.tsx).
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -12,6 +16,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'i.vimeocdn.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'save-art.ddev.site',
         pathname: '/**',
       },
     ],

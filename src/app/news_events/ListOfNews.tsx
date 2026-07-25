@@ -3,10 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
-import type { NewsItem } from "../../data/newsData";
+
+export const NEWS_IMAGE_PLACEHOLDER = "/news/news-image-1.png";
+
+export interface NewsListCardItem {
+  id: number;
+  slug: string;
+  category: string;
+  date: string;
+  title: string;
+  mainImage: string | null;
+}
 
 interface ListOfNewsProps {
-  news: NewsItem[];
+  news: NewsListCardItem[];
   disableHover?: boolean;
 }
 
@@ -32,7 +42,7 @@ export default function ListOfNews({ news, disableHover = false }: ListOfNewsPro
               {/* News image - square aspect ratio */}
               <div className="relative w-full aspect-square bg-cover bg-center overflow-hidden">
                 <Image
-                  src={newsItem.mainImage}
+                  src={newsItem.mainImage ?? NEWS_IMAGE_PLACEHOLDER}
                   alt={newsItem.title}
                   fill
                   className="object-cover"

@@ -6,10 +6,10 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
-import ListOfNews from "./ListOfNews";
-import { newsData } from "../../data/newsData";
+import ListOfNews, { type NewsListCardItem } from "./ListOfNews";
 import PaginationSection from "../../components/PaginationSection";
 import Image from "next/image";
+import { newsAPI, type PublicNewsListItem } from "../../lib/api/news";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -20,10 +20,21 @@ const parseNewsDate = (dateValue: string) => {
     return new Date(year, month - 1, day).getTime();
 };
 
+const mapToCardItem = (item: PublicNewsListItem): NewsListCardItem => ({
+    id: item.id,
+    slug: item.slug,
+    category: item.categoryLabel,
+    date: item.date,
+    title: item.title,
+    mainImage: item.mainImageUrl,
+});
+
 export default function NewsEventsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortOption, setSortOption] = useState<SortOption>("Новіші");
     const [isSortOpen, setIsSortOpen] = useState(false);
+    const [allNews, setAllNews] = useState<PublicNewsListItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -36,10 +47,37 @@ export default function NewsEventsPage() {
         setSearchInput(searchQueryParam);
     }, [searchQueryParam]);
 
+    useEffect(() => {
+        let isMounted = true;
+
+        setIsLoading(true);
+        newsAPI
+            .list({ per_page: 200, language: "uk" })
+            .then((result) => {
+                if (isMounted) {
+                    setAllNews(result.items);
+                }
+            })
+            .catch(() => {
+                if (isMounted) {
+                    setAllNews([]);
+                }
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
     const filteredNews = normalizedSearchQuery
-        ? newsData.filter((newsItem) => newsItem.title.toLowerCase().includes(normalizedSearchQuery))
-        : newsData;
+        ? allNews.filter((newsItem) => newsItem.title.toLowerCase().includes(normalizedSearchQuery))
+        : allNews;
 
     const sortedNews = [...filteredNews].sort((a, b) => {
         const dateA = parseNewsDate(a.date);
@@ -52,7 +90,7 @@ export default function NewsEventsPage() {
     const totalPages = hasResults ? Math.ceil(sortedNews.length / ITEMS_PER_PAGE) : 0;
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentNews = sortedNews.slice(startIndex, endIndex);
+    const currentNews = sortedNews.slice(startIndex, endIndex).map(mapToCardItem);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -161,7 +199,7 @@ export default function NewsEventsPage() {
                     totalPages={totalPages}
                     onPageChange={handlePageChange}
                 />
-            ) : (
+            ) : isLoading ? null : (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pb-8 px-4">
                     <button
                         type="button"

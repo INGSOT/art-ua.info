@@ -16,12 +16,36 @@ import { authorsFilters } from "../../components/filters/filterConfig";
 import Participant from "../../components/Participant";
 import SortingControls from "./SortingControls";
 import PaginationSection from "../../components/PaginationSection";
-import { artistsData, type ArtistData } from "../../data/artistsData";
+import { type ArtistData } from "../../data/artistsData";
 import { organizationsData } from "../../data/organizationsData";
 import { teamData, type TeamProfile } from "../../data/teamData";
 import { projectsData } from "../../data/projectsData";
+import { artistsAPI } from "../../lib/api/artists";
 
 const ITEMS_PER_PAGE = 10;
+const FALLBACK_ARTIST_PHOTO = "/artists/artist-photo-5.png";
+
+/**
+ * Найпоширеніша непорожня категорія у списку проєктів митця —
+ * використовується як фолбек для `artSubCategory`, якого немає в
+ * `GET /v1/artists` (беклог не повʼязує митця з конкретною категорією напряму).
+ */
+function pickMostCommonSubcategory(values: (string | null)[]): string {
+  const counts = new Map<string, number>();
+  values.forEach((value) => {
+    if (!value) return;
+    counts.set(value, (counts.get(value) ?? 0) + 1);
+  });
+  let best = "";
+  let bestCount = 0;
+  counts.forEach((count, value) => {
+    if (count > bestCount) {
+      best = value;
+      bestCount = count;
+    }
+  });
+  return best;
+}
 
 export default function AuthorsPage() {
     const searchParams = useSearchParams();
@@ -52,10 +76,62 @@ export default function AuthorsPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [searchInput, setSearchInput] = useState(searchQueryParam);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+    const [artistsData, setArtistsData] = useState<ArtistData[]>([]);
 
     useEffect(() => {
         setSearchInput(searchQueryParam);
     }, [searchQueryParam]);
+
+    useEffect(() => {
+        let isCancelled = false;
+
+        (async () => {
+            try {
+                const artists = await artistsAPI.list({ per_page: 50 });
+
+                const artistsWithProjects = await Promise.all(
+                    artists.map(async (artist) => {
+                        let projects: Awaited<ReturnType<typeof artistsAPI.projects>> = [];
+                        try {
+                            projects = await artistsAPI.projects(artist.slug, { per_page: 5 });
+                        } catch (error) {
+                            console.error(`Failed to load projects for artist "${artist.slug}":`, error);
+                        }
+
+                        const mapped: ArtistData = {
+                            id: artist.id,
+                            slug: artist.slug,
+                            artistPhoto: artist.avatarUrl ?? FALLBACK_ARTIST_PHOTO,
+                            artistName: artist.name,
+                            artistType: artist.profession || "Митець",
+                            artSubCategory: pickMostCommonSubcategory(
+                                projects.map((project) => project.artSubcategory ?? project.artCategory)
+                            ),
+                            tags: [artist.profession, artist.city, artist.country].filter((value): value is string => !!value),
+                            catalogButtonText: "До каталогу робіт",
+                            photos: projects.map((project) => ({
+                                image: project.coverUrl ?? FALLBACK_ARTIST_PHOTO,
+                                likes: project.likesCount,
+                                slug: project.slug,
+                            })),
+                        };
+
+                        return mapped;
+                    })
+                );
+
+                if (!isCancelled) {
+                    setArtistsData(artistsWithProjects);
+                }
+            } catch (error) {
+                console.error("Failed to load artists:", error);
+            }
+        })();
+
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
 
     const initialSelectedFilters: Record<string, boolean> = (() => {
         const base: Record<string, boolean> = {
@@ -162,7 +238,7 @@ export default function AuthorsPage() {
         return "all";
     };
 
-    let activeData: (ArtistData | TeamProfile)[] = getAuthorsByParticipantFilter(currentParticipantFilter);
+    const activeData: (ArtistData | TeamProfile)[] = getAuthorsByParticipantFilter(currentParticipantFilter);
 
     const filteredDataByCategory = selectedArtCategoryIds.length
         ? activeData.filter(
@@ -336,13 +412,7 @@ export default function AuthorsPage() {
                                             artistName={participant.artistName}
                                             artistType={participant.artistType}
                                             tags={participant.tags}
-                                            photos={projectsData
-                                                .filter((project) => project.authorId === participant.id)
-                                                .map((project) => ({
-                                                    image: project.image,
-                                                    likes: project.likes,
-                                                    slug: project.slug,
-                                                }))}
+                                            photos={participant.photos}
                                             catalogButtonText={participant.catalogButtonText}
                                         />
                                     ) : (

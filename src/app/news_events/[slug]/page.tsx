@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Header from "../../../components/Header";
 import JoinCommunityWrapper from "../../../components/JoinCommunityWrapper";
-import { newsData } from "../../../data/newsData";
+import { newsAPI } from "../../../lib/api/news";
 import ArticleText from "./ArticleText";
 import Photo from "./Photo";
 import SocialLinksBar from "./SocialLinksBar";
@@ -12,7 +12,13 @@ interface ArticlePageProps {
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params;
-  const article = newsData.find((item) => item.slug === slug);
+
+  let article;
+  try {
+    article = await newsAPI.get(slug, "uk");
+  } catch {
+    article = null;
+  }
 
   if (!article) {
     notFound();
@@ -23,8 +29,15 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <Header isHomePage={false} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2">
-        <Photo mainImage={article.mainImage} title={article.title} />
-        <ArticleText article={article} />
+        <Photo mainImage={article.mainImageUrl} title={article.title} />
+        <ArticleText
+          article={{
+            category: article.categoryLabel,
+            date: article.date,
+            title: article.title,
+            textBlocks: article.textBlocks,
+          }}
+        />
       </div>
 
       <SocialLinksBar />

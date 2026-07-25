@@ -1,8 +1,19 @@
 import Image from "next/image";
-import type { NewsItem } from "../../../data/newsData";
+
+export interface ArticleTextBlock {
+  paragraphs: string[];
+  imageUrl: string | null;
+}
+
+export interface ArticleData {
+  category: string;
+  date: string;
+  title: string;
+  textBlocks: ArticleTextBlock[];
+}
 
 interface ArticleTextProps {
-  article: NewsItem;
+  article: ArticleData;
 }
 
 export default function ArticleText({ article }: ArticleTextProps) {
@@ -23,9 +34,9 @@ export default function ArticleText({ article }: ArticleTextProps) {
             </p>
           ))}
 
-          {block.image && (
+          {block.imageUrl && (
             <div className="relative w-full aspect-[16/10] mb-8 mt-8">
-              <Image src={block.image} alt={article.title} fill className="object-cover" />
+              <Image src={block.imageUrl} alt={article.title} fill className="object-cover" />
             </div>
           )}
         </div>
