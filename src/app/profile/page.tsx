@@ -1,6 +1,17 @@
-import { redirect } from "next/navigation";
-import { DEFAULT_AUTHOR_PROFILE_SLUG } from "../../data/profileData";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/AuthContext";
 
 export default function ProfileRootPage() {
-  redirect(`/profile/${DEFAULT_AUTHOR_PROFILE_SLUG}/projects`);
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+    router.replace(user ? `/profile/${user.slug}/projects` : "/");
+  }, [loading, user, router]);
+
+  return null;
 }
