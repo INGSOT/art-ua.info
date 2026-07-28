@@ -55,14 +55,15 @@ export const catalogsAPI = {
     return response.data.data;
   },
 
+  // Без явного language бекенд повертає назви/значення як {uk, en} (а не локалізовану
+  // строку) — це потрібно для форми створення проєкту, де довільні характеристики
+  // заповнюються обома мовами одразу.
   parameters: async (params: {
     art_category: string;
     art_subcategory?: string;
     language?: "uk" | "en";
   }): Promise<Parameter[]> => {
-    const response = await api.get<ParametersResponse>("/v1/parameters", {
-      params: { language: "uk", ...params },
-    });
+    const response = await api.get<ParametersResponse>("/v1/parameters", { params });
     return response.data.data;
   },
 };

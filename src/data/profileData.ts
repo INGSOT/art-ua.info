@@ -31,6 +31,7 @@ export interface AboutMeData {
   avatar: string;
   teams: Team[];
   buttons: AboutMeButton[];
+  legalEntity?: { name: string; avatar: string } | null;
 }
 
 // My Projects

@@ -89,17 +89,6 @@ export const newProjectTexts = {
   tagsPlaceholder: 'Додайте теги',
   tagsPlaceholderEn: 'Add tags',
   tagsHint: 'Поле не є обов’язковим.',
-  characteristicsTitle: 'Характеристики проекту',
-  characteristicsDescription: `Таблиця характеристик проєкту.
-Якщо ви малюєте картину — якого розміру вона буде? Знімаєте фільм — хто напише сценарій?
-Розділ не є обов'язковим.`,
-  characteristicNameLabel: 'Назва',
-  characteristicDescLabel: 'Опис',
-  characteristicNamePlaceholder: 'Наприклад, довжина фільму',
-  characteristicNamePlaceholderEn: 'For example, film lenght',
-  characteristicDescPlaceholder: 'Наприклад, 90 хв.',
-  characteristicDescPlaceholderEn: 'For example, 90 min.',
-  addBlockButton: 'Додати блок',
   soldProjectDescription: `Вкажіть, якщо ваш проєкт вже був проданий через ${ART_UA_COM_DOMAIN} чи будь-яку іншу платформу.`,
   soldProjectLabel: 'Проект проданий',
   acceptTermsLabel: 'Я приймаю умови використання платформи',

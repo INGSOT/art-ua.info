@@ -32,6 +32,12 @@ export function ProfileViewProvider({ children }: { children: ReactNode }) {
         ? user.profession
         : user.profession?.uk ?? "";
 
+    // "profile_legal" повертається бекендом і для порожнього юр. профілю (лише edrpou/name
+    // не заповнені) — орієнтуємось на реально заповнену назву чи ЄДРПОУ, а не на факт наявності
+    // самого об'єкта (див. аналогічну перевірку в save-art SelectProjectOwner.jsx).
+    const legalName = user.profile_legal?.name?.uk || user.profile_legal?.name?.en;
+    const hasLegalProfile = Boolean(legalName) || Boolean(user.profile_legal?.edrpou);
+
     return {
       ...mockFallback,
       id: user.id,
@@ -46,6 +52,12 @@ export function ProfileViewProvider({ children }: { children: ReactNode }) {
           icon: getImageUrl(team.avatar) || mockFallback.aboutMe.avatar,
           slug: team.slug,
         })),
+        legalEntity: hasLegalProfile
+          ? {
+              name: legalName || "Юридична особа",
+              avatar: getImageUrl(user.profile_legal?.logo) || "/legals/legals-photo-1.jpg",
+            }
+          : null,
         buttons: [
           {
             id: "save-art",

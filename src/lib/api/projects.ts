@@ -42,6 +42,31 @@ export interface CreateProjectResponse {
   status: string;
 }
 
+export interface ArtUaInfoContentBlock {
+  type: "paragraph" | "image" | "link";
+  paragraph_text?: { uk?: string; en?: string };
+  image?: string;
+  url?: string;
+}
+
+export interface ArtUaInfoParameterAnswer {
+  parameter_id: number;
+  parameter_value_id?: number | null;
+  custom_value?: { uk?: string; en?: string };
+}
+
+export interface CreateArtUaInfoProjectPayload {
+  status?: "new" | "draft" | "moderation";
+  user_type: "personal" | "legal";
+  title: { uk: string; en?: string };
+  art_category?: string;
+  art_subcategory?: string;
+  parameters?: ArtUaInfoParameterAnswer[];
+  cover?: string | null;
+  content_blocks?: ArtUaInfoContentBlock[];
+  tags?: { uk?: string; en?: string };
+}
+
 export interface MyProjectListItem {
   id: number;
   slug: string;
@@ -111,6 +136,16 @@ export const projectsAPI = {
 
   myCreate: async (payload: CreateProjectPayload): Promise<CreateProjectResponse> => {
     const response = await api.post<{ data: CreateProjectResponse }>("/v1/my/projects", payload);
+    return response.data.data;
+  },
+
+  createArtUaInfoProject: async (
+    payload: CreateArtUaInfoProjectPayload
+  ): Promise<CreateProjectResponse> => {
+    const response = await api.post<{ data: CreateProjectResponse }>(
+      "/v1/art-ua-info/projects",
+      payload
+    );
     return response.data.data;
   },
 };

@@ -3,7 +3,6 @@ export type NewProjectTab =
   | "name"
   | "media"
   | "description"
-  | "parameters"
   | "characteristics"
   | "additional"
   | "publication";
@@ -13,7 +12,6 @@ const menuItems: { id: NewProjectTab; label: string }[] = [
   { id: "name", label: "Назва" },
   { id: "media", label: "Медіа" },
   { id: "description", label: "Опис" },
-  { id: "parameters", label: "Параметри" },
   { id: "characteristics", label: "Характеристики" },
   { id: "additional", label: "Додатково" },
   { id: "publication", label: "Публікація" },

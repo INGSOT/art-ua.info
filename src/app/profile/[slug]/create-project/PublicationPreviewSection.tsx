@@ -5,11 +5,19 @@ import Image from "next/image";
 import WorkVideoEmbed from "./WorkVideoEmbed";
 import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 import { SAVE_ART_DOMAIN } from "../../../../lib/siteDomains";
+import type { Parameter } from "../../../../lib/api/catalogs";
+import type { ParameterAnswers } from "./SpecificationsSection";
 
-interface Characteristic {
-  id: string;
+interface PreviewCharacteristic {
+  id: number;
   name: string;
   description: string;
+}
+
+function localize(value: string | { uk: string; en?: string } | null | undefined): string {
+  if (value == null) return "";
+  if (typeof value === "object") return value.uk ?? value.en ?? "";
+  return value;
 }
 
 interface PublicationPreviewSectionProps {
@@ -17,7 +25,8 @@ interface PublicationPreviewSectionProps {
   selectedArtFieldLabel: string | null;
   workGalleryItems: ProjectWorkMediaItem[];
   descriptionUa: string;
-  characteristics: Characteristic[];
+  parameterCatalog: Parameter[];
+  parameterAnswers: ParameterAnswers;
 }
 
 export default function PublicationPreviewSection({
@@ -25,7 +34,8 @@ export default function PublicationPreviewSection({
   selectedArtFieldLabel,
   workGalleryItems,
   descriptionUa,
-  characteristics,
+  parameterCatalog,
+  parameterAnswers,
 }: PublicationPreviewSectionProps) {
   const [activeSlide, setActiveSlide] = useState(0);
 
@@ -41,9 +51,16 @@ export default function PublicationPreviewSection({
   const previewTitle = projectNameUa.trim() || "«Назва проєкту»";
   const previewGenre = selectedArtFieldLabel || "Жанр не обрано";
   const previewDescription = descriptionUa.trim() || "Текст опису проекту";
-  const previewCharacteristics = characteristics.filter(
-    (item) => item.name.trim() || item.description.trim()
-  );
+  const previewCharacteristics: PreviewCharacteristic[] = parameterCatalog
+    .map((param) => {
+      const answer = parameterAnswers[param.id];
+      const value =
+        param.type === "list"
+          ? localize(param.values.find((v) => v.id === answer?.valueId)?.value)
+          : answer?.value.uk || answer?.value.en || "";
+      return { id: param.id, name: localize(param.name), description: value };
+    })
+    .filter((item) => item.description.trim());
 
   const current = slides[safeSlideIndex];
 
@@ -159,7 +176,7 @@ export default function PublicationPreviewSection({
         <div className="flex flex-col gap-[2px]">
           {(previewCharacteristics.length > 0
             ? previewCharacteristics
-            : [{ id: "empty", name: "-", description: "-" }]
+            : [{ id: -1, name: "-", description: "-" }]
           ).map((item) => (
             <div key={item.id} className="grid grid-cols-2 gap-[2px]">
               <div className="font-wix bg-[#343434] px-6 py-4 text-white text-base break-words min-w-0">

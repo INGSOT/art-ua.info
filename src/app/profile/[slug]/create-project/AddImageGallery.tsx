@@ -119,13 +119,17 @@ export default function AddImageGallery({
     updater: React.SetStateAction<ProjectWorkMediaItem[]>,
     notifyParent?: boolean
   ) => {
-    setItems((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      if (notifyParent !== false && onItemsUpdate) {
-        onItemsUpdate(next);
-      }
-      return next;
-    });
+    // Обчислюємо next поза функціональним updater'ом setItems: виклик onItemsUpdate
+    // (яке в батьківському компоненті синхронно оновлює інший стан) всередині updater'а
+    // React вважає оновленням іншого компонента під час рендеру і видає попередження/помилку.
+    const next =
+      typeof updater === "function"
+        ? (updater as (prev: ProjectWorkMediaItem[]) => ProjectWorkMediaItem[])(itemsRef.current)
+        : updater;
+    setItems(next);
+    if (notifyParent !== false && onItemsUpdate) {
+      onItemsUpdate(next);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,11 +146,9 @@ export default function AddImageGallery({
     const filesToProcess = fileArray.slice(0, slots);
     void Promise.all(filesToProcess.map(readImageFileAsGalleryItem))
       .then((newImages) => {
-        setItems((prevNow) => {
-          const next = [...prevNow, ...newImages].slice(0, MAX_ITEMS);
-          onItemsUpdate?.(next);
-          return next;
-        });
+        const next = [...itemsRef.current, ...newImages].slice(0, MAX_ITEMS);
+        setItems(next);
+        onItemsUpdate?.(next);
       })
       .catch(() => {});
   };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import WorkMediaSlider from "./WorkMediaSlider";
 import type { ProjectWorkMediaItem } from "./projectWorkMedia";
@@ -16,6 +17,7 @@ interface MediaSectionProps {
   tagsPlaceholder: string;
   tagsPlaceholderEn: string;
   tagsHint: string;
+  workError?: string;
   onOpenCoverModal: () => void;
   onOpenGalleryModal: () => void;
   onOpenWorkModal: () => void;
@@ -35,12 +37,21 @@ export default function MediaSection({
   tagsPlaceholder,
   tagsPlaceholderEn,
   tagsHint,
+  workError,
   onOpenCoverModal,
   onOpenGalleryModal,
   onOpenWorkModal,
   onTagsUaChange,
   onTagsEnChange,
 }: MediaSectionProps) {
+  const workBlockRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (workError) {
+      workBlockRef.current?.focus();
+    }
+  }, [workError]);
+
   return (
     <>
       <div className="w-full max-w-[1000px] flex flex-col gap-2">
@@ -83,7 +94,11 @@ export default function MediaSection({
 
       <div className="w-full max-w-[1000px] flex flex-col gap-2">
         <label className="font-wix text-white text-sm">Робота</label>
-        <div className="flex justify-center">
+        <div
+          ref={workBlockRef}
+          tabIndex={-1}
+          className={`flex justify-center ${workError ? "border-2 border-red-500 p-2" : ""}`}
+        >
           {workGalleryItems.length > 0 ? (
             <WorkMediaSlider items={workGalleryItems} onEditClick={onOpenGalleryModal} />
           ) : (
@@ -96,6 +111,7 @@ export default function MediaSection({
             </div>
           )}
         </div>
+        {workError && <p className="text-red-500 text-sm">{workError}</p>}
       </div>
 
       <div className="w-full max-w-[1000px] flex flex-col gap-2">

@@ -45,6 +45,12 @@ export interface AuthUserTeam {
   avatar: string | null;
 }
 
+export interface AuthUserLegalProfile {
+  name: { uk: string | null; en?: string | null } | null;
+  edrpou: string | null;
+  logo: string | null;
+}
+
 export interface AuthUser {
   id: number;
   name: string;
@@ -56,6 +62,7 @@ export interface AuthUser {
   avatar_url?: string | null;
   created_at?: string;
   teams?: AuthUserTeam[];
+  profile_legal?: AuthUserLegalProfile | null;
 }
 
 interface AuthResponse {

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 
 interface OwnerItem {
@@ -10,6 +11,8 @@ interface OwnerSelectionSectionProps {
   owners: OwnerItem[];
   selectedOwner: string | null;
   hoveredOwner: string | null;
+  showError?: boolean;
+  errorMessage?: string;
   onOwnerSelect: (ownerId: string) => void;
   onOwnerHover: (ownerId: string | null) => void;
 }
@@ -18,15 +21,31 @@ export default function OwnerSelectionSection({
   owners,
   selectedOwner,
   hoveredOwner,
+  showError,
+  errorMessage,
   onOwnerSelect,
   onOwnerHover,
 }: OwnerSelectionSectionProps) {
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (showError) {
+      listRef.current?.focus();
+    }
+  }, [showError]);
+
   return (
     <div className="w-full max-w-[1000px] flex flex-col items-center gap-4">
       <p className="font-wix text-white text-[18px] font-semibold text-center">
         Вкажіть власника проєкту
       </p>
-      <div className="flex flex-col gap-4">
+      <div
+        ref={listRef}
+        tabIndex={-1}
+        className={`flex flex-col gap-4 ${
+          showError ? "border-2 border-red-500 p-2" : ""
+        }`}
+      >
         {owners.map((owner) => (
           <button
             key={owner.id}
@@ -43,9 +62,7 @@ export default function OwnerSelectionSection({
                   alt={owner.name}
                   width={40}
                   height={40}
-                  className={`w-full h-full object-cover ${
-                    owner.id === "legal-entity" ? "grayscale opacity-70" : ""
-                  }`}
+                  className="w-full h-full object-cover"
                 />
               </div>
             ) : (
@@ -75,6 +92,11 @@ export default function OwnerSelectionSection({
           </button>
         ))}
       </div>
+      {showError && (
+        <p className="font-wix text-red-500 text-sm text-center">
+          {errorMessage || "Оберіть власника проєкту"}
+        </p>
+      )}
     </div>
   );
 }

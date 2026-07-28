@@ -2,20 +2,18 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { newProjectTexts, artCategories } from "../../../../data/newProjectData";
+import { newProjectTexts } from "../../../../data/newProjectData";
 import Message from "../../../../components/Message";
-import { normalizeWorkGalleryItems } from "./projectWorkMedia";
-import { projectsAPI } from "../../../../lib/api/projects";
-import { getApiErrorMessage } from "../../../../lib/apiError";
 
-function findArtCategoryIdForSubcategory(subcategoryId: string | undefined): string | undefined {
-  if (!subcategoryId) return undefined;
-  return artCategories.find((category) =>
-    category.subcategories.some((subcategory) => subcategory.id === subcategoryId)
-  )?.id;
+interface ProjectPublicationProps {
+  // Валідацію обов'язкових полів проєкту (власник/назва/жанр/робота) виконує сервер
+  // (POST /v1/art-ua-info/projects) — ця функція надсилає запит і повертає результат;
+  // сама сторінка (ProjectCreating) відповідає за розбір 422-помилок по полях і
+  // перемикання на вкладку з помилкою.
+  onPublish: () => Promise<{ type: "success" | "error"; text: string }>;
 }
 
-export default function ProjectPublication() {
+export default function ProjectPublication({ onPublish }: ProjectPublicationProps) {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isTermsHovered, setIsTermsHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
@@ -25,98 +23,19 @@ export default function ProjectPublication() {
 
   const handlePublish = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Reset previous notification
     setNotification(null);
 
-    // Get project data from localStorage (populated by ProjectCreating)
-    const projectDataStr = typeof window !== 'undefined' ? localStorage.getItem('projectData') : null;
-    
-    if (!projectDataStr) {
-      setNotification({ type: "error", text: "Помилка: дані проекту не знайдені" });
+    // Прийняття умов публікації — суто клієнтська згода на дію, не дані проєкту,
+    // тож на сервер не надсилається і серверною валідацією не покривається.
+    if (!acceptedTerms) {
+      setNotification({ type: "error", text: "Прийміть умови публікації" });
       return;
     }
 
-    try {
-      const projectData = JSON.parse(projectDataStr);
-
-      // Validation 1: Check if owner is selected
-      if (!projectData.selectedOwner) {
-        setNotification({ type: "error", text: "Оберіть власника проекту" });
-        return;
-      }
-
-      // Validation 2: Check if project name is filled in both languages
-      if (!projectData.projectNameUa?.trim() || !projectData.projectNameEn?.trim()) {
-        setNotification({ type: "error", text: "Введіть назву проекту" });
-        return;
-      }
-
-      // Validation 3: Check if both Ukrainian and English names are filled
-      if (!projectData.projectNameUa?.trim() && projectData.projectNameEn?.trim()) {
-        setNotification({ type: "error", text: "Заповніть назву українською" });
-        return;
-      }
-
-      if (projectData.projectNameUa?.trim() && !projectData.projectNameEn?.trim()) {
-        setNotification({ type: "error", text: "Заповніть назву англійською" });
-        return;
-      }
-
-      // Validation 4: Check if art field (genre) is selected
-      if (!projectData.selectedArtField) {
-        setNotification({ type: "error", text: "Оберіть жанр проекту" });
-        return;
-      }
-
-      // Validation 5: Check if at least one work element is added
-      const galleryCount = normalizeWorkGalleryItems(
-        projectData.workGalleryItems
-      ).length;
-      const hasWorkContent =
-        galleryCount > 0 ||
-        Boolean(projectData.workImage) ||
-        Boolean(projectData.workVideoUrl) ||
-        (Array.isArray(projectData.galleryImages) &&
-          projectData.galleryImages.length > 0);
-      if (!hasWorkContent) {
-        setNotification({ type: "error", text: "Додайте роботу" });
-        return;
-      }
-
-      // Validation 6: Check if terms are accepted
-      if (!acceptedTerms) {
-        setNotification({ type: "error", text: "Прийміть умови публікації" });
-        return;
-      }
-
-      // All validations passed, submit to the backend
-      await projectsAPI.myCreate({
-        status: "new",
-        title: {
-          uk: projectData.projectNameUa.trim(),
-          en: projectData.projectNameEn.trim(),
-        },
-        short_description: {
-          uk: projectData.descriptionUa?.trim() || undefined,
-          en: projectData.descriptionEn?.trim() || undefined,
-        },
-        cover: projectData.projectCover || undefined,
-        art_category: findArtCategoryIdForSubcategory(projectData.selectedArtField?.id),
-        art_subcategory: projectData.selectedArtField?.id,
-        tags: {
-          uk: projectData.tagsUa?.trim() || undefined,
-          en: projectData.tagsEn?.trim() || undefined,
-        },
-      });
-
-      setNotification({ type: "success", text: "Проект відправлено на модерацію" });
-      // Clear localStorage and reset form
-      localStorage.removeItem('projectData');
+    const result = await onPublish();
+    setNotification(result);
+    if (result.type === "success") {
       setAcceptedTerms(false);
-    } catch (error) {
-      setNotification({ type: "error", text: getApiErrorMessage(error, "Помилка при надіслані проекту") });
-      console.error("Project submission error:", error);
     }
   };
 
