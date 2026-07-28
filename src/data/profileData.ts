@@ -102,6 +102,12 @@ export const catalogsTexts: CatalogsTexts = {
   likeIconAlt: "Like",
 };
 
+export const catalogEmptyState = {
+  message: "Тут ще нічого немає",
+  subMessage: "Додайте свій перший каталог.",
+  createButtonText: "Додати каталог",
+};
+
 // Add Catalog Modal
 export interface AddCatalogTexts {
   title: string;
@@ -160,6 +166,12 @@ export const servicesTexts: ServicesTexts = {
   editServiceButton: "Редагувати послугу",
 };
 
+export const serviceEmptyState = {
+  message: "Тут ще нічого немає",
+  subMessage: "Додайте свою першу послугу.",
+  createButtonText: "Додати послугу",
+};
+
 // Teams
 export type TeamCardType = "own" | "other";
 
@@ -176,6 +188,12 @@ export interface ProfileTeam {
   description: string;
   members: TeamMember[];
 }
+
+export const teamEmptyState = {
+  message: "Тут ще нічого немає",
+  subMessage: "Створіть свою першу команду.",
+  createButtonText: "Створити команду",
+};
 
 /** Колекція текстів і локацій для вкладки «Інформація» (по authorId), див. `profileInfoData.ts`. */
 export { authorProfileInfoData };

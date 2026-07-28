@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { catalogsTexts } from "../../../../data/profileData";
+import { catalogsTexts, catalogEmptyState } from "../../../../data/profileData";
 import { myCatalogsAPI, type MyCatalog } from "../../../../lib/api/myCatalogs";
 import DeleteCatalog from "./DeleteCatalog";
 import AddCatalog from "./AddCatalog";
+import EmptyState from "../../../../components/ui/empty-state";
 
 export default function Catalogs() {
   const [catalogs, setCatalogs] = useState<MyCatalog[]>([]);
@@ -77,6 +78,26 @@ export default function Catalogs() {
 
   if (loading) {
     return <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[400px]" />;
+  }
+
+  if (catalogs.length === 0) {
+    return (
+      <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
+        <EmptyState
+          title={catalogEmptyState.message}
+          description={catalogEmptyState.subMessage}
+          buttonText={catalogEmptyState.createButtonText}
+          onButtonClick={handleAddClick}
+        />
+
+        {/* Add Catalog Modal */}
+        <AddCatalog
+          isOpen={isAddModalOpen}
+          onClose={handleAddCancel}
+          onAdd={handleAddCatalog}
+        />
+      </section>
+    );
   }
 
   return (

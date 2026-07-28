@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../../../components/ui/card";
+import EmptyState from "../../../../components/ui/empty-state";
 import { projectFilterButtons, projectEmptyState } from "../../../../data/profileData";
 import { projectsAPI, type MyProjectListItem } from "../../../../lib/api/projects";
 import { useProfileView } from "../../ProfileViewContext";
@@ -46,7 +47,7 @@ export default function Projects() {
           {/* Create Project Button */}
           <div className="mb-8 flex justify-center">
             <Link
-              href={withProfileId("/profile/new_project", slug)}
+              href={withProfileId("/profile/create-project", slug)}
               className="h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-white w-full md:w-[320px]"
             >
               <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">
@@ -127,31 +128,12 @@ export default function Projects() {
           </div>
         </>
       ) : (
-        <div className="flex flex-col items-center justify-center min-h-[400px] py-16 px-4">
-          <Image src="/megaphone.svg" alt="Megaphone" width={420} height={420} className="w-[200px] h-[200px] md:w-[420px] md:h-[420px]" />
-          <h2 className="mt-8 text-white text-xl md:text-3xl font-bold text-center max-w-[600px]">
-            {projectEmptyState.message}
-          </h2>
-          <p className="font-wix mt-6 text-white text-base md:text-lg text-center">
-            {projectEmptyState.subMessage}
-          </p>
-          <Link
-            href={withProfileId("/profile/new_project", slug)}
-            className="mt-8 h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-[#FECC39] w-full md:w-[320px]"
-          >
-            <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">
-              {projectEmptyState.createButtonText}
-            </span>
-            <div className="flex items-center justify-center w-[60px] flex-shrink-0 border-l border-black">
-              <Image
-                src="/plus.svg"
-                alt="Plus"
-                width={24}
-                height={24}
-              />
-            </div>
-          </Link>
-        </div>
+        <EmptyState
+          title={projectEmptyState.message}
+          description={projectEmptyState.subMessage}
+          buttonText={projectEmptyState.createButtonText}
+          buttonHref={withProfileId("/profile/create-project", slug)}
+        />
       )}
     </section>
   );

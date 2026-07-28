@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import ServiceCard from "../../../../components/ServiceCard";
-import { servicesTexts } from "../../../../data/profileData";
+import EmptyState from "../../../../components/ui/empty-state";
+import { servicesTexts, serviceEmptyState } from "../../../../data/profileData";
 import { myServicesAPI, type MyService } from "../../../../lib/api/myServices";
 import { withProfileId } from "../../../../lib/authorQuery";
 import { useProfileView } from "../../ProfileViewContext";
@@ -45,6 +46,19 @@ export default function Services() {
 
   if (loading) {
     return <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[400px]" />;
+  }
+
+  if (myServices.length === 0) {
+    return (
+      <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
+        <EmptyState
+          title={serviceEmptyState.message}
+          description={serviceEmptyState.subMessage}
+          buttonText={serviceEmptyState.createButtonText}
+          onButtonClick={handleAddClick}
+        />
+      </section>
+    );
   }
 
   return (

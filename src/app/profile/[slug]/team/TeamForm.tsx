@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import AddProjectCover from "../new_project/AddProjectCover";
+import AddProjectCover from "../create-project/AddProjectCover";
 import { artistsAPI } from "../../../../lib/api/artists";
 import { myTeamsAPI } from "../../../../lib/api/myTeams";
 import { withProfileId } from "../../../../lib/authorQuery";

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import AddProjectCover from "../new_project/AddProjectCover";
+import AddProjectCover from "../create-project/AddProjectCover";
 import { myServicesAPI } from "../../../../lib/api/myServices";
 import { withProfileId } from "../../../../lib/authorQuery";
 import { useProfileView } from "../../ProfileViewContext";

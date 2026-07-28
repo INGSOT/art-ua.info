@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { withProfileId } from "../../../../lib/authorQuery";
 import { myTeamsAPI, type MyTeam } from "../../../../lib/api/myTeams";
+import { teamEmptyState } from "../../../../data/profileData";
 import { useProfileView } from "../../ProfileViewContext";
 import LeaveTeamModal from "./LeaveTeamModal";
 import TeamCard from "../team/TeamCard";
+import EmptyState from "../../../../components/ui/empty-state";
 
 export default function ListOfTeams() {
   const router = useRouter();
@@ -47,6 +49,19 @@ export default function ListOfTeams() {
 
   if (loading) {
     return <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[400px]" />;
+  }
+
+  if (teams.length === 0) {
+    return (
+      <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
+        <EmptyState
+          title={teamEmptyState.message}
+          description={teamEmptyState.subMessage}
+          buttonText={teamEmptyState.createButtonText}
+          onButtonClick={() => router.push(withProfileId("/profile/team/new", slug))}
+        />
+      </section>
+    );
   }
 
   return (
