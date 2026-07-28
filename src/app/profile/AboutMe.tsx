@@ -3,14 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "../../components/ui/button";
 import { profileTexts } from "../../data/profileData";
-import { withTeamId } from "../../lib/authorQuery";
+import { withProfileId, withTeamId } from "../../lib/authorQuery";
 import { useProfileView } from "./ProfileViewContext";
 
 export default function AboutMe() {
   const [hoveredButton, setHoveredButton] = useState<string | null>(null);
-  const { aboutMe: aboutMeData } = useProfileView();
+  const { aboutMe: aboutMeData, slug } = useProfileView();
 
   return (
     <section className="w-full bg-[#414141] py-16 px-4">
@@ -63,12 +62,13 @@ export default function AboutMe() {
         {/* Buttons */}
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           {aboutMeData.buttons.map((button) => (
-            <Button
+            <a
               key={button.id}
-              className={`h-[60px] flex items-stretch transition-all duration-300 rounded-none p-0 w-full md:w-auto ${
-                hoveredButton === button.id
-                  ? "bg-[#FECC39] hover:bg-[#FECC39]"
-                  : "bg-[#343434] hover:bg-[#343434]"
+              href={button.href}
+              target={button.external ? "_blank" : undefined}
+              rel={button.external ? "noopener noreferrer" : undefined}
+              className={`h-[60px] flex items-stretch transition-all duration-300 rounded-none w-full md:w-auto ${
+                hoveredButton === button.id ? "bg-[#FECC39]" : "bg-[#343434]"
               }`}
               onMouseEnter={() => setHoveredButton(button.id)}
               onMouseLeave={() => setHoveredButton(null)}
@@ -100,16 +100,15 @@ export default function AboutMe() {
                   height={24}
                 />
               </div>
-            </Button>
+            </a>
           ))}
         </div>
 
         {/* Edit Profile Button */}
-        <Button
-          className={`mt-8 h-[60px] flex items-stretch transition-all duration-300 rounded-none p-0 w-full md:w-auto ${
-            hoveredButton === "edit-profile"
-              ? "bg-white hover:bg-white"
-              : "bg-white hover:bg-white"
+        <Link
+          href={withProfileId("/profile/edit", slug)}
+          className={`mt-8 h-[60px] flex items-stretch transition-all duration-300 rounded-none w-full md:w-auto ${
+            hoveredButton === "edit-profile" ? "bg-white" : "bg-white"
           }`}
           onMouseEnter={() => setHoveredButton("edit-profile")}
           onMouseLeave={() => setHoveredButton(null)}
@@ -125,7 +124,7 @@ export default function AboutMe() {
               height={24}
             />
           </div>
-        </Button>
+        </Link>
       </div>
     </section>
   );

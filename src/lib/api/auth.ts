@@ -38,6 +38,13 @@ api.interceptors.response.use(
   }
 );
 
+export interface AuthUserTeam {
+  id: number;
+  slug: string;
+  name: string | { uk: string; en?: string };
+  avatar: string | null;
+}
+
 export interface AuthUser {
   id: number;
   name: string;
@@ -45,8 +52,10 @@ export interface AuthUser {
   slug: string;
   role?: string;
   profile_type?: string | null;
+  profession?: string | { uk: string; en?: string } | null;
   avatar_url?: string | null;
   created_at?: string;
+  teams?: AuthUserTeam[];
 }
 
 interface AuthResponse {

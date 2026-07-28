@@ -3,6 +3,7 @@ import Header from "../../../components/Header";
 import { projectsAPI, type PublicProjectDetail } from "../../../lib/api/projects";
 import type { Project, SalesStatus } from "../../../data/projectsData";
 import ProjectPageClient from "./ProjectPageClient";
+import { saveArtProfileLabel, siteProfileLabel } from "../../../lib/siteDomains";
 
 interface ProjectPageProps {
   params: Promise<{
@@ -86,8 +87,8 @@ function mapToProject(raw: PublicProjectDetail): Project {
         { text: raw.artSubcategoryLabel ?? "Авторський проєкт", hasIcon: true },
       ],
       links: {
-        saveArt: authorSlug ? `Проєкт на save-art.in.ua/${authorSlug}` : "",
-        artUa: authorSlug ? `Проєкт на art-ua.info/${authorSlug}` : "",
+        saveArt: authorSlug ? `Проєкт на ${saveArtProfileLabel(authorSlug)}` : "",
+        artUa: authorSlug ? `Проєкт на ${siteProfileLabel(authorSlug)}` : "",
       },
       slides: finalSlides,
       initialLikes: raw.likesCount,
@@ -104,8 +105,8 @@ function mapToProject(raw: PublicProjectDetail): Project {
         avatar: raw.author.avatarUrl ?? "",
         name: raw.author.name,
         description: raw.author.profession || raw.shortDescription || "",
-        artUaLink: authorSlug ? `art-ua.info/${authorSlug}` : "",
-        saveArtLink: authorSlug ? `save-art.in.ua/${authorSlug}` : "",
+        artUaLink: authorSlug ? siteProfileLabel(authorSlug) : "",
+        saveArtLink: authorSlug ? saveArtProfileLabel(authorSlug) : "",
       },
       socialLinks: DEFAULT_SOCIAL_LINKS,
       descriptionText: descriptionText.length ? descriptionText : fallbackDescriptionText,

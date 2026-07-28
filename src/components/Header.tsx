@@ -10,6 +10,7 @@ import RegistrationModal from "./RegistrationModal";
 import ResetPassModal from "./ResetPassModal";
 import ProfileMenuModal from "./ProfileMenuModal";
 import { useAuth } from "../context/AuthContext";
+import { SITE_DOMAIN } from "../lib/siteDomains";
 import { useToast } from "../context/ToastContext";
 import { getImageUrl } from "../lib/url";
 
@@ -79,7 +80,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
 
           <div className="inline-flex items-start">
             <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39]">
-              art-ua.info
+              {SITE_DOMAIN}
             </div>
           </div>
 

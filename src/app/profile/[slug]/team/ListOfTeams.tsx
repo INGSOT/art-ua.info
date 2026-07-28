@@ -1,23 +1,53 @@
+"use client";
+
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { withProfileId } from "../../../../lib/authorQuery";
-import type { ProfileTeam } from "../../../../data/profileData";
+import { myTeamsAPI, type MyTeam } from "../../../../lib/api/myTeams";
 import { useProfileView } from "../../ProfileViewContext";
 import LeaveTeamModal from "./LeaveTeamModal";
 import TeamCard from "../team/TeamCard";
 
 export default function ListOfTeams() {
   const router = useRouter();
-  const { profileTeams, slug } = useProfileView();
-  const [selectedTeam, setSelectedTeam] = useState<ProfileTeam | null>(null);
+  const { slug } = useProfileView();
+  const [teams, setTeams] = useState<MyTeam[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedTeam, setSelectedTeam] = useState<MyTeam | null>(null);
 
-  const openLeaveTeamModal = (team: ProfileTeam) => {
-    if (team.type !== "other") return;
+  useEffect(() => {
+    let cancelled = false;
+    myTeamsAPI
+      .list()
+      .then((data) => {
+        if (!cancelled) setTeams(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const openLeaveTeamModal = (team: MyTeam) => {
+    if (team.isOwner) return;
     setSelectedTeam(team);
   };
 
   const closeLeaveTeamModal = () => setSelectedTeam(null);
+
+  const handleLeave = async () => {
+    if (!selectedTeam) return;
+    await myTeamsAPI.leave(selectedTeam.slug);
+    setTeams((prev) => prev.filter((t) => t.slug !== selectedTeam.slug));
+    setSelectedTeam(null);
+  };
+
+  if (loading) {
+    return <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[400px]" />;
+  }
 
   return (
     <>
@@ -40,7 +70,7 @@ export default function ListOfTeams() {
 
         {/* Teams Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4 lg:gap-8">
-          {profileTeams.map((team) => (
+          {teams.map((team) => (
             <TeamCard
               key={team.id}
               team={team}
@@ -54,7 +84,7 @@ export default function ListOfTeams() {
         isOpen={Boolean(selectedTeam)}
         teamName={selectedTeam?.name ?? ""}
         onClose={closeLeaveTeamModal}
-        onLeave={closeLeaveTeamModal}
+        onLeave={handleLeave}
       />
     </>
   );

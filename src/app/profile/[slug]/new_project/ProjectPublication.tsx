@@ -2,9 +2,18 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { newProjectTexts } from "../../../../data/newProjectData";
+import { newProjectTexts, artCategories } from "../../../../data/newProjectData";
 import Message from "../../../../components/Message";
 import { normalizeWorkGalleryItems } from "./projectWorkMedia";
+import { projectsAPI } from "../../../../lib/api/projects";
+import { getApiErrorMessage } from "../../../../lib/apiError";
+
+function findArtCategoryIdForSubcategory(subcategoryId: string | undefined): string | undefined {
+  if (!subcategoryId) return undefined;
+  return artCategories.find((category) =>
+    category.subcategories.some((subcategory) => subcategory.id === subcategoryId)
+  )?.id;
+}
 
 export default function ProjectPublication() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -81,28 +90,32 @@ export default function ProjectPublication() {
         return;
       }
 
-      // All validations passed, submit form to server
-      // В fetch нужно ввести URL, который будет обрабатывать запрос формы на сервере
-      const response = await fetch('', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      // All validations passed, submit to the backend
+      await projectsAPI.myCreate({
+        status: "new",
+        title: {
+          uk: projectData.projectNameUa.trim(),
+          en: projectData.projectNameEn.trim(),
         },
-        body: JSON.stringify(projectData),
+        short_description: {
+          uk: projectData.descriptionUa?.trim() || undefined,
+          en: projectData.descriptionEn?.trim() || undefined,
+        },
+        cover: projectData.projectCover || undefined,
+        art_category: findArtCategoryIdForSubcategory(projectData.selectedArtField?.id),
+        art_subcategory: projectData.selectedArtField?.id,
+        tags: {
+          uk: projectData.tagsUa?.trim() || undefined,
+          en: projectData.tagsEn?.trim() || undefined,
+        },
       });
 
-      if (response.ok) {
-        setNotification({ type: "success", text: "Проект відправлено на модерацію" });
-        // Clear localStorage and reset form
-        localStorage.removeItem('projectData');
-        setAcceptedTerms(false);
-        console.log("Project submitted successfully");
-      } else {
-        setNotification({ type: "error", text: "Помилка при надіслані проекту" });
-        console.error("Project submission failed with status:", response.status);
-      }
+      setNotification({ type: "success", text: "Проект відправлено на модерацію" });
+      // Clear localStorage and reset form
+      localStorage.removeItem('projectData');
+      setAcceptedTerms(false);
     } catch (error) {
-      setNotification({ type: "error", text: "Помилка при надіслані проекту" });
+      setNotification({ type: "error", text: getApiErrorMessage(error, "Помилка при надіслані проекту") });
       console.error("Project submission error:", error);
     }
   };

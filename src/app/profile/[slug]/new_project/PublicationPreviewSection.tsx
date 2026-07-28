@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import WorkVideoEmbed from "./WorkVideoEmbed";
 import type { ProjectWorkMediaItem } from "./projectWorkMedia";
+import { SAVE_ART_DOMAIN } from "../../../../lib/siteDomains";
 
 interface Characteristic {
   id: string;
@@ -129,7 +130,7 @@ export default function PublicationPreviewSection({
         <div className="w-full aspect-video bg-[#343434]" />
       )}
 
-      <p className="text-white font-bold">Проєкт на save-art.in.ua</p>
+      <p className="text-white font-bold">Проєкт на {SAVE_ART_DOMAIN}</p>
 
       <div className="bg-[#343434] flex items-stretch justify-center h-16">
         <div className="flex items-center justify-center w-16">

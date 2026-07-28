@@ -1,3 +1,5 @@
+import { SAVE_ART_DOMAIN } from "../lib/siteDomains";
+
 // Hero Banner Data
 export const heroBannerData = {
   heroText: "Мистецтво допомоги —\nнайсучасніше з мистецтв",
@@ -59,7 +61,7 @@ export const featuredWorksData = {
 // Support Artists Data
 export const supportArtistsData = {
   title: "Підтримати митців",
-  link: "save-art.in.ua",
+  link: SAVE_ART_DOMAIN,
   backgroundImage: "/support_artists.jpg",
 };
 

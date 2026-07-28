@@ -8,6 +8,7 @@ import {
   type ProjectDetails,
 } from "./projectsData";
 import { teamData } from "./teamData";
+import { ART_UA_COM_DOMAIN, SAVE_ART_DOMAIN, artUaComProfileUrl, saveArtProfileUrl } from "../lib/siteDomains";
 
 // About Me
 export interface Team {
@@ -19,6 +20,8 @@ export interface Team {
 export interface AboutMeButton {
   id: string;
   label: string;
+  href: string;
+  external?: boolean;
 }
 
 export interface AboutMeData {
@@ -222,8 +225,18 @@ function buildAboutMe(artist: ArtistData, usernameSlug: string): AboutMeData {
       slug: team.username,
     })),
     buttons: [
-      { id: "save-art", label: `save-art.in.ua/${usernameSlug}` },
-      { id: "art-ua", label: `art-ua.info/${usernameSlug}` },
+      {
+        id: "save-art",
+        label: SAVE_ART_DOMAIN,
+        href: saveArtProfileUrl(usernameSlug),
+        external: true,
+      },
+      {
+        id: "art-ua",
+        label: ART_UA_COM_DOMAIN,
+        href: artUaComProfileUrl(usernameSlug),
+        external: true,
+      },
     ],
   };
 }

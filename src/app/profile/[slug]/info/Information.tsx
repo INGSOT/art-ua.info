@@ -1,10 +1,39 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useProfileView } from "../../ProfileViewContext";
+import { profileAPI, type MyProfileInfo } from "../../../../lib/api/profile";
+
+const EMPTY_INFO: MyProfileInfo = {
+  website: "",
+  socialLinks: [],
+  location: { country: "", city: "" },
+  description: [],
+};
 
 export default function Information() {
-  const { profileInfo } = useProfileView();
+  const [profileInfo, setProfileInfo] = useState<MyProfileInfo>(EMPTY_INFO);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    profileAPI
+      .getMyProfileInfo()
+      .then((data) => {
+        if (!cancelled) setProfileInfo(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[400px]" />;
+  }
+
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
       <div className="w-full bg-[#343434] h-auto md:h-[80px] mb-4 py-4 md:py-0">

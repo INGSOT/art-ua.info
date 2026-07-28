@@ -4,13 +4,14 @@ import Image from "next/image";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { useCurrentTeam } from "./useCurrentTeam";
+import { SITE_URL, siteProfileLabel } from "../../lib/siteDomains";
 
 export default function AboutTeam() {
   const [hoveredButton, setHoveredButton] = useState(false);
   const team = useCurrentTeam();
 
-  const profileUrl = `https://art-ua.info/${team.username}`;
-  const buttonLabel = `art-ua.info/${team.username}`;
+  const profileUrl = `${SITE_URL}/${team.username}`;
+  const buttonLabel = siteProfileLabel(team.username);
 
   return (
     <section className="w-full bg-[#414141] py-16 px-4">

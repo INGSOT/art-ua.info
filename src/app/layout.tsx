@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import Toast from "../components/Toast";
 import { AuthProvider } from "../context/AuthContext";
 import { ToastProvider } from "../context/ToastContext";
+import { SITE_DOMAIN } from "../lib/siteDomains";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +29,7 @@ const wixMadeforDisplay = Wix_Madefor_Display({
 });
 
 export const metadata: Metadata = {
-  title: "art-ua.info",
+  title: SITE_DOMAIN,
   description: "The art of helping — the most modern of the arts",
 };
 

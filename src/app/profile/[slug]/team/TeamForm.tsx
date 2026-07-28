@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import AddProjectCover from "../new_project/AddProjectCover";
-import { artistsData } from "../../../../data/artistsData";
-import { teamData } from "../../../../data/teamData";
+import { artistsAPI } from "../../../../lib/api/artists";
+import { myTeamsAPI } from "../../../../lib/api/myTeams";
+import { withProfileId } from "../../../../lib/authorQuery";
+import { useProfileView } from "../../ProfileViewContext";
 
 interface TeamFormProps {
   mode?: "create" | "edit";
@@ -12,13 +15,17 @@ interface TeamFormProps {
 
 interface MemberOption {
   key: string;
+  id: number;
   name: string;
   icon: string;
-  type: "artist" | "team";
 }
 
 export default function TeamForm({ mode = "create" }: TeamFormProps) {
-  const isEditMode = mode === "edit";
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const editSlug = searchParams.get("slug");
+  const { slug: profileSlug } = useProfileView();
+  const isEditMode = mode === "edit" && !!editSlug;
 
   const [teamCover, setTeamCover] = useState<string | null>(null);
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
@@ -45,54 +52,105 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
 
   const [membersQuery, setMembersQuery] = useState("");
   const [selectedMembers, setSelectedMembers] = useState<MemberOption[]>([]);
+  const [searchResults, setSearchResults] = useState<MemberOption[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const [isPrimaryHovered, setIsPrimaryHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
 
-  const handlePrimary = () => {
-    // TODO: implement create/save logic
-    console.log(isEditMode ? "Saving team..." : "Creating team...");
-  };
+  useEffect(() => {
+    if (!isEditMode || !editSlug) return;
+    myTeamsAPI.list().then((teams) => {
+      const team = teams.find((t) => t.slug === editSlug);
+      if (!team) return;
+      setTeamCover(team.avatarUrl);
+      setNameUa(team.name);
+      setCountryUa(team.country);
+      setCityUa(team.city);
+      setAboutUa(team.description);
+      setSelectedMembers(
+        team.members.map((m) => ({
+          key: `member-${m.id}`,
+          id: m.id,
+          name: m.name,
+          icon: m.avatarUrl ?? "/megaphone.svg",
+        }))
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditMode, editSlug]);
 
-  const handleDelete = () => {
-    // TODO: implement delete logic
-    console.log("Deleting team...");
-  };
-
-  const normalizedMembersQuery = membersQuery.trim().toLowerCase();
-  const matchedArtists: MemberOption[] = normalizedMembersQuery
-    ? artistsData
-        .filter((artist) =>
-          artist.artistName.toLowerCase().includes(normalizedMembersQuery)
-        )
+  useEffect(() => {
+    const query = membersQuery.trim();
+    if (!query) {
+      setSearchResults([]);
+      return;
+    }
+    let cancelled = false;
+    artistsAPI.list({ search: query }).then((artists) => {
+      if (cancelled) return;
+      const results = artists
         .map((artist) => ({
-          key: `artist-${artist.id}`,
-          name: artist.artistName,
-          icon: artist.artistPhoto,
-          type: "artist",
+          key: `member-${artist.id}`,
+          id: artist.id,
+          name: artist.name,
+          icon: artist.avatarUrl ?? "/megaphone.svg",
         }))
-    : [];
+        .filter((result) => !selectedMembers.some((member) => member.id === result.id));
+      setSearchResults(results);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [membersQuery]);
 
-  const matchedTeams: MemberOption[] = normalizedMembersQuery
-    ? teamData
-        .filter((team) =>
-          team.name.toLowerCase().includes(normalizedMembersQuery)
-        )
-        .map((team) => ({
-          key: `team-${team.id}`,
-          name: team.name,
-          icon: team.avatar,
-          type: "team",
-        }))
-    : [];
+  const handlePrimary = async () => {
+    setError(null);
+    if (!nameUa.trim()) {
+      setError("Вкажіть назву команди");
+      return;
+    }
 
-  const searchResults: MemberOption[] = [...matchedArtists, ...matchedTeams].filter(
-    (result) => !selectedMembers.some((member) => member.key === result.key)
-  );
+    const payload = {
+      nameUk: nameUa.trim(),
+      nameEn: nameEn.trim() || undefined,
+      avatar: teamCover,
+      website: undefined,
+      countryUk: countryUa.trim() || undefined,
+      countryEn: countryEn.trim() || undefined,
+      cityUk: cityUa.trim() || undefined,
+      cityEn: cityEn.trim() || undefined,
+      descriptionUk: aboutUa.trim() || undefined,
+      descriptionEn: aboutEn.trim() || undefined,
+      memberIds: selectedMembers.map((m) => m.id),
+    };
+
+    try {
+      if (isEditMode && editSlug) {
+        await myTeamsAPI.update(editSlug, payload);
+      } else {
+        await myTeamsAPI.create(payload);
+      }
+      router.push(withProfileId("/profile/team", profileSlug));
+    } catch {
+      setError("Не вдалося зберегти команду");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!isEditMode || !editSlug) return;
+    try {
+      await myTeamsAPI.remove(editSlug);
+      router.push(withProfileId("/profile/team", profileSlug));
+    } catch {
+      setError("Не вдалося видалити команду");
+    }
+  };
 
   const handleAddMember = (member: MemberOption) => {
     setSelectedMembers((prev) => {
-      if (prev.some((item) => item.key === member.key)) {
+      if (prev.some((item) => item.id === member.id)) {
         return prev;
       }
       return [...prev, member];
@@ -106,6 +164,11 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
 
   return (
     <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-[75px] bg-[#414141] min-h-screen">
+      {error && (
+        <div className="w-full max-w-[1000px] bg-red-900/40 border border-red-500 text-white px-4 py-3">
+          {error}
+        </div>
+      )}
       <form className="flex flex-col items-center gap-8 w-full max-w-[1000px]">
         {/* Cover Upload */}
         <div className="w-full flex justify-center">
@@ -380,7 +443,7 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
                     <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
                       <Image
                         src={member.icon}
-                        alt={member.type === "artist" ? "Артист" : "Команда"}
+                        alt="Артист"
                         width={32}
                         height={32}
                         className="w-full h-full object-cover"
@@ -440,7 +503,7 @@ export default function TeamForm({ mode = "create" }: TeamFormProps) {
                       <div className="w-8 h-8 rounded-full overflow-hidden shrink-0">
                         <Image
                           src={result.icon}
-                          alt={result.type === "artist" ? "Артист" : "Команда"}
+                          alt="Артист"
                           width={32}
                           height={32}
                           className="w-full h-full object-cover"

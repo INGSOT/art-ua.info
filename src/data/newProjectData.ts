@@ -1,3 +1,5 @@
+import { ART_UA_COM_DOMAIN } from "../lib/siteDomains";
+
 export interface LanguageButton {
   id: string;
   label: string;
@@ -98,10 +100,10 @@ export const newProjectTexts = {
   characteristicDescPlaceholder: 'Наприклад, 90 хв.',
   characteristicDescPlaceholderEn: 'For example, 90 min.',
   addBlockButton: 'Додати блок',
-  soldProjectDescription: 'Вкажіть, якщо ваш проєкт вже був проданий через art-ua.com чи будь-яку іншу платформу.',
+  soldProjectDescription: `Вкажіть, якщо ваш проєкт вже був проданий через ${ART_UA_COM_DOMAIN} чи будь-яку іншу платформу.`,
   soldProjectLabel: 'Проект проданий',
   acceptTermsLabel: 'Я приймаю умови використання платформи',
-  publicationNotice: 'Проєкт також буде опубліковано у вашому профілі на art-ua.com',
+  publicationNotice: `Проєкт також буде опубліковано у вашому профілі на ${ART_UA_COM_DOMAIN}`,
   deleteButton: 'Видалити',
   saveDraftButton: 'Зберегти чернетку',
   publishButton: 'Опублікувати',

@@ -1,14 +1,14 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { withProfileId } from "../../../../lib/authorQuery";
-import type { ProfileTeam } from "../../../../data/profileData";
+import type { MyTeam } from "../../../../lib/api/myTeams";
 import { useProfileView } from "../../ProfileViewContext";
 
 interface TeamCardProps {
-  team: ProfileTeam;
+  team: MyTeam;
   /** Приховати кнопки редагування / меню (публічний перегляд автора). */
   readOnly?: boolean;
-  onLeaveTeamClick?: (team: ProfileTeam) => void;
+  onLeaveTeamClick?: (team: MyTeam) => void;
 }
 
 export default function TeamCard({
@@ -16,7 +16,6 @@ export default function TeamCard({
   readOnly = false,
   onLeaveTeamClick,
 }: TeamCardProps) {
-  const isOwnTeam = team.type === "own";
   const router = useRouter();
   const { slug } = useProfileView();
 
@@ -26,7 +25,7 @@ export default function TeamCard({
       <div className="flex items-start gap-4">
         <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
           <Image
-            src={team.avatar}
+            src={team.avatarUrl ?? "/megaphone.svg"}
             alt={team.name}
             width={64}
             height={64}
@@ -42,11 +41,11 @@ export default function TeamCard({
 
         {!readOnly && (
           <div className="ml-4 flex-shrink-0">
-            {isOwnTeam ? (
+            {team.isOwner ? (
               <button
                 type="button"
                 onClick={() =>
-                router.push(withProfileId("/profile/team/edit", slug))
+                router.push(`${withProfileId("/profile/team/edit", slug)}?slug=${team.slug}`)
               }
                 aria-label="Редагувати команду"
                 className="p-1 -m-1"
@@ -79,14 +78,14 @@ export default function TeamCard({
 
       {/* Members */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-4">
-        {team.members.map((member, index) => (
+        {team.members.map((member) => (
           <div
-            key={`${member.name}-${index}`}
+            key={member.id}
             className="flex items-center gap-3"
           >
             <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
               <Image
-                src={member.avatar}
+                src={member.avatarUrl ?? "/megaphone.svg"}
                 alt={member.name}
                 width={40}
                 height={40}

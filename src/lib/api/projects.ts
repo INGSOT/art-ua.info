@@ -25,7 +25,63 @@ interface ProjectsListResponse {
   data: RawProjectListItem[];
 }
 
+export interface CreateProjectPayload {
+  status?: "new" | "draft" | "moderation";
+  local_id?: string;
+  title: { uk: string; en?: string };
+  short_description?: { uk?: string; en?: string };
+  cover?: string | null;
+  art_category?: string;
+  art_subcategory?: string;
+  tags?: { uk?: string; en?: string };
+}
+
+export interface CreateProjectResponse {
+  id: number;
+  slug: string;
+  status: string;
+}
+
+export interface MyProjectListItem {
+  id: number;
+  slug: string;
+  status: string;
+  statusLabel: string;
+  title: string;
+  coverUrl: string | null;
+  likesCount: number;
+}
+
+interface RawMyProjectListItem {
+  id: number;
+  slug: string;
+  status: string;
+  status_label: string;
+  title: string;
+  cover_url: string | null;
+  likes_count: number;
+}
+
+interface MyProjectsListResponse {
+  data: RawMyProjectListItem[];
+}
+
 export const projectsAPI = {
+  myList: async (params?: Record<string, string | number>): Promise<MyProjectListItem[]> => {
+    const response = await api.get<MyProjectsListResponse>("/v1/my/projects", {
+      params: { language: "uk", ...params },
+    });
+    return response.data.data.map((project) => ({
+      id: project.id,
+      slug: project.slug,
+      status: project.status,
+      statusLabel: project.status_label,
+      title: project.title,
+      coverUrl: absoluteUrl(project.cover_url),
+      likesCount: project.likes_count,
+    }));
+  },
+
   list: async (params?: Record<string, string | number>): Promise<PublicProjectListItem[]> => {
     const response = await api.get<ProjectsListResponse>("/v1/projects", {
       params: { language: "uk", ...params },
@@ -50,6 +106,11 @@ export const projectsAPI = {
     const response = await api.get<ProjectDonorsResponse>(`/v1/projects/${slug}/donors`, {
       params,
     });
+    return response.data.data;
+  },
+
+  myCreate: async (payload: CreateProjectPayload): Promise<CreateProjectResponse> => {
+    const response = await api.post<{ data: CreateProjectResponse }>("/v1/my/projects", payload);
     return response.data.data;
   },
 };

@@ -9,6 +9,7 @@ import {
   footerContent,
   linkMap,
 } from "../data/footerData";
+import { SITE_DOMAIN } from "../lib/siteDomains";
 
 export default function Footer() {
   return (
@@ -65,7 +66,7 @@ export default function Footer() {
             key={columnIndex}
             className="flex flex-col items-start gap-[30px] p-[30px] flex-1 bg-[#FFFCF5] self-stretch"
           >
-            {column.title === "art-ua.info" ? (
+            {column.title === SITE_DOMAIN ? (
               <Link
                 href="/"
                 className="block font-h6 font-bold text-[#414141] text-[20px] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)] [font-style:var(--h6-font-style)] transition-colors hover:text-[#FECC39]"

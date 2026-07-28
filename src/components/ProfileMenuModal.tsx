@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AuthUser } from "../lib/api/auth";
 import { socialIcons } from "../data/headerData";
 import { getImageUrl } from "../lib/url";
+import { ART_UA_COM_DOMAIN, ART_UA_COM_URL, SAVE_ART_DOMAIN, SAVE_ART_URL, SITE_DOMAIN } from "../lib/siteDomains";
 
 interface ProfileMenuModalProps {
   isOpen: boolean;
@@ -88,7 +89,7 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
             className="mt-8 flex items-center justify-between gap-3 bg-[#343434] px-4 py-3 hover:bg-[#272727] transition-colors"
           >
             <span className="font-bold text-[#FECC39] text-[14px]">
-              art-ua.info/author/{user.slug}
+              {SITE_DOMAIN}/author/{user.slug}
             </span>
             <img src="/yellow_triangle_down.svg" alt="" className="w-4 h-4 -rotate-90 shrink-0" />
           </Link>
@@ -108,11 +109,11 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
             <div className="w-full border-t border-black/10" />
             <div className="mt-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <a href="https://save-art.in.ua" className="font-wix text-sm text-[#343434] hover:text-[#FECC39] transition-colors">
-                  save-art.in.ua
+                <a href={SAVE_ART_URL} className="font-wix text-sm text-[#343434] hover:text-[#FECC39] transition-colors">
+                  {SAVE_ART_DOMAIN}
                 </a>
-                <a href="https://art-ua.com" className="font-wix text-sm text-[#343434] hover:text-[#FECC39] transition-colors">
-                  art-ua.com
+                <a href={ART_UA_COM_URL} className="font-wix text-sm text-[#343434] hover:text-[#FECC39] transition-colors">
+                  {ART_UA_COM_DOMAIN}
                 </a>
               </div>
               <div className="flex items-center gap-3">

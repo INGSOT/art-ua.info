@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { getApiErrorMessage } from "../lib/apiError";
+import { ART_UA_COM_DOMAIN, SAVE_ART_DOMAIN, SITE_DOMAIN } from "../lib/siteDomains";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -68,7 +69,7 @@ export default function LoginModal({
         <div className="p-6 md:p-[30px] flex-1">
           <div className="flex items-center justify-between">
             <div className="font-bold text-white text-[16px] font-[family-name:var(--font-unbounded)]">
-              save-art.in.ua
+              {SAVE_ART_DOMAIN}
             </div>
             <button
               type="button"
@@ -81,7 +82,7 @@ export default function LoginModal({
           </div>
 
           <div className="mt-8 font-bold text-white text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
-            save-art.in.ua - платформа для митців та бажаючих долучитись до
+            {SAVE_ART_DOMAIN} - платформа для митців та бажаючих долучитись до
             створення, розвитку і збереження новітнього українського мистецтва
           </div>
 
@@ -108,19 +109,19 @@ export default function LoginModal({
               type="button"
               className="font-wix text-sm text-white hover:text-[#FECC39] transition-colors"
             >
-              save-art.in.ua
+              {SAVE_ART_DOMAIN}
             </button>
             <button
               type="button"
               className="font-wix text-sm text-white hover:text-[#FECC39] transition-colors"
             >
-              art-ua.com
+              {ART_UA_COM_DOMAIN}
             </button>
             <button
               type="button"
               className="font-wix text-sm text-white hover:text-[#FECC39] transition-colors"
             >
-              art-ua.info
+              {SITE_DOMAIN}
             </button>
           </div>
 

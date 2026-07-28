@@ -1,36 +1,39 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { catalogsTexts } from "../../../../data/profileData";
-import { getMyCatalogsByAuthorId } from "../../../../data/catalogsData";
-import { useProfileView } from "../../ProfileViewContext";
+import { myCatalogsAPI, type MyCatalog } from "../../../../lib/api/myCatalogs";
 import DeleteCatalog from "./DeleteCatalog";
 import AddCatalog from "./AddCatalog";
 
 export default function Catalogs() {
-  const profile = useProfileView();
-  const profileCatalogs = useMemo(
-    () => getMyCatalogsByAuthorId(profile.id),
-    [profile.id],
-  );
-  const [selectedCatalogs, setSelectedCatalogs] = useState<number[]>([]);
+  const [catalogs, setCatalogs] = useState<MyCatalog[]>([]);
+  const [loading, setLoading] = useState(true);
   const [hoveredCheckbox, setHoveredCheckbox] = useState<number | null>(null);
-  const [catalogs, setCatalogs] = useState(() => [...profileCatalogs]);
-
-  useEffect(() => {
-    setCatalogs([...profileCatalogs]);
-    setSelectedCatalogs([]);
-  }, [profile.id, profileCatalogs]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [catalogToDelete, setCatalogToDelete] = useState<number | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const toggleCatalogSelection = (catalogId: number) => {
-    setSelectedCatalogs((prev) =>
-      prev.includes(catalogId)
-        ? prev.filter((id) => id !== catalogId)
-        : [...prev, catalogId]
+  useEffect(() => {
+    let cancelled = false;
+    myCatalogsAPI
+      .list()
+      .then((data) => {
+        if (!cancelled) setCatalogs(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const togglePrimary = async (catalogId: number) => {
+    const updated = await myCatalogsAPI.setPrimary(catalogId);
+    setCatalogs((prev) =>
+      prev.map((catalog) => ({ ...catalog, isPrimary: catalog.id === updated.id }))
     );
   };
 
@@ -41,12 +44,13 @@ export default function Catalogs() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (catalogToDelete !== null) {
-      setCatalogs(catalogs.filter((catalog) => catalog.id !== catalogToDelete));
-      setSelectedCatalogs(selectedCatalogs.filter((id) => id !== catalogToDelete));
+      await myCatalogsAPI.remove(catalogToDelete);
+      setCatalogs((prev) => prev.filter((catalog) => catalog.id !== catalogToDelete));
       setCatalogToDelete(null);
     }
+    setIsDeleteModalOpen(false);
   };
 
   const handleDeleteCancel = () => {
@@ -58,19 +62,22 @@ export default function Catalogs() {
     setIsAddModalOpen(true);
   };
 
-  const handleAddCatalog = (imageUrl: string, catalogFile: File, catalogFileName: string) => {
-    const newCatalog = {
-      id: Math.max(...catalogs.map(c => c.id), 0) + 1,
+  const handleAddCatalog = async (imageUrl: string, catalogFile: File, catalogFileName: string) => {
+    const created = await myCatalogsAPI.create({
+      titleUk: catalogFileName.replace(/\.pdf$/i, ""),
       image: imageUrl,
-      title: catalogFileName.replace(/\.pdf$/i, ""),
-      likes: 0,
-    };
-    setCatalogs([...catalogs, newCatalog]);
+      pdfFile: catalogFile,
+    });
+    setCatalogs((prev) => [...prev, created]);
   };
 
   const handleAddCancel = () => {
     setIsAddModalOpen(false);
   };
+
+  if (loading) {
+    return <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[400px]" />;
+  }
 
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
@@ -97,7 +104,7 @@ export default function Catalogs() {
             <div className="relative w-full aspect-[4/3] bg-cover bg-center">
               <div className="absolute inset-0 overflow-hidden">
                 <Image
-                  src={catalog.image}
+                  src={catalog.imageUrl}
                   alt={catalog.title}
                   fill
                   className="object-cover"
@@ -110,17 +117,17 @@ export default function Catalogs() {
                   className="relative bg-[#343434] p-2 cursor-pointer"
                   onMouseEnter={() => setHoveredCheckbox(catalog.id)}
                   onMouseLeave={() => setHoveredCheckbox(null)}
-                  onClick={() => toggleCatalogSelection(catalog.id)}
+                  onClick={() => togglePrimary(catalog.id)}
                 >
                   {/* Checkbox */}
                   <div
                     className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${
-                      selectedCatalogs.includes(catalog.id) || hoveredCheckbox === catalog.id
+                      catalog.isPrimary || hoveredCheckbox === catalog.id
                         ? "border-[#FFD700]"
                         : "border-white"
                     }`}
                   >
-                    {selectedCatalogs.includes(catalog.id) && (
+                    {catalog.isPrimary && (
                       <div className="w-3 h-3 bg-[#FFD700]"></div>
                     )}
                   </div>
@@ -169,7 +176,7 @@ export default function Catalogs() {
               {/* Likes in bottom-right corner */}
               <div className="absolute right-3 bottom-3 flex items-center gap-2 z-10">
                 <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
-                  {catalog.likes}
+                  {catalog.likesCount}
                 </span>
                 <Image src="/like.svg" alt={catalogsTexts.likeIconAlt} width={32} height={32} />
               </div>

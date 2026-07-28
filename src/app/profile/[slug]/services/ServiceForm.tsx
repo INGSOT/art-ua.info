@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import AddProjectCover from "../new_project/AddProjectCover";
+import { myServicesAPI } from "../../../../lib/api/myServices";
+import { withProfileId } from "../../../../lib/authorQuery";
+import { useProfileView } from "../../ProfileViewContext";
 
 interface ServiceFormProps {
   mode?: "create" | "edit";
@@ -14,7 +18,26 @@ interface Option {
   nameEn: string;
 }
 
+type CurrencyId = "hryvnia" | "dollar" | "euro";
+
+const CURRENCY_TO_CODE: Record<CurrencyId, "UAH" | "USD" | "EUR"> = {
+  hryvnia: "UAH",
+  dollar: "USD",
+  euro: "EUR",
+};
+
+const CODE_TO_CURRENCY: Record<string, CurrencyId> = {
+  UAH: "hryvnia",
+  USD: "dollar",
+  EUR: "euro",
+};
+
 export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const editSlug = searchParams.get("slug");
+  const { slug: profileSlug } = useProfileView();
+
   const [serviceCover, setServiceCover] = useState<string | null>(null);
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
   const [serviceNameUa, setServiceNameUa] = useState("");
@@ -22,7 +45,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
   const [priceFrom, setPriceFrom] = useState(false);
   const [priceNegotiable, setPriceNegotiable] = useState(false);
   const [priceAmount, setPriceAmount] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState<'hryvnia' | 'dollar' | 'euro' | null>(null);
+  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyId | null>(null);
   const [descriptionUa, setDescriptionUa] = useState("");
   const [descriptionEn, setDescriptionEn] = useState("");
   const [options, setOptions] = useState<Option[]>([
@@ -32,8 +55,27 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
   const [isNegotiableHovered, setIsNegotiableHovered] = useState(false);
   const [isPublishHovered, setIsPublishHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const isEditMode = mode === "edit";
+  const isEditMode = mode === "edit" && !!editSlug;
+
+  useEffect(() => {
+    if (!isEditMode || !editSlug) return;
+    myServicesAPI.list().then((services) => {
+      const service = services.find((s) => s.slug === editSlug);
+      if (!service) return;
+      setServiceCover(service.imageUrl);
+      setServiceNameUa(service.title);
+      setPriceNegotiable(service.price === null);
+      setPriceAmount(service.price !== null ? String(service.price) : "");
+      setSelectedCurrency(service.currency ? CODE_TO_CURRENCY[service.currency] ?? null : null);
+      setDescriptionUa(service.description);
+      if (service.options.length > 0) {
+        setOptions(service.options.map((name, index) => ({ id: String(index + 1), nameUa: name, nameEn: "" })));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditMode, editSlug]);
 
   const currencies = [
     { id: 'hryvnia', icon: '/hryvnia.svg' },
@@ -72,18 +114,53 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
     }
   };
 
-  const handlePublish = () => {
-    // TODO: Implement publish logic
-    console.log("Publishing service...");
+  const handlePublish = async () => {
+    setError(null);
+    if (!serviceNameUa.trim()) {
+      setError("Вкажіть назву послуги");
+      return;
+    }
+
+    const payload = {
+      titleUk: serviceNameUa.trim(),
+      titleEn: serviceNameEn.trim() || undefined,
+      descriptionUk: descriptionUa.trim() || undefined,
+      descriptionEn: descriptionEn.trim() || undefined,
+      image: serviceCover,
+      price: priceNegotiable ? null : priceAmount ? Number(priceAmount) : null,
+      currency: selectedCurrency ? CURRENCY_TO_CODE[selectedCurrency] : null,
+      options: options.map((opt) => ({ nameUk: opt.nameUa, nameEn: opt.nameEn || undefined })),
+    };
+
+    try {
+      if (isEditMode && editSlug) {
+        await myServicesAPI.update(editSlug, payload);
+      } else {
+        await myServicesAPI.create(payload);
+      }
+      router.push(withProfileId("/profile/services", profileSlug));
+    } catch {
+      setError("Не вдалося зберегти послугу");
+    }
   };
 
-  const handleDelete = () => {
-    // TODO: Implement delete logic
-    console.log("Deleting service...");
+  const handleDelete = async () => {
+    if (!isEditMode || !editSlug) return;
+    try {
+      await myServicesAPI.remove(editSlug);
+      router.push(withProfileId("/profile/services", profileSlug));
+    } catch {
+      setError("Не вдалося видалити послугу");
+    }
   };
 
   return (
     <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-[75px] bg-[#414141] min-h-screen">
+      {error && (
+        <div className="w-full max-w-[1000px] bg-red-900/40 border border-red-500 text-white px-4 py-3">
+          {error}
+        </div>
+      )}
       <form className="flex flex-col items-center gap-8 w-full max-w-[1000px]">
         {/* Cover Upload */}
         <div className="w-full flex justify-center">

@@ -1,3 +1,5 @@
+import { ART_UA_COM_DOMAIN, SAVE_ART_DOMAIN, SITE_DOMAIN } from "../lib/siteDomains";
+
 // Footer Social Icons
 export interface SocialIcon {
   src: string;
@@ -39,7 +41,7 @@ export interface NavigationColumn {
 
 export const navigationData: NavigationColumn[] = [
   {
-    title: "art-ua.info",
+    title: SITE_DOMAIN,
     links: [
       "Учасники",
       "Каталоги",
@@ -51,7 +53,7 @@ export const navigationData: NavigationColumn[] = [
     ],
   },
   {
-    title: "art-ua.com",
+    title: ART_UA_COM_DOMAIN,
     links: [
       "Учасники",
       "Каталоги",
@@ -64,7 +66,7 @@ export const navigationData: NavigationColumn[] = [
     ],
   },
   {
-    title: "save-art.in.ua",
+    title: SAVE_ART_DOMAIN,
     links: [
       "Проєкти",
       "Звіти",
@@ -107,7 +109,7 @@ export const socialLinks: SocialLink[] = [
 // Footer Text Content
 export const footerContent = {
   header: {
-    siteName: "art-ua.info",
+    siteName: SITE_DOMAIN,
     slogan: "Мистецтво допомоги — найсучасніше з мистецтв",
   },
   expertiseSection: {

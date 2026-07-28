@@ -1,25 +1,51 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import ServiceCard from "../../../../components/ServiceCard";
 import { servicesTexts } from "../../../../data/profileData";
-import { getMyServicesByAuthorId } from "../../../../data/servicesData";
+import { myServicesAPI, type MyService } from "../../../../lib/api/myServices";
 import { withProfileId } from "../../../../lib/authorQuery";
 import { useProfileView } from "../../ProfileViewContext";
 
+function formatOverlayLabel(service: MyService): string {
+  if (service.price === null) return "Договірна ціна";
+  return `${service.price} ${service.currency ?? ""}`.trim();
+}
+
 export default function Services() {
   const router = useRouter();
-  const { id: profileId, slug } = useProfileView();
-  const myServices = getMyServicesByAuthorId(profileId);
+  const { slug } = useProfileView();
+  const [myServices, setMyServices] = useState<MyService[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    myServicesAPI
+      .list()
+      .then((data) => {
+        if (!cancelled) setMyServices(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleAddClick = () => {
     router.push(withProfileId("/profile/services/new", slug));
   };
 
-  const handleEditClick = () => {
-    router.push(withProfileId("/profile/services/edit", slug));
+  const handleEditClick = (serviceSlug: string) => {
+    router.push(`${withProfileId("/profile/services/edit", slug)}?slug=${serviceSlug}`);
   };
+
+  if (loading) {
+    return <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[400px]" />;
+  }
 
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
@@ -42,13 +68,13 @@ export default function Services() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4 lg:gap-8">
         {myServices.map((service) => (
           <ServiceCard
-            key={service.id}
-            image={service.image}
-            overlayButtonLabel={service.buttonLabel}
+            key={service.slug}
+            image={service.imageUrl ?? "/megaphone.svg"}
+            overlayButtonLabel={formatOverlayLabel(service)}
             title={service.title}
             footer={{
               variant: "edit",
-              onClick: handleEditClick,
+              onClick: () => handleEditClick(service.slug),
               label: servicesTexts.editServiceButton,
             }}
           />

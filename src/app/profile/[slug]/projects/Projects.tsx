@@ -1,25 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { projectFilterButtons, projectEmptyState } from "../../../../data/profileData";
-import { getMyProjectsByAuthorId } from "../../../../data/projectsData";
+import { projectsAPI, type MyProjectListItem } from "../../../../lib/api/projects";
 import { useProfileView } from "../../ProfileViewContext";
 import { withProfileId } from "../../../../lib/authorQuery";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
-  const { id: profileId, slug } = useProfileView();
-  const myProjects = getMyProjectsByAuthorId(profileId);
+  const { slug } = useProfileView();
+  const [myProjects, setMyProjects] = useState<MyProjectListItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    projectsAPI
+      .myList()
+      .then((projects) => {
+        if (!cancelled) setMyProjects(projects);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const hasProjects = myProjects.length > 0;
+
+  if (loading) {
+    return (
+      <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[400px]" />
+    );
+  }
 
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
       {hasProjects ? (
         <>
+          {/* Create Project Button */}
+          <div className="mb-8 flex justify-center">
+            <Link
+              href={withProfileId("/profile/new_project", slug)}
+              className="h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-white w-full md:w-[320px]"
+            >
+              <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">
+                {projectEmptyState.createButtonText}
+              </span>
+              <div className="flex items-center justify-center w-[60px] flex-shrink-0 border-l border-black">
+                <Image src="/plus.svg" alt="Plus" width={24} height={24} />
+              </div>
+            </Link>
+          </div>
+
           {/* Dark gray filter bar */}
           <div className="w-full bg-[#343434] h-[80px] mb-8">
             <div className="flex items-center h-full px-4 md:px-[30px]">
@@ -54,23 +92,25 @@ export default function Projects() {
                     <CardContent className="p-0 flex flex-col gap-3">
                       {/* Project image with likes overlay */}
                       <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
-                        <Image
-                          src={project.image}
-                          alt={project.title}
-                          fill
-                          className="object-cover"
-                        />
+                        {project.coverUrl && (
+                          <Image
+                            src={project.coverUrl}
+                            alt={project.title}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
                         {/* Darkening overlay on hover */}
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
-                        
+
                         {/* Centered arrow on hover */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                           <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
                         </div>
-                        
+
                         <div className="absolute right-3 bottom-3 flex items-center gap-2 z-10">
                           <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
-                            {project.likes}
+                            {project.likesCount}
                           </span>
                           <Image src="/like.svg" alt="Like" width={32} height={32} />
                         </div>
