@@ -349,8 +349,10 @@ export default function ProjectsPage() {
             {!noSearchResults && (
                 <>
                     <section className="w-full bg-[#414141] py-8 px-4 sm:px-6 md:px-10 lg:px-20">
-                        {/* Категорії мистецтва зверху сторінки */}
-                        <div className="flex flex-wrap gap-2 mb-3">
+                        {/* Категорії мистецтва зверху сторінки — горизонтальний скрол на всіх шириноах,
+                            без переносу на новий рядок (як .category_tabs у save-art, тільки без
+                            wrap на десктопі). */}
+                        <div className="flex flex-nowrap gap-2 mb-3 overflow-x-auto scrollbar-hide">
                             <button
                                 type="button"
                                 onClick={() => handleCategoryClick(null)}
@@ -380,7 +382,7 @@ export default function ProjectsPage() {
 
                         {/* Підкатегорії обраної категорії — той самий стан, що й чекбокси в сайдбарі */}
                         {!!activeCategory?.subcategories.length && (
-                            <div className="flex flex-wrap gap-x-5 gap-y-2 mb-5">
+                            <div className="flex flex-nowrap gap-x-5 gap-y-2 mb-5 overflow-x-auto scrollbar-hide">
                                 {activeCategory.subcategories.map((sub) => (
                                     <button
                                         key={sub.slug}
@@ -398,18 +400,33 @@ export default function ProjectsPage() {
                             </div>
                         )}
 
-                        {/* Чіпи фільтрів і сортування — один рядок над сайдбаром/контентом, як у save-art
-                            (там .active_filters і .sort_list — flex-сусіди з justify-content: space-between). */}
-                        <div className="relative z-30 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4 lg:mb-6">
-                            <div className="min-w-0">
-                                <SelectedFiltersBar
-                                    chips={selectedFilterChips}
-                                    onRemove={handleRemoveFilterChip}
-                                    onClearAll={handleClearAllFilters}
+                        {/* Фільтри/сортування + чіпи — липкий (sticky) блок, як .active_filters
+                            у save-art: лишається на екрані під час скролу і на мобілці, і на
+                            десктопі (там .top/.active_filters мають position: sticky; top: 0). */}
+                        <div className="sticky top-0 z-40 bg-[#414141] py-2 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10 lg:-mx-20 lg:px-20 mb-4 lg:mb-6">
+                            <div className="flex items-center justify-between gap-1 md:gap-2 mb-3 lg:hidden">
+                                <FiltersButton
+                                    className="lg:hidden"
+                                    onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                                    isActive={isMobileFiltersOpen}
+                                    selectedCount={selectedFilterChips.length}
                                 />
+                                <div className="relative ml-auto min-w-0 flex-1 max-w-[220px] sm:max-w-[260px]">
+                                    {sortDropdown}
+                                </div>
                             </div>
-                            <div className="hidden lg:block relative lg:w-[260px] lg:flex-shrink-0">
-                                {sortDropdown}
+
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                                <div className="min-w-0">
+                                    <SelectedFiltersBar
+                                        chips={selectedFilterChips}
+                                        onRemove={handleRemoveFilterChip}
+                                        onClearAll={handleClearAllFilters}
+                                    />
+                                </div>
+                                <div className="hidden lg:block relative lg:w-[260px] lg:flex-shrink-0">
+                                    {sortDropdown}
+                                </div>
                             </div>
                         </div>
 
@@ -417,18 +434,6 @@ export default function ProjectsPage() {
                             <div className="hidden lg:block">{sidebar}</div>
 
                             <div className="flex-1 w-full min-w-0">
-                                <div className="relative z-30 flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6 lg:hidden">
-                                    <FiltersButton
-                                        className="lg:hidden"
-                                        onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
-                                        isActive={isMobileFiltersOpen}
-                                        selectedCount={selectedFilterChips.length}
-                                    />
-                                    <div className="relative ml-auto w-[260px] flex-shrink-0">
-                                        {sortDropdown}
-                                    </div>
-                                </div>
-
                                 {isMobileFiltersOpen && <div className="lg:hidden mb-6">{sidebar}</div>}
 
                                 {loading && !hasLoaded ? (
