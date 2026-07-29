@@ -9,6 +9,14 @@ function absoluteUrl(path: string | null | undefined): string | null {
   return path.startsWith("http") ? path : `${API_BASE}${path}`;
 }
 
+// Зворотне до absoluteUrl: перед відправкою на бекенд вже завантажене (не base64)
+// зображення повертаємо у відносний шлях — інакше бекенд збереже абсолютний URL
+// "як є" і задвоїть домен при наступному Storage::url() на цьому ж полі.
+export function toApiRelativePath(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
+  return url.startsWith(API_BASE) ? url.slice(API_BASE.length) : url;
+}
+
 export interface PublicProjectListItem {
   id: number;
   slug: string;
@@ -65,6 +73,63 @@ export interface CreateArtUaInfoProjectPayload {
   cover?: string | null;
   content_blocks?: ArtUaInfoContentBlock[];
   tags?: { uk?: string; en?: string };
+}
+
+// Оновлення (без status — редагування не змінює completed/approved)
+export type UpdateArtUaInfoProjectPayload = Omit<CreateArtUaInfoProjectPayload, "status">;
+
+// ---------------------------------------------------------------------------
+// Мій проєкт для редагування (GET /v1/my/projects/{slug} без ?language —
+// повертає всі мультимовні поля повністю, {uk, en}, а не локалізований рядок)
+// ---------------------------------------------------------------------------
+
+export interface Bilingual {
+  uk?: string;
+  en?: string;
+}
+
+export interface MyProjectContentBlock {
+  type: "paragraph" | "image" | "link";
+  paragraph_text?: Bilingual | null;
+  image?: string | null;
+  url?: string | null;
+}
+
+export interface MyProjectParameterAnswer {
+  parameter_id: number;
+  type: "list" | "custom";
+  value_id: number | null;
+  value: Bilingual | null;
+}
+
+export interface MyProjectDetail {
+  id: number;
+  slug: string;
+  source: "save_art" | "art_ua_info";
+  status: string;
+  title: Bilingual;
+  artCategory: string | null;
+  artSubcategory: string | null;
+  tags: Bilingual;
+  coverUrl: string | null;
+  authorType: "personal" | "legal" | string;
+  contentBlocks: MyProjectContentBlock[];
+  parameters: MyProjectParameterAnswer[];
+}
+
+interface RawMyProjectDetail {
+  id: number;
+  slug: string;
+  source: "save_art" | "art_ua_info";
+  status: string;
+  title: Bilingual | null;
+  art_category: string | null;
+  art_subcategory: string | null;
+  tags: Bilingual | null;
+  cover_url: string | null;
+  author: { type: string };
+  content_blocks: MyProjectContentBlock[] | null;
+  parameters: MyProjectParameterAnswer[] | null;
 }
 
 export interface MyProjectListItem {
@@ -163,6 +228,40 @@ export const projectsAPI = {
     );
     return response.data.data;
   },
+
+  updateArtUaInfoProject: async (
+    slug: string,
+    payload: UpdateArtUaInfoProjectPayload
+  ): Promise<CreateProjectResponse> => {
+    const response = await api.put<{ data: CreateProjectResponse }>(
+      `/v1/art-ua-info/projects/${slug}`,
+      payload
+    );
+    return response.data.data;
+  },
+
+  // Повні (нелокалізовані, {uk, en}) дані власного проєкту для форми редагування —
+  // GET /v1/my/projects/{slug} без ?language.
+  myShow: async (slug: string): Promise<MyProjectDetail> => {
+    const response = await api.get<{ data: RawMyProjectDetail }>(`/v1/my/projects/${slug}`);
+    const raw = response.data.data;
+    return {
+      id: raw.id,
+      slug: raw.slug,
+      source: raw.source,
+      status: raw.status,
+      title: raw.title ?? {},
+      artCategory: raw.art_category,
+      artSubcategory: raw.art_subcategory,
+      tags: raw.tags ?? {},
+      coverUrl: absoluteUrl(raw.cover_url),
+      authorType: raw.author?.type ?? "personal",
+      contentBlocks: (raw.content_blocks ?? []).map((block) =>
+        block.type === "image" ? { ...block, image: absoluteUrl(block.image) } : block
+      ),
+      parameters: raw.parameters ?? [],
+    };
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -230,6 +329,7 @@ export interface PublicProjectDetail {
   id: number;
   slug: string;
   code: string;
+  source: "save_art" | "art_ua_info";
   status: string;
   statusLabel: string;
   title: string;
@@ -322,6 +422,7 @@ interface RawProjectDetail {
   id: number;
   slug: string;
   code: string;
+  source: "save_art" | "art_ua_info";
   status: string;
   status_label: string;
   title: LocalizedText | null;
@@ -363,6 +464,7 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
     id: raw.id,
     slug: raw.slug,
     code: raw.code,
+    source: raw.source,
     status: raw.status,
     statusLabel: raw.status_label,
     title: localize(raw.title),

@@ -61,6 +61,7 @@ export interface Project {
   likes: number;
   authorAvatar: string;
   authorName: string;
+  source?: "save_art" | "art_ua_info";
   projectDetails: ProjectDetails;
   projectDescriptionData: ProjectDescriptionData;
 }

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import type { Project } from "../../../data/projectsData";
+import { useAuth } from "../../../context/AuthContext";
 
 interface ProjectPageClientProps {
   project: Project;
@@ -12,8 +14,13 @@ export default function ProjectPageClient({ project }: ProjectPageClientProps) {
   const [activeMainSlide, setActiveMainSlide] = useState(0);
   const [activeDescriptionSlide, setActiveDescriptionSlide] = useState(0);
   const [likes] = useState(project.projectDetails.initialLikes);
+  const { user } = useAuth();
 
   const { projectDetails, projectDescriptionData } = project;
+
+  // Редагувати можна лише проєкти, створені через майстер art-ua-info (окремий флоу
+  // без бюджету/етапів/бонусів) — save-art проєкти редагуються на save-art.in.ua.
+  const canEdit = user?.id === project.authorId && project.source === "art_ua_info";
 
   const handlePrevMainSlide = () => {
     setActiveMainSlide((prev) => (prev === 0 ? projectDetails.slides.length - 1 : prev - 1));
@@ -94,6 +101,20 @@ export default function ProjectPageClient({ project }: ProjectPageClientProps) {
             <p className="text-white font-bold">{projectDetails.links.saveArt}</p>
             <p className="text-white font-bold">{projectDetails.links.artUa}</p>
           </div>
+
+          {canEdit && (
+            <Link
+              href={`/profile/${user!.slug}/create-project?edit=${project.slug}`}
+              className="flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors mb-8"
+            >
+              <span className="flex items-center justify-center flex-1 px-6 font-bold text-[#343434] whitespace-nowrap">
+                Редагувати проект
+              </span>
+              <div className="flex items-center justify-center w-[60px] flex-shrink-0 border-l border-[#343434]">
+                <Image src="/edit.svg" alt="Редагувати" width={20} height={20} />
+              </div>
+            </Link>
+          )}
 
           <div className="bg-[#343434] flex items-stretch justify-center gap-0 mb-8 h-16">
             <div className="flex items-center justify-center w-16">

@@ -1,13 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { newProjectTexts, artCategories } from "../../../../data/newProjectData";
 import { getVideoInfo } from "../../../../utils/videoUtils";
 import { useProfileView } from "../../ProfileViewContext";
-import { projectsAPI, type ArtUaInfoContentBlock, type ArtUaInfoParameterAnswer } from "../../../../lib/api/projects";
+import {
+  projectsAPI,
+  toApiRelativePath,
+  type ArtUaInfoContentBlock,
+  type ArtUaInfoParameterAnswer,
+} from "../../../../lib/api/projects";
 import { getApiErrorMessage, getApiFieldErrors } from "../../../../lib/apiError";
 import { catalogsAPI, type Parameter } from "../../../../lib/api/catalogs";
+import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 import AddProjectCover from "./AddProjectCover";
 import AddWork from "./AddWork";
 import SelectArtForm from "./SelectArtForm";
@@ -23,13 +30,37 @@ import SpecificationsSection, { type ParameterAnswers } from "./SpecificationsSe
 import SoldProject from "./SoldProject";
 import PublicationPreviewSection from "./PublicationPreviewSection";
 import ProjectPublication from "./ProjectPublication";
-import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 
 function findArtCategoryIdForSubcategory(subcategoryId: string | undefined): string | undefined {
   if (!subcategoryId) return undefined;
   return artCategories.find((category) =>
     category.subcategories.some((subcategory) => subcategory.id === subcategoryId)
   )?.id;
+}
+
+function findSubcategoryLabel(subcategoryId: string | null | undefined): string | undefined {
+  if (!subcategoryId) return undefined;
+  for (const category of artCategories) {
+    const subcategory = category.subcategories.find((item) => item.id === subcategoryId);
+    if (subcategory) return subcategory.label;
+  }
+  return undefined;
+}
+
+// content_blocks з бекенду (image/link) -> елементи галереї роботи візарда.
+// "paragraph"-блоки цей майстер сам не створює (лише image/link), тож ігноруємо їх при завантаженні.
+function contentBlocksToGalleryItems(
+  blocks: { type: string; image?: string | null; url?: string | null }[]
+): ProjectWorkMediaItem[] {
+  const items: ProjectWorkMediaItem[] = [];
+  for (const block of blocks) {
+    if (block.type === "image" && block.image) {
+      items.push({ kind: "image", src: block.image });
+    } else if (block.type === "link" && block.url) {
+      items.push({ kind: "video", url: block.url });
+    }
+  }
+  return items;
 }
 
 // Бекенд-ключі полів (з 422-відповіді POST /v1/art-ua-info/projects), згруповані по
@@ -53,6 +84,11 @@ export default function ProjectCreating() {
     "publication",
   ];
   const { aboutMe } = useProfileView();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const editSlug = searchParams.get("edit");
+  const [isLoadingEditData, setIsLoadingEditData] = useState(Boolean(editSlug));
+  const [editLoadError, setEditLoadError] = useState<string | null>(null);
   const [selectedOwner, setSelectedOwner] = useState<string | null>(null);
   const [hoveredOwner, setHoveredOwner] = useState<string | null>(null);
   const [ownerError, setOwnerError] = useState(false);
@@ -90,8 +126,54 @@ export default function ProjectCreating() {
     });
   };
 
+  // Режим редагування (?edit=slug): підтягуємо дані вже опублікованого проєкту
+  // і заповнюємо ними форму замість порожнього створення.
+  useEffect(() => {
+    if (!editSlug) return;
+    let cancelled = false;
+
+    projectsAPI
+      .myShow(editSlug)
+      .then((project) => {
+        if (cancelled) return;
+        setSelectedOwner(project.authorType === "legal" ? "legal-entity" : "author");
+        setProjectNameUa(project.title.uk ?? "");
+        setProjectNameEn(project.title.en ?? "");
+        setTagsUa(project.tags.uk ?? "");
+        setTagsEn(project.tags.en ?? "");
+        setProjectCover(project.coverUrl);
+        setWorkGalleryItems(contentBlocksToGalleryItems(project.contentBlocks));
+        if (project.artSubcategory) {
+          const label = findSubcategoryLabel(project.artSubcategory);
+          if (label) setSelectedArtField({ id: project.artSubcategory, label });
+        }
+        setParameterAnswers(
+          project.parameters.reduce<ParameterAnswers>((acc, param) => {
+            acc[param.parameter_id] = {
+              valueId: param.value_id,
+              value: { uk: param.value?.uk ?? "", en: param.value?.en ?? "" },
+            };
+            return acc;
+          }, {})
+        );
+        setUnlockedTabs(tabOrder);
+      })
+      .catch(() => {
+        if (!cancelled) setEditLoadError("Не вдалося завантажити проєкт для редагування.");
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingEditData(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editSlug]);
+
   // Save project data to localStorage whenever it changes
   useEffect(() => {
+    if (editSlug) return;
     const projectData = {
       selectedOwner,
       projectNameUa,
@@ -120,10 +202,11 @@ export default function ProjectCreating() {
         // Квота вичерпана навіть без медіа — пропускаємо збереження цього знімку.
       }
     }
-  }, [selectedOwner, projectNameUa, projectNameEn, descriptionUa, descriptionEn, tagsUa, tagsEn, selectedArtField, projectCover, workGalleryItems, parameterAnswers]);
+  }, [editSlug, selectedOwner, projectNameUa, projectNameEn, descriptionUa, descriptionEn, tagsUa, tagsEn, selectedArtField, projectCover, workGalleryItems, parameterAnswers]);
 
   // Check if projectData was deleted from localStorage (after successful submit) and clear form
   useEffect(() => {
+    if (editSlug) return;
     const checkIfCleared = setInterval(() => {
       const projectData = localStorage.getItem('projectData');
       if (!projectData) {
@@ -144,7 +227,7 @@ export default function ProjectCreating() {
     }, 500);
     
     return () => clearInterval(checkIfCleared);
-  }, []);
+  }, [editSlug]);
 
   const handleProjectNameUaChange = (value: string) => {
     clearFieldErrors(["title", "title.uk"]);
@@ -319,30 +402,40 @@ export default function ProjectCreating() {
   };
 
   const handlePublish = async (): Promise<{ type: "success" | "error"; text: string }> => {
+    // toApiRelativePath: якщо це вже завантажене (не base64) зображення з бекенду,
+    // повертаємо відносний шлях назад — інакше бекенд збереже абсолютний URL "як є"
+    // і задвоїть домен при наступному завантаженні цього ж проєкту.
     const contentBlocks: ArtUaInfoContentBlock[] = workGalleryItems.map((item) =>
       item.kind === "image"
-        ? { type: "image", image: item.src }
+        ? { type: "image", image: toApiRelativePath(item.src) }
         : { type: "link", url: item.url }
     );
 
+    const commonPayload = {
+      user_type: (selectedOwner === "legal-entity" ? "legal" : "personal") as "legal" | "personal",
+      title: {
+        uk: projectNameUa.trim(),
+        en: projectNameEn.trim(),
+      },
+      art_category: findArtCategoryIdForSubcategory(selectedArtField?.id),
+      art_subcategory: selectedArtField?.id,
+      cover: toApiRelativePath(projectCover || undefined),
+      content_blocks: contentBlocks.length ? contentBlocks : undefined,
+      parameters: parameterCatalog.length ? buildParametersPayload() : undefined,
+      tags: {
+        uk: tagsUa?.trim() || undefined,
+        en: tagsEn?.trim() || undefined,
+      },
+    };
+
     try {
-      await projectsAPI.createArtUaInfoProject({
-        status: "moderation",
-        user_type: selectedOwner === "legal-entity" ? "legal" : "personal",
-        title: {
-          uk: projectNameUa.trim(),
-          en: projectNameEn.trim(),
-        },
-        art_category: findArtCategoryIdForSubcategory(selectedArtField?.id),
-        art_subcategory: selectedArtField?.id,
-        cover: projectCover || undefined,
-        content_blocks: contentBlocks.length ? contentBlocks : undefined,
-        parameters: parameterCatalog.length ? buildParametersPayload() : undefined,
-        tags: {
-          uk: tagsUa?.trim() || undefined,
-          en: tagsEn?.trim() || undefined,
-        },
-      });
+      if (editSlug) {
+        const updated = await projectsAPI.updateArtUaInfoProject(editSlug, commonPayload);
+        router.push(`/projects/${updated.slug}`);
+        return { type: "success", text: "Проект оновлено" };
+      }
+
+      await projectsAPI.createArtUaInfoProject({ ...commonPayload, status: "moderation" });
 
       localStorage.removeItem("projectData");
       setSelectedOwner(null);
@@ -403,6 +496,18 @@ export default function ProjectCreating() {
     })),
   ];
 
+  if (isLoadingEditData) {
+    return <div className="min-h-screen bg-[#414141]" />;
+  }
+
+  if (editLoadError) {
+    return (
+      <div className="min-h-screen bg-[#414141] flex items-center justify-center">
+        <p className="text-white">{editLoadError}</p>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`flex flex-col items-center gap-8 ${
@@ -421,7 +526,7 @@ export default function ProjectCreating() {
       <div className="flex flex-col items-center gap-8 w-full min-w-0">
       {/* Title */}
       <h1 className="text-[#A0A0A0] text-[32px] md:text-[40px] font-bold text-center">
-        {newProjectTexts.title}
+        {editSlug ? "Редагування проєкту" : newProjectTexts.title}
       </h1>
 
       <NewProjectMenu

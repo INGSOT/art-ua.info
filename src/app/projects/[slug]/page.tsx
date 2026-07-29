@@ -74,6 +74,7 @@ function mapToProject(raw: PublicProjectDetail): Project {
     image: raw.coverUrl ?? FALLBACK_IMAGE,
     title: raw.title,
     slug: raw.slug,
+    source: raw.source,
     date: formatDate(raw.announcedAt ?? raw.createdAt),
     artSubCategory: raw.artSubcategory ?? raw.artCategory ?? "",
     likes: raw.likesCount,
@@ -84,7 +85,7 @@ function mapToProject(raw: PublicProjectDetail): Project {
       title: raw.title,
       tags: [
         { text: raw.artCategoryLabel ?? raw.artCategory ?? "", hasIcon: false },
-        { text: raw.artSubcategoryLabel ?? "Авторський проєкт", hasIcon: true },
+        { text: raw.statusLabel, hasIcon: true },
       ],
       links: {
         saveArt: authorSlug ? `Проєкт на ${saveArtProfileLabel(authorSlug)}` : "",
