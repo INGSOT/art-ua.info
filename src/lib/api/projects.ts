@@ -91,20 +91,35 @@ interface MyProjectsListResponse {
   data: RawMyProjectListItem[];
 }
 
+function mapMyProjectListItem(project: RawMyProjectListItem): MyProjectListItem {
+  return {
+    id: project.id,
+    slug: project.slug,
+    status: project.status,
+    statusLabel: project.status_label,
+    title: project.title,
+    coverUrl: absoluteUrl(project.cover_url),
+    likesCount: project.likes_count,
+  };
+}
+
 export const projectsAPI = {
   myList: async (params?: Record<string, string | number>): Promise<MyProjectListItem[]> => {
     const response = await api.get<MyProjectsListResponse>("/v1/my/projects", {
       params: { language: "uk", ...params },
     });
-    return response.data.data.map((project) => ({
-      id: project.id,
-      slug: project.slug,
-      status: project.status,
-      statusLabel: project.status_label,
-      title: project.title,
-      coverUrl: absoluteUrl(project.cover_url),
-      likesCount: project.likes_count,
-    }));
+    return response.data.data.map(mapMyProjectListItem);
+  },
+
+  // Завершені проєкти (completed, sold) незалежно від джерела створення
+  // (save-art або майстер art-ua-info) — GET /v1/my/projects/completed.
+  myCompletedList: async (
+    params?: Record<string, string | number>
+  ): Promise<MyProjectListItem[]> => {
+    const response = await api.get<MyProjectsListResponse>("/v1/my/projects/completed", {
+      params: { language: "uk", ...params },
+    });
+    return response.data.data.map(mapMyProjectListItem);
   },
 
   list: async (params?: Record<string, string | number>): Promise<PublicProjectListItem[]> => {

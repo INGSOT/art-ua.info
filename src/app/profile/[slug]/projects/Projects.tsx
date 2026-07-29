@@ -20,7 +20,7 @@ export default function Projects() {
     let cancelled = false;
     setLoading(true);
     projectsAPI
-      .myList()
+      .myCompletedList()
       .then((projects) => {
         if (!cancelled) setMyProjects(projects);
       })
