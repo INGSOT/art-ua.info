@@ -58,6 +58,12 @@ export const projectEmptyState = {
   createButtonText: "Створити",
 };
 
+export const draftsEmptyState = {
+  message: "У вас ще немає чернеток",
+  subMessage: "Незавершені та неопубліковані проєкти зʼявляться тут.",
+  createButtonText: "Створити проєкт",
+};
+
 export const profileTexts = {
   editProfileButton: "Редагувати профіль",
 };

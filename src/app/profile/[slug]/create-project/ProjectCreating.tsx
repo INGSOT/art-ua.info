@@ -158,6 +158,8 @@ export default function ProjectCreating() {
   const [isSoldExternally, setIsSoldExternally] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [likesCount, setLikesCount] = useState(0);
+  const [projectStatus, setProjectStatus] = useState<string | null>(null);
+  const [projectStatusLabel, setProjectStatusLabel] = useState<string | null>(null);
 
   const clearFieldErrors = (keys: string[]) => {
     setFieldErrors((prev) => {
@@ -190,6 +192,8 @@ export default function ProjectCreating() {
         setAdditionalBlocks(contentBlocksToAdditionalBlocks(project.contentBlocks));
         setIsSoldExternally(project.soldExternally);
         setLikesCount(project.likesCount);
+        setProjectStatus(project.status);
+        setProjectStatusLabel(project.statusLabel);
         if (project.artSubcategory) {
           const label = findSubcategoryLabel(project.artSubcategory);
           if (label) setSelectedArtField({ id: project.artSubcategory, label });
@@ -562,7 +566,15 @@ export default function ProjectCreating() {
 
     try {
       if (editSlug) {
-        const updated = await projectsAPI.updateArtUaInfoProject(editSlug, commonPayload);
+        // Якщо проєкт зараз чернетка (напр. щойно знятий з публікації) — публікація
+        // так само проводить його через status "moderation" (=> Completed на бекенді),
+        // як і при першому створенні. Для вже опублікованого проєкту status
+        // не передаємо, щоб не чіпати completed/announced зайвий раз.
+        const isDraft = projectStatus === "draft" || projectStatus === "new";
+        const updated = await projectsAPI.updateArtUaInfoProject(
+          editSlug,
+          isDraft ? { ...commonPayload, status: "moderation" } : commonPayload
+        );
         router.push(`/projects/${updated.slug}`);
         return { type: "success", text: "Проект оновлено" };
       }
@@ -590,16 +602,23 @@ export default function ProjectCreating() {
     }
   };
 
-  // Зберегти чернетку: для нового проєкту — POST зі status "draft", для вже
-  // збереженого (editSlug) — звичайне оновлення без зміни статусу (редагування
-  // draft/moderation/rejected не чіпає завершені/продані проєкти, це контролює бекенд).
+  // Зберегти чернетку: для нового проєкту — POST зі status "draft". Для вже
+  // збереженого (editSlug) — PUT зі status "draft", що знімає опублікований
+  // проєкт з публічної сторінки й повертає його в чернетку (бекенд дозволяє
+  // через цей ендпоінт лише цей один статус-перехід).
   const handleSaveDraft = async (): Promise<{ type: "success" | "error"; text: string }> => {
     const commonPayload = buildCommonPayload();
+    const wasPublished = projectStatus !== null && projectStatus !== "draft" && projectStatus !== "new";
 
     try {
       if (editSlug) {
-        await projectsAPI.updateArtUaInfoProject(editSlug, commonPayload);
-        return { type: "success", text: "Зміни збережено" };
+        await projectsAPI.updateArtUaInfoProject(editSlug, { ...commonPayload, status: "draft" });
+        setProjectStatus("draft");
+        setProjectStatusLabel("Чернетка");
+        return {
+          type: "success",
+          text: wasPublished ? "Проєкт знято з публікації та збережено як чернетку" : "Чернетку збережено",
+        };
       }
 
       await projectsAPI.createArtUaInfoProject({ ...commonPayload, status: "draft" });
@@ -806,6 +825,7 @@ export default function ProjectCreating() {
             parameterAnswers={parameterAnswers}
             additionalBlocks={additionalBlocks}
             likesCount={likesCount}
+            statusLabel={projectStatusLabel || "Чернетка"}
           />
           <ProjectPublication
             onPublish={handlePublish}

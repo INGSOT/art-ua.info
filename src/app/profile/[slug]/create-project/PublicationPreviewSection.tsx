@@ -42,6 +42,7 @@ interface PublicationPreviewSectionProps {
   parameterAnswers: ParameterAnswers;
   additionalBlocks: AdditionalContentBlock[];
   likesCount?: number;
+  statusLabel?: string;
 }
 
 export default function PublicationPreviewSection({
@@ -53,6 +54,7 @@ export default function PublicationPreviewSection({
   parameterAnswers,
   additionalBlocks,
   likesCount = 0,
+  statusLabel,
 }: PublicationPreviewSectionProps) {
   const profile = useProfileView();
 
@@ -80,7 +82,10 @@ export default function PublicationPreviewSection({
   return (
     <ProjectResultShowcase
       title={previewTitle}
-      tags={[{ text: previewGenre }]}
+      tags={[
+        { text: previewGenre },
+        ...(statusLabel ? [{ text: statusLabel, icon: "/coins.svg" }] : []),
+      ]}
       slides={slides}
       likesCount={likesCount}
       author={{

@@ -5,6 +5,27 @@ import Image from "next/image";
 import Link from "next/link";
 import WorkVideoEmbed from "../../app/profile/[slug]/create-project/WorkVideoEmbed";
 import { getVideoInfo } from "../../utils/videoUtils";
+import { useToast } from "../../context/ToastContext";
+
+// Стандартні share-intent URL. DeviantArt офіційного share-intent для довільних
+// зовнішніх посилань не має — для нього замість попапу копіюємо посилання.
+function buildShareUrl(network: string, pageUrl: string, title: string): string | null {
+  const encodedUrl = encodeURIComponent(pageUrl);
+  const encodedTitle = encodeURIComponent(title);
+
+  switch (network) {
+    case "Facebook":
+      return `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+    case "X":
+      return `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+    case "Pinterest":
+      return `https://pinterest.com/pin/create/button/?url=${encodedUrl}&description=${encodedTitle}`;
+    case "LinkedIn":
+      return `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+    default:
+      return null;
+  }
+}
 
 export interface ProjectResultShowcaseTag {
   text: string;
@@ -155,6 +176,25 @@ export default function ProjectResultShowcase({
 }: ProjectResultShowcaseProps) {
   const [activeSlide, setActiveSlide] = useState(0);
   const safeIndex = Math.min(activeSlide, Math.max(slides.length - 1, 0));
+  const { showToast } = useToast();
+  const [hoveredSocialIndex, setHoveredSocialIndex] = useState<number | null>(null);
+
+  const handleShareClick = async (network: string) => {
+    const pageUrl = window.location.href;
+    const shareUrl = buildShareUrl(network, pageUrl, title);
+
+    if (shareUrl) {
+      window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=600");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      showToast("Посилання на проєкт скопійовано", "green");
+    } catch {
+      showToast("Не вдалося скопіювати посилання", "red");
+    }
+  };
 
   return (
     <div className="w-full flex flex-col items-center gap-20">
@@ -339,13 +379,22 @@ export default function ProjectResultShowcase({
           {socialLinks && socialLinks.length > 0 && (
             <div className="flex items-center justify-center gap-[30px] p-[30px]">
               {socialLinks.map((social, index) => (
-                <a
+                <button
                   key={index}
-                  href="#"
+                  type="button"
+                  onClick={() => handleShareClick(social.alt)}
+                  onMouseEnter={() => setHoveredSocialIndex(index)}
+                  onMouseLeave={() => setHoveredSocialIndex(null)}
+                  aria-label={buildShareUrl(social.alt, "", "") ? `Поділитися в ${social.alt}` : "Скопіювати посилання на проєкт"}
                   className="w-11 h-11 flex items-center justify-center hover:bg-[#FECC39] transition-colors"
                 >
-                  <Image src={social.icon} alt={social.alt} width={20} height={20} />
-                </a>
+                  <Image
+                    src={hoveredSocialIndex === index ? social.icon.replace("_yellow", "_black") : social.icon}
+                    alt={social.alt}
+                    width={20}
+                    height={20}
+                  />
+                </button>
               ))}
             </div>
           )}

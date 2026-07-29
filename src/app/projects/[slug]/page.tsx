@@ -13,8 +13,10 @@ interface ProjectPageProps {
 
 const FALLBACK_IMAGE = "/gallery/ship.png";
 
+// Той самий набір і порядок іконок "Поділитися", що й на project-картці в
+// save-art (CollectionProjectCardPublish): посилання, Facebook, X, Pinterest, LinkedIn.
 const DEFAULT_SOCIAL_LINKS = [
-  { icon: "/socials/deviantart_yellow.svg", alt: "DeviantArt" },
+  { icon: "/socials/link_yellow.svg", alt: "Посилання" },
   { icon: "/socials/facebook_yellow.svg", alt: "Facebook" },
   { icon: "/socials/x_yellow.svg", alt: "X" },
   { icon: "/socials/pinterest_yellow.svg", alt: "Pinterest" },

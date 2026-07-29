@@ -15,7 +15,7 @@ export default function Menu({ activeItem }: MenuProps) {
 
   const menuItems = [
     { id: "projects", label: "Проєкти", href: withProfileId("/profile/projects", slug) },
-    { id: "drafts", label: "Чернетки", href: "#" },
+    { id: "drafts", label: "Чернетки", href: withProfileId("/profile/drafts", slug) },
     { id: "catalogs", label: "Каталоги", href: withProfileId("/profile/catalogs", slug) },
     { id: "services", label: "Послуги", href: withProfileId("/profile/services", slug) },
     { id: "team", label: "Команда", href: withProfileId("/profile/team", slug) },

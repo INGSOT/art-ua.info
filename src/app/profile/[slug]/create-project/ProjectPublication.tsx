@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../../data/newProjectData";
 import Message from "../../../../components/Message";
+import DeleteProjectModal from "./DeleteProjectModal";
 
 interface ProjectPublicationProps {
   // Валідацію обов'язкових полів проєкту (власник/назва/жанр/робота) виконує сервер
@@ -21,6 +22,7 @@ export default function ProjectPublication({ onPublish, onSaveDraft, onDelete }:
   const [isPublishHovered, setIsPublishHovered] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [notification, setNotification] = useState<{ type: "error" | "success"; text: string } | null>(null);
 
   const handlePublish = async (e: React.FormEvent) => {
@@ -39,8 +41,8 @@ export default function ProjectPublication({ onPublish, onSaveDraft, onDelete }:
     setNotification(result);
   };
 
-  const handleDeleteClick = async () => {
-    if (!window.confirm("Видалити проєкт? Цю дію не можна скасувати.")) return;
+  const handleDeleteConfirm = async () => {
+    setIsDeleteModalOpen(false);
     setNotification(null);
     setIsDeleting(true);
     const result = await onDelete();
@@ -63,7 +65,7 @@ export default function ProjectPublication({ onPublish, onSaveDraft, onDelete }:
         {/* Delete Button */}
         <button
           type="button"
-          onClick={handleDeleteClick}
+          onClick={() => setIsDeleteModalOpen(true)}
           disabled={isDeleting}
           onMouseEnter={() => setIsDeleteHovered(true)}
           onMouseLeave={() => setIsDeleteHovered(false)}
@@ -147,6 +149,12 @@ export default function ProjectPublication({ onPublish, onSaveDraft, onDelete }:
         </button>
       </div>
       </form>
+
+      <DeleteProjectModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </section>
   );
 }

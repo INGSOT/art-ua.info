@@ -96,8 +96,12 @@ export interface CreateArtUaInfoProjectPayload {
   sold_externally?: boolean;
 }
 
-// Оновлення (без status — редагування не змінює completed/approved)
-export type UpdateArtUaInfoProjectPayload = Omit<CreateArtUaInfoProjectPayload, "status">;
+// Оновлення: дозволені статус-переходи — "draft" (зняти опублікований проєкт
+// з публікації) та "moderation" (опублікувати чернетку). Будь-які інші
+// значення бекенд відхилить.
+export type UpdateArtUaInfoProjectPayload = Omit<CreateArtUaInfoProjectPayload, "status"> & {
+  status?: "draft" | "moderation";
+};
 
 // ---------------------------------------------------------------------------
 // Мій проєкт для редагування (GET /v1/my/projects/{slug} без ?language —
@@ -143,6 +147,7 @@ export interface MyProjectDetail {
   slug: string;
   source: "save_art" | "art_ua_info";
   status: string;
+  statusLabel: string;
   title: Bilingual;
   shortDescription: Bilingual;
   artCategory: string | null;
@@ -163,6 +168,7 @@ interface RawMyProjectDetail {
   slug: string;
   source: "save_art" | "art_ua_info";
   status: string;
+  status_label: string;
   title: Bilingual | null;
   short_description: Bilingual | null;
   art_category: string | null;
@@ -314,6 +320,7 @@ export const projectsAPI = {
       slug: raw.slug,
       source: raw.source,
       status: raw.status,
+      statusLabel: raw.status_label,
       title: raw.title ?? {},
       shortDescription: raw.short_description ?? {},
       artCategory: raw.art_category,
