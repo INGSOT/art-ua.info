@@ -64,11 +64,10 @@ function mapToProject(raw: PublicProjectDetail): Project {
         { name: "Статус", description: raw.statusLabel },
       ];
 
-  const descriptionText = raw.contentBlocks
-    .filter((block) => block.type === "paragraph" && block.paragraphText)
-    .map((block) => block.paragraphText as string);
-
-  const fallbackDescriptionText = [raw.shortDescription, raw.additionalInfo].filter(Boolean);
+  // Короткий опис (short_description) показуємо окремо від content_blocks — самі
+  // content_blocks (заголовки/текст/зображення/посилання) рендеряться нижче один в
+  // один як на save-art, тож тут беремо лише короткий опис, щоб не дублювати абзаци.
+  const descriptionText = [raw.shortDescription, raw.additionalInfo].filter(Boolean);
 
   const authorSlug = raw.author.slug ?? "";
 
@@ -114,7 +113,8 @@ function mapToProject(raw: PublicProjectDetail): Project {
         saveArtLink: authorSlug ? saveArtProfileLabel(authorSlug) : "",
       },
       socialLinks: DEFAULT_SOCIAL_LINKS,
-      descriptionText: descriptionText.length ? descriptionText : fallbackDescriptionText,
+      descriptionText,
+      contentBlocks: raw.contentBlocks,
     },
   };
 }

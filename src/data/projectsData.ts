@@ -28,6 +28,18 @@ export interface ProjectDetails {
   characteristics: ProjectCharacteristic[];
 }
 
+// Блок додаткової інформації проєкту (заголовок/текст/зображення/посилання) —
+// той самий формат, що й PublicProjectDetail.contentBlocks з lib/api/projects.
+export interface ProjectContentBlockDisplay {
+  type: string;
+  headingLevel?: string;
+  headingText?: string;
+  paragraphText?: string;
+  image?: string | null;
+  imageCaption?: string;
+  url?: string | null;
+}
+
 export interface ProjectDescriptionData {
   slides: string[];
   tags: string[];
@@ -45,6 +57,7 @@ export interface ProjectDescriptionData {
     alt: string;
   }>;
   descriptionText: string[];
+  contentBlocks?: ProjectContentBlockDisplay[];
 }
 
 export type SalesStatus = "for-sale" | "sold" | "reserved";

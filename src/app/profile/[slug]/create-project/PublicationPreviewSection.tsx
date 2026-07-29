@@ -1,23 +1,36 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import WorkVideoEmbed from "./WorkVideoEmbed";
+import ProjectResultShowcase, {
+  type ProjectResultContentBlock,
+} from "../../../../components/project/ProjectResultShowcase";
 import type { ProjectWorkMediaItem } from "./projectWorkMedia";
-import { SAVE_ART_DOMAIN } from "../../../../lib/siteDomains";
+import type { AdditionalContentBlock } from "./additionalContentBlock";
+import { useProfileView } from "../../ProfileViewContext";
 import type { Parameter } from "../../../../lib/api/catalogs";
 import type { ParameterAnswers } from "./SpecificationsSection";
-
-interface PreviewCharacteristic {
-  id: number;
-  name: string;
-  description: string;
-}
 
 function localize(value: string | { uk: string; en?: string } | null | undefined): string {
   if (value == null) return "";
   if (typeof value === "object") return value.uk ?? value.en ?? "";
   return value;
+}
+
+function workGalleryItemToSlide(item: ProjectWorkMediaItem): string {
+  return item.kind === "image" ? item.src : item.url;
+}
+
+// Прев'ю показує лише українську мову — беремо *Uk-поля блоків додаткової інформації.
+function additionalBlockToContentBlock(block: AdditionalContentBlock): ProjectResultContentBlock {
+  switch (block.type) {
+    case "heading":
+      return { type: "heading", headingText: block.headingUk };
+    case "paragraph":
+      return { type: "paragraph", paragraphText: block.paragraphUk };
+    case "image":
+      return { type: "image", image: block.image };
+    case "link":
+      return { type: "link", url: block.url };
+  }
 }
 
 interface PublicationPreviewSectionProps {
@@ -27,6 +40,7 @@ interface PublicationPreviewSectionProps {
   descriptionUa: string;
   parameterCatalog: Parameter[];
   parameterAnswers: ParameterAnswers;
+  additionalBlocks: AdditionalContentBlock[];
 }
 
 export default function PublicationPreviewSection({
@@ -36,22 +50,19 @@ export default function PublicationPreviewSection({
   descriptionUa,
   parameterCatalog,
   parameterAnswers,
+  additionalBlocks,
 }: PublicationPreviewSectionProps) {
-  const [activeSlide, setActiveSlide] = useState(0);
+  const profile = useProfileView();
 
-  const slides = useMemo(() => workGalleryItems, [workGalleryItems]);
-
-  useEffect(() => {
-    if (activeSlide >= slides.length && slides.length > 0) {
-      setActiveSlide(slides.length - 1);
-    }
-  }, [slides.length, activeSlide]);
-
-  const safeSlideIndex = Math.min(activeSlide, Math.max(slides.length - 1, 0));
   const previewTitle = projectNameUa.trim() || "«Назва проєкту»";
   const previewGenre = selectedArtFieldLabel || "Жанр не обрано";
-  const previewDescription = descriptionUa.trim() || "Текст опису проекту";
-  const previewCharacteristics: PreviewCharacteristic[] = parameterCatalog
+  const slides = workGalleryItems.map(workGalleryItemToSlide);
+  const descriptionParagraphs = descriptionUa
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const characteristics = parameterCatalog
     .map((param) => {
       const answer = parameterAnswers[param.id];
       const value =
@@ -62,133 +73,29 @@ export default function PublicationPreviewSection({
     })
     .filter((item) => item.description.trim());
 
-  const current = slides[safeSlideIndex];
+  const saveArtButton = profile.aboutMe.buttons.find((button) => button.id === "save-art");
 
   return (
-    <section className="w-full max-w-[1000px] min-w-0 flex flex-col items-center gap-6 px-4 md:px-0">
-      <h2 className="text-white text-xl md:text-[28px] font-bold text-center break-words max-w-full">
-        {previewTitle}
-      </h2>
-
-      <div className="bg-[#343434] px-6 py-3">
-        <p className="text-white text-sm md:text-base">{previewGenre}</p>
-      </div>
-
-      {slides.length > 0 ? (
-        <div className="w-full flex flex-col items-center gap-4">
-          <div
-            className={`relative w-full bg-[#343434] ${
-              current?.kind === "image" ? "aspect-video" : ""
-            }`}
-          >
-            {current?.kind === "image" ? (
-              <Image
-                src={current.src}
-                alt="Медіа проєкту"
-                fill
-                className="object-cover"
-              />
-            ) : current?.kind === "video" ? (
-              <WorkVideoEmbed workVideoUrl={current.url} />
-            ) : null}
-          </div>
-
-          {slides.length > 1 ? (
-            <div className="flex items-center justify-center gap-4 min-w-0 flex-wrap max-w-full">
-              <button
-                type="button"
-                onClick={() =>
-                  setActiveSlide((prev) =>
-                    prev === 0 ? slides.length - 1 : prev - 1
-                  )
-                }
-              >
-                <Image
-                  src="/white-arrow-left-slider.svg"
-                  alt="Попередній"
-                  width={32}
-                  height={32}
-                />
-              </button>
-              <div className="flex gap-2">
-                {slides.map((_, index) => (
-                  <Image
-                    key={index}
-                    src={
-                      safeSlideIndex === index
-                        ? "/white-slider-item-active.svg"
-                        : "/white-slider-item-non-active.svg"
-                    }
-                    alt=""
-                    width={20}
-                    height={20}
-                  />
-                ))}
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  setActiveSlide((prev) =>
-                    prev === slides.length - 1 ? 0 : prev + 1
-                  )
-                }
-              >
-                <Image
-                  src="/white-arrow-right-slider.svg"
-                  alt="Наступний"
-                  width={32}
-                  height={32}
-                />
-              </button>
-            </div>
-          ) : null}
-        </div>
-      ) : (
-        <div className="w-full aspect-video bg-[#343434]" />
-      )}
-
-      <p className="text-white font-bold">Проєкт на {SAVE_ART_DOMAIN}</p>
-
-      <div className="bg-[#343434] flex items-stretch justify-center h-16">
-        <div className="flex items-center justify-center w-16">
-          <span className="text-[#FECC39] font-bold text-base">0</span>
-        </div>
-        <div className="w-[2px] bg-black" />
-        <div className="flex items-center justify-center w-16">
-          <Image src="/yellow_like.svg" alt="Like" width={24} height={24} />
-        </div>
-      </div>
-
-      <div className="w-full min-w-0">
-        <p className="font-wix text-white text-base whitespace-pre-line break-words">
-          {previewDescription}
-        </p>
-      </div>
-
-      <div className="w-full min-w-0">
-        <h3 className="text-white font-bold text-lg mb-4">Характеристики проекту:</h3>
-
-        <div className="grid grid-cols-2 gap-4 mb-2">
-          <span className="font-wix text-white text-sm">Назва</span>
-          <span className="font-wix text-white text-sm">Опис</span>
-        </div>
-
-        <div className="flex flex-col gap-[2px]">
-          {(previewCharacteristics.length > 0
-            ? previewCharacteristics
-            : [{ id: -1, name: "-", description: "-" }]
-          ).map((item) => (
-            <div key={item.id} className="grid grid-cols-2 gap-[2px]">
-              <div className="font-wix bg-[#343434] px-6 py-4 text-white text-base break-words min-w-0">
-                {item.name || "-"}
-              </div>
-              <div className="font-wix bg-[#343434] px-6 py-4 text-white text-base break-words min-w-0">
-                {item.description || "-"}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+    <ProjectResultShowcase
+      title={previewTitle}
+      tags={[{ text: previewGenre }]}
+      slides={slides}
+      saveArtLinkText={saveArtButton ? `Проєкт на ${saveArtButton.label}` : undefined}
+      likesCount={0}
+      author={{
+        avatarUrl: profile.aboutMe.avatar,
+        name: profile.aboutMe.name,
+        description: profile.aboutMe.artistType,
+        linkHref: saveArtButton?.href,
+        linkLabel: saveArtButton?.label,
+      }}
+      characteristicsTitle="Характеристики проекту:"
+      tableHeaders={{ name: "Назва", description: "Опис" }}
+      characteristics={
+        characteristics.length > 0 ? characteristics : [{ id: -1, name: "-", description: "-" }]
+      }
+      descriptionParagraphs={descriptionParagraphs.length > 0 ? descriptionParagraphs : ["Текст опису проекту"]}
+      contentBlocks={additionalBlocks.map(additionalBlockToContentBlock)}
+    />
   );
 }

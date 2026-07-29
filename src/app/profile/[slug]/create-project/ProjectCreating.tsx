@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { newProjectTexts, artCategories } from "../../../../data/newProjectData";
 import { getVideoInfo } from "../../../../utils/videoUtils";
@@ -120,8 +120,12 @@ export default function ProjectCreating() {
   ];
   const { aboutMe, slug: profileSlug } = useProfileView();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const editSlug = searchParams.get("edit");
+  const tabParam = searchParams.get("tab") as NewProjectTab | null;
+  const initialTab: NewProjectTab =
+    tabParam && tabOrder.includes(tabParam) ? tabParam : "owner";
   const [isLoadingEditData, setIsLoadingEditData] = useState(Boolean(editSlug));
   const [editLoadError, setEditLoadError] = useState<string | null>(null);
   const [selectedOwner, setSelectedOwner] = useState<string | null>(null);
@@ -141,7 +145,7 @@ export default function ProjectCreating() {
   const [isWorkImageModalOpen, setIsWorkImageModalOpen] = useState(false);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
   const [isArtFormModalOpen, setIsArtFormModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<NewProjectTab>("owner");
+  const [activeTab, setActiveTab] = useState<NewProjectTab>(initialTab);
   const [unlockedTabs, setUnlockedTabs] = useState<NewProjectTab[]>(["owner"]);
   const [selectedArtField, setSelectedArtField] = useState<{
     id: string;
@@ -460,13 +464,22 @@ export default function ProjectCreating() {
     if (currentIndex < tabOrder.length - 1) {
       const nextTab = tabOrder[currentIndex + 1];
       setUnlockedTabs((prev) => (prev.includes(nextTab) ? prev : [...prev, nextTab]));
-      setActiveTab(nextTab);
+      goToTab(nextTab);
     }
+  };
+
+  // Синхронізує активну вкладку з ?tab= в URL (як save-art ?tab=description/publication),
+  // щоб посилання на конкретну вкладку можна було відкрити напряму або поділитись ним.
+  const goToTab = (tab: NewProjectTab) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   const handleTabChange = (tab: NewProjectTab) => {
     if (unlockedTabs.includes(tab)) {
-      setActiveTab(tab);
+      goToTab(tab);
     }
   };
 
@@ -789,6 +802,7 @@ export default function ProjectCreating() {
             descriptionUa={descriptionUa}
             parameterCatalog={parameterCatalog}
             parameterAnswers={parameterAnswers}
+            additionalBlocks={additionalBlocks}
           />
           <ProjectPublication
             onPublish={handlePublish}
