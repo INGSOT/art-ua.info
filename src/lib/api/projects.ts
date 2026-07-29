@@ -92,7 +92,7 @@ export interface CreateArtUaInfoProjectPayload {
   cover?: string | null;
   final_result?: ArtUaInfoFinalResultItem[];
   content_blocks?: ArtUaInfoContentBlock[];
-  tags?: { uk?: string; en?: string };
+  tags?: { uk?: string[]; en?: string[] };
   sold_externally?: boolean;
 }
 
@@ -107,6 +107,13 @@ export type UpdateArtUaInfoProjectPayload = Omit<CreateArtUaInfoProjectPayload, 
 export interface Bilingual {
   uk?: string;
   en?: string;
+}
+
+// Теги art-ua-info зберігаються як списки рядків по мовах (не comma-separated
+// рядок, як у save-art) — { uk: string[], en: string[] }.
+export interface BilingualTags {
+  uk?: string[];
+  en?: string[];
 }
 
 export interface MyProjectContentBlock {
@@ -140,7 +147,7 @@ export interface MyProjectDetail {
   shortDescription: Bilingual;
   artCategory: string | null;
   artSubcategory: string | null;
-  tags: Bilingual;
+  tags: BilingualTags;
   coverUrl: string | null;
   authorType: "personal" | "legal" | string;
   contentBlocks: MyProjectContentBlock[];
@@ -158,7 +165,7 @@ interface RawMyProjectDetail {
   short_description: Bilingual | null;
   art_category: string | null;
   art_subcategory: string | null;
-  tags: Bilingual | null;
+  tags: BilingualTags | null;
   cover_url: string | null;
   author: { type: string };
   sold_externally: boolean;
@@ -295,7 +302,7 @@ export const projectsAPI = {
       shortDescription: raw.short_description ?? {},
       artCategory: raw.art_category,
       artSubcategory: raw.art_subcategory,
-      tags: raw.tags ?? {},
+      tags: { uk: raw.tags?.uk ?? [], en: raw.tags?.en ?? [] },
       coverUrl: absoluteUrl(raw.cover_url),
       authorType: raw.author?.type ?? "personal",
       contentBlocks: (raw.content_blocks ?? []).map((block) =>
@@ -481,7 +488,10 @@ interface RawProjectDetail {
   art_category_label: string | null;
   art_subcategory: string | null;
   art_subcategory_label: string | null;
-  tags: LocalizedText | null;
+  // save-art зберігає теги як comma-separated LocalizedText, art-ua-info — як
+  // список рядків per мова; з ?language=uk бекенд вже повертає локалізоване
+  // значення — рядок або масив відповідно.
+  tags: LocalizedText | string[] | null;
   currency: string | null;
   budget_goal: number | null;
   budget_collected: number;
@@ -524,10 +534,12 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
     artCategoryLabel: raw.art_category_label,
     artSubcategory: raw.art_subcategory,
     artSubcategoryLabel: raw.art_subcategory_label,
-    tags: localize(raw.tags)
-      .split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean),
+    tags: Array.isArray(raw.tags)
+      ? raw.tags
+      : localize(raw.tags)
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
     currency: raw.currency,
     budgetGoal: raw.budget_goal,
     budgetCollected: raw.budget_collected ?? 0,

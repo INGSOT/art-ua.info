@@ -131,8 +131,8 @@ export default function ProjectCreating() {
   const [projectNameEn, setProjectNameEn] = useState("");
   const [descriptionUa, setDescriptionUa] = useState("");
   const [descriptionEn, setDescriptionEn] = useState("");
-  const [tagsUa, setTagsUa] = useState("");
-  const [tagsEn, setTagsEn] = useState("");
+  const [tagsUa, setTagsUa] = useState<string[]>([]);
+  const [tagsEn, setTagsEn] = useState<string[]>([]);
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
   const [projectCover, setProjectCover] = useState<string | null>(null);
   const [workGalleryItems, setWorkGalleryItems] = useState<ProjectWorkMediaItem[]>([]);
@@ -178,8 +178,8 @@ export default function ProjectCreating() {
         setProjectNameEn(project.title.en ?? "");
         setDescriptionUa(project.shortDescription.uk ?? "");
         setDescriptionEn(project.shortDescription.en ?? "");
-        setTagsUa(project.tags.uk ?? "");
-        setTagsEn(project.tags.en ?? "");
+        setTagsUa(project.tags.uk ?? []);
+        setTagsEn(project.tags.en ?? []);
         setProjectCover(project.coverUrl);
         setWorkGalleryItems(finalResultToGalleryItems(project.finalResult));
         setAdditionalBlocks(contentBlocksToAdditionalBlocks(project.contentBlocks));
@@ -259,8 +259,8 @@ export default function ProjectCreating() {
         setProjectNameEn("");
         setDescriptionUa("");
         setDescriptionEn("");
-        setTagsUa("");
-        setTagsEn("");
+        setTagsUa([]);
+        setTagsEn([]);
         setSelectedArtField(null);
         setProjectCover(null);
         setWorkGalleryItems([]);
@@ -517,8 +517,8 @@ export default function ProjectCreating() {
       content_blocks: contentBlocks.length ? contentBlocks : undefined,
       parameters: parameterCatalog.length ? buildParametersPayload() : undefined,
       tags: {
-        uk: tagsUa?.trim() || undefined,
-        en: tagsEn?.trim() || undefined,
+        uk: tagsUa.length ? tagsUa : undefined,
+        en: tagsEn.length ? tagsEn : undefined,
       },
       sold_externally: isSoldExternally,
     };
@@ -531,8 +531,8 @@ export default function ProjectCreating() {
     setProjectNameEn("");
     setDescriptionUa("");
     setDescriptionEn("");
-    setTagsUa("");
-    setTagsEn("");
+    setTagsUa([]);
+    setTagsEn([]);
     setSelectedArtField(null);
     setProjectCover(null);
     setWorkGalleryItems([]);
