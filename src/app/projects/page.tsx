@@ -6,208 +6,318 @@ import Header from "../../components/Header";
 import LatestNews from "../../components/LatestNews";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
-import FilterSection from "../../components/filters/FilterSection";
-import FiltersButton from "../../components/filters/FiltersButton";
-import FiltersModal from "../../components/filters/FiltersModal";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
-import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
-import { projectsFilters } from "../../components/filters/filterConfig";
+import FiltersButton from "../../components/filters/FiltersButton";
+import { FilterChip } from "../../components/filters/filterChipUtils";
 import ListOfProjects from "./ListOfProjects";
+import ProjectsFilterSidebar from "./ProjectsFilterSidebar";
 import PaginationSection from "../../components/PaginationSection";
 import Image from "next/image";
-import { projectsData, type SalesStatus } from "../../data/projectsData";
+import {
+    projectsAPI,
+    type ProjectListCardItem,
+    type ProjectsListFilters,
+} from "../../lib/api/projects";
 
 const ITEMS_PER_PAGE = 12;
 
-type SortOption = "Популярні" | "Новіші" | "Давніші";
-
-const parseProjectDate = (dateString: string): number => {
-    const [day, month, year] = dateString.split(".").map(Number);
-    return new Date(year, month - 1, day).getTime();
+const DEFAULT_FILTERS: ProjectsListFilters = {
+    sort_options: [
+        { slug: "newest", name: "Найновіші" },
+        { slug: "popular", name: "Популярні" },
+        { slug: "ending_soon", name: "Скоро завершуються" },
+    ],
+    categories: [],
+    statuses: [],
+    parameters: [],
 };
 
 export default function ProjectsPage() {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortOption, setSortOption] = useState<SortOption>("Популярні");
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
+
     const searchQueryParam = searchParams.get("search") ?? "";
-
-    const artFieldsSection = projectsFilters.find((section) => section.id === "art-fields");
-    const artItems =
-        artFieldsSection?.subsections?.flatMap((sub) => sub.items ?? []) ?? [];
-
-    const salesSection = projectsFilters.find((section) => section.id === "sales");
-    const salesItems = salesSection?.items ?? [];
-
-    const allowedArtCategoryIds = new Set(artItems.map((item) => item.id));
-    const selectedArtCategoryIds = searchParams
-        .getAll("art_subcategory")
-        .filter((value) => allowedArtCategoryIds.has(value));
-
-    const allowedSalesStatusIds = new Set(salesItems.map((item) => item.id));
-    const salesStatusParam = searchParams.get("sales_status");
-    const selectedSalesStatus =
-        salesStatusParam && allowedSalesStatusIds.has(salesStatusParam)
-            ? (salesStatusParam as SalesStatus)
-            : null;
+    const artCategoryParam = searchParams.get("art_category") ?? "";
+    const subcategoryParam = searchParams.get("art_subcategory") ?? "";
+    const selectedSubcategories = subcategoryParam ? subcategoryParam.split(",").filter(Boolean) : [];
+    const statusParam = searchParams.get("status") ?? "";
+    const selectedStatuses = statusParam ? statusParam.split(",").filter(Boolean) : [];
+    const parameterValueParam = searchParams.get("parameter_value_id") ?? "";
+    const selectedParameterValueIds = parameterValueParam ? parameterValueParam.split(",").filter(Boolean) : [];
+    const sortBy = searchParams.get("sort_by") ?? "newest";
+    const currentPage = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
     const [searchInput, setSearchInput] = useState(searchQueryParam);
+    const [projects, setProjects] = useState<ProjectListCardItem[]>([]);
+    const [meta, setMeta] = useState({ current_page: 1, last_page: 1, per_page: ITEMS_PER_PAGE, total: 0 });
+    const [filtersData, setFiltersData] = useState<ProjectsListFilters>(DEFAULT_FILTERS);
+    const [loading, setLoading] = useState(true);
+    const [hasLoaded, setHasLoaded] = useState(false);
 
     useEffect(() => {
         setSearchInput(searchQueryParam);
     }, [searchQueryParam]);
 
-    const initialSelectedFilters: Record<string, boolean> = {
-        ...Object.fromEntries(
-            artItems.map((item) => [item.id, selectedArtCategoryIds.includes(item.id)])
-        ),
-        ...Object.fromEntries(
-            salesItems.map((item) => [item.id, selectedSalesStatus === item.id])
-        ),
+    useEffect(() => {
+        let ignore = false;
+
+        const fetchProjects = async () => {
+            setLoading(true);
+            try {
+                const result = await projectsAPI.browse({
+                    page: currentPage,
+                    per_page: ITEMS_PER_PAGE,
+                    ...(artCategoryParam ? { art_category: artCategoryParam } : {}),
+                    ...(selectedSubcategories.length ? { art_subcategory: selectedSubcategories.join(",") } : {}),
+                    ...(selectedStatuses.length ? { status: selectedStatuses.join(",") } : {}),
+                    ...(selectedParameterValueIds.length
+                        ? { parameter_value_id: selectedParameterValueIds.join(",") }
+                        : {}),
+                    ...(sortBy ? { sort_by: sortBy } : {}),
+                    ...(searchQueryParam ? { search: searchQueryParam } : {}),
+                });
+
+                if (ignore) return;
+                setProjects(result.data);
+                setMeta(result.meta);
+                setFiltersData(result.filters);
+            } catch (error) {
+                if (ignore) return;
+                console.error("Failed to load projects:", error);
+                setProjects([]);
+            } finally {
+                if (!ignore) {
+                    setLoading(false);
+                    setHasLoaded(true);
+                }
+            }
+        };
+
+        fetchProjects();
+        return () => {
+            ignore = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        currentPage,
+        artCategoryParam,
+        subcategoryParam,
+        statusParam,
+        parameterValueParam,
+        sortBy,
+        searchQueryParam,
+    ]);
+
+    const pushParams = (mutate: (params: URLSearchParams) => void, resetPage = true) => {
+        const params = new URLSearchParams(searchParams.toString());
+        mutate(params);
+        if (resetPage) {
+            params.delete("page");
+        }
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
-    const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
+    // Клік по батьківській категорії скидає підкатегорії й обрані параметри —
+    // вони належать попередньому вибору і більше не актуальні.
+    const handleCategoryClick = (slug: string | null) => {
+        pushParams((params) => {
+            if (slug) {
+                params.set("art_category", slug);
+            } else {
+                params.delete("art_category");
+            }
+            params.delete("art_subcategory");
+            params.delete("parameter_value_id");
+        });
+    };
 
-    const filteredProjectsByCategory = selectedArtCategoryIds.length
-        ? projectsData.filter((project) => selectedArtCategoryIds.includes(project.artSubCategory))
-        : projectsData;
+    // Підкатегорії — мультивибір (чекбокси в бічній панелі й пілюлі зверху
+    // керують тим самим станом), скидаємо обрані параметри при будь-якій зміні.
+    const handleSubcategoryToggle = (slug: string) => {
+        pushParams((params) => {
+            const next = selectedSubcategories.includes(slug)
+                ? selectedSubcategories.filter((s) => s !== slug)
+                : [...selectedSubcategories, slug];
+            if (next.length) {
+                params.set("art_subcategory", next.join(","));
+            } else {
+                params.delete("art_subcategory");
+            }
+            params.delete("parameter_value_id");
+        });
+    };
 
-    const filteredProjectsBySales = selectedSalesStatus
-        ? filteredProjectsByCategory.filter((project) => project.salesStatus === selectedSalesStatus)
-        : filteredProjectsByCategory;
+    const handleParameterValueToggle = (valueId: number) => {
+        pushParams((params) => {
+            const id = String(valueId);
+            const next = selectedParameterValueIds.includes(id)
+                ? selectedParameterValueIds.filter((v) => v !== id)
+                : [...selectedParameterValueIds, id];
+            if (next.length) {
+                params.set("parameter_value_id", next.join(","));
+            } else {
+                params.delete("parameter_value_id");
+            }
+        });
+    };
 
-    const filteredProjects = normalizedSearchQuery
-        ? filteredProjectsBySales.filter((project) => {
-            const titleMatch = project.title.toLowerCase().includes(normalizedSearchQuery);
-            const authorMatch = project.authorName.toLowerCase().includes(normalizedSearchQuery);
-            return titleMatch || authorMatch;
-        })
-        : filteredProjectsBySales;
+    const handleStatusToggle = (slug: string) => {
+        pushParams((params) => {
+            const next = selectedStatuses.includes(slug)
+                ? selectedStatuses.filter((s) => s !== slug)
+                : [...selectedStatuses, slug];
+            if (next.length) {
+                params.set("status", next.join(","));
+            } else {
+                params.delete("status");
+            }
+        });
+    };
 
-    const sortedProjects = [...filteredProjects].sort((a, b) => {
-        if (sortOption === "Популярні") {
-            return b.likes - a.likes;
-        }
-
-        const aDate = parseProjectDate(a.date);
-        const bDate = parseProjectDate(b.date);
-
-        if (sortOption === "Новіші") {
-            return bDate - aDate;
-        }
-
-        return aDate - bDate;
-    });
-
-    const hasResults = sortedProjects.length > 0;
-    const totalPages = hasResults ? Math.ceil(sortedProjects.length / ITEMS_PER_PAGE) : 0;
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentProjects = sortedProjects.slice(startIndex, endIndex);
+    const handleSortSelect = (slug: string) => {
+        setIsSortOpen(false);
+        pushParams((params) => {
+            params.set("sort_by", slug);
+        }, false);
+    };
 
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        pushParams((params) => {
+            if (page > 1) {
+                params.set("page", String(page));
+            } else {
+                params.delete("page");
+            }
+        }, false);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handleSortChange = (option: SortOption) => {
-        setSortOption(option);
-        setIsSortOpen(false);
-    };
-
-    const handleFilterChange = (filters: Record<string, boolean>) => {
-        setCurrentPage(1);
-
-        const selectedArtIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!filters[id]);
-
-        const selectedSalesId = salesItems
-            .map((item) => item.id)
-            .find((id) => !!filters[id]);
-
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete("art_subcategory");
-        params.delete("sales_status");
-
-        selectedArtIds.forEach((id) => {
-            params.append("art_subcategory", id);
-        });
-
-        if (selectedSalesId) {
-            params.set("sales_status", selectedSalesId);
-        }
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
-    };
-
-    const selectedFilterChips = buildFilterChips(projectsFilters, initialSelectedFilters);
-
-    const handleRemoveFilter = (chipId: string) => {
-        handleFilterChange(removeFilterFromState(chipId, initialSelectedFilters, projectsFilters));
-    };
-
-    const handleClearAllFilters = () => {
-        handleFilterChange(getClearedFiltersState(projectsFilters));
-    };
-
-    const getModalResultCount = (filters: Record<string, boolean>) => {
-        const selectedArtIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!filters[id]);
-
-        const selectedSalesId = salesItems
-            .map((item) => item.id)
-            .find((id) => !!filters[id]);
-
-        let result = selectedArtIds.length
-            ? projectsData.filter((project) => selectedArtIds.includes(project.artSubCategory))
-            : projectsData;
-
-        if (selectedSalesId) {
-            result = result.filter((project) => project.salesStatus === selectedSalesId);
-        }
-
-        if (normalizedSearchQuery) {
-            result = result.filter((project) => {
-                const titleMatch = project.title.toLowerCase().includes(normalizedSearchQuery);
-                const authorMatch = project.authorName.toLowerCase().includes(normalizedSearchQuery);
-                return titleMatch || authorMatch;
-            });
-        }
-
-        return result.length;
-    };
-
     const handleSearch = () => {
-        const params = new URLSearchParams(searchParams.toString());
-        const trimmedValue = searchInput.trim();
-
-        if (trimmedValue) {
-            params.set("search", trimmedValue);
-        } else {
-            params.delete("search");
-        }
-
-        setCurrentPage(1);
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        pushParams((params) => {
+            const trimmed = searchInput.trim();
+            if (trimmed) {
+                params.set("search", trimmed);
+            } else {
+                params.delete("search");
+            }
+        });
     };
 
     const handleClearSearch = () => {
         setSearchInput("");
-
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete("search");
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        pushParams((params) => {
+            params.delete("search");
+        });
     };
+
+    const handleClearAllFilters = () => {
+        pushParams((params) => {
+            params.delete("art_category");
+            params.delete("art_subcategory");
+            params.delete("parameter_value_id");
+            params.delete("status");
+        });
+    };
+
+    const activeCategory = filtersData.categories.find((c) => c.slug === artCategoryParam);
+    const categoryNameMap = Object.fromEntries(filtersData.categories.map((c) => [c.slug, c.name]));
+    const subcategoryNameMap = Object.fromEntries(
+        filtersData.categories.flatMap((c) => c.subcategories.map((s) => [s.slug, s.name]))
+    );
+    const statusNameMap = Object.fromEntries(filtersData.statuses.map((s) => [s.slug, s.name]));
+    const parameterValueNameMap = Object.fromEntries(
+        filtersData.parameters.flatMap((p) => p.values.map((v) => [String(v.id), v.value]))
+    );
+
+    const selectedFilterChips: FilterChip[] = [
+        ...(artCategoryParam
+            ? [{ id: `art_category:${artCategoryParam}`, label: categoryNameMap[artCategoryParam] ?? artCategoryParam }]
+            : []),
+        ...selectedSubcategories.map((slug) => ({
+            id: `art_subcategory:${slug}`,
+            label: subcategoryNameMap[slug] ?? slug,
+        })),
+        ...selectedStatuses.map((slug) => ({
+            id: `status:${slug}`,
+            label: statusNameMap[slug] ?? slug,
+        })),
+        ...selectedParameterValueIds.map((id) => ({
+            id: `parameter_value_id:${id}`,
+            label: parameterValueNameMap[id] ?? id,
+        })),
+    ];
+
+    const handleRemoveFilterChip = (chipId: string) => {
+        if (chipId.startsWith("art_category:")) {
+            handleCategoryClick(null);
+            return;
+        }
+        if (chipId.startsWith("art_subcategory:")) {
+            handleSubcategoryToggle(chipId.slice("art_subcategory:".length));
+            return;
+        }
+        if (chipId.startsWith("status:")) {
+            handleStatusToggle(chipId.slice("status:".length));
+            return;
+        }
+        if (chipId.startsWith("parameter_value_id:")) {
+            handleParameterValueToggle(Number(chipId.slice("parameter_value_id:".length)));
+        }
+    };
+
+    const normalizedSearchQuery = searchQueryParam.trim();
+    const noSearchResults = hasLoaded && !loading && normalizedSearchQuery && projects.length === 0;
+    const sortOptions = filtersData.sort_options;
+    const activeSortOption = sortOptions.find((option) => option.slug === sortBy) ?? sortOptions[0];
+
+    const sidebar = (
+        <ProjectsFilterSidebar
+            statuses={filtersData.statuses}
+            selectedStatuses={selectedStatuses}
+            onToggleStatus={handleStatusToggle}
+            parameters={filtersData.parameters}
+            selectedParameterValueIds={selectedParameterValueIds}
+            onToggleParameterValue={handleParameterValueToggle}
+        />
+    );
+
+    const sortDropdown = (
+        <div className="relative w-full">
+            <button
+                onClick={() => setIsSortOpen(!isSortOpen)}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-[#343434] font-bold text-sm bg-[#FECC39] hover:bg-white transition-colors"
+            >
+                {activeSortOption?.name}
+                <Image
+                    src="/black_triangle_down.svg"
+                    alt=""
+                    width={12}
+                    height={8}
+                    className={`w-3 h-2 flex-shrink-0 transition-transform ${isSortOpen ? "rotate-180" : ""}`}
+                />
+            </button>
+
+            {isSortOpen && (
+                <div className="absolute top-full right-0 lg:left-0 lg:right-auto w-full z-50 mt-px flex flex-col gap-px">
+                    {sortOptions.map((option) => (
+                        <button
+                            key={option.slug}
+                            onClick={() => handleSortSelect(option.slug)}
+                            className={`block w-full text-left px-3 py-3 font-bold text-sm whitespace-nowrap transition-colors bg-[#343434] ${
+                                sortBy === option.slug ? "text-[#FECC39]" : "text-white hover:text-[#FECC39]"
+                            }`}
+                        >
+                            {option.name}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 
     return (
         <>
@@ -221,7 +331,7 @@ export default function ProjectsPage() {
                     </p>
                 </div>
             )}
-            {normalizedSearchQuery && filteredProjects.length === 0 && (
+            {noSearchResults && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pb-8 px-4">
                     <button
                         type="button"
@@ -236,92 +346,109 @@ export default function ProjectsPage() {
                 </div>
             )}
 
-            {!(normalizedSearchQuery && filteredProjects.length === 0) && (
+            {!noSearchResults && (
                 <>
-                    {/* Main Content Section */}
                     <section className="w-full bg-[#414141] py-8 px-4 sm:px-6 md:px-10 lg:px-20">
-                        <SelectedFiltersBar
-                            chips={selectedFilterChips}
-                            onRemove={handleRemoveFilter}
-                            onClearAll={handleClearAllFilters}
-                        />
-                        <div className="flex flex-col lg:flex-row gap-6">
-                            <div className="hidden lg:block">
-                                <FilterSection
-                                    key={`projects-filters-${selectedArtCategoryIds.slice().sort().join(",") || "all"}-${selectedSalesStatus ?? "all-sales"}`}
-                                    filters={projectsFilters}
-                                    onFilterChange={handleFilterChange}
-                                    initialSelectedFilters={initialSelectedFilters}
+                        {/* Категорії мистецтва зверху сторінки */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            <button
+                                type="button"
+                                onClick={() => handleCategoryClick(null)}
+                                className={`px-5 py-3 font-bold text-[13px] leading-[18px] whitespace-nowrap transition-colors ${
+                                    !artCategoryParam
+                                        ? "bg-[#FECC39] text-[#272727]"
+                                        : "bg-[#343434] text-[#FECC39] hover:bg-[#2a2a2a]"
+                                }`}
+                            >
+                                Усі
+                            </button>
+                            {filtersData.categories.map((category) => (
+                                <button
+                                    key={category.slug}
+                                    type="button"
+                                    onClick={() => handleCategoryClick(category.slug)}
+                                    className={`px-5 py-3 font-bold text-[13px] leading-[18px] whitespace-nowrap transition-colors ${
+                                        artCategoryParam === category.slug
+                                            ? "bg-[#FECC39] text-[#272727]"
+                                            : "bg-[#343434] text-[#FECC39] hover:bg-[#2a2a2a]"
+                                    }`}
+                                >
+                                    {category.name}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Підкатегорії обраної категорії — той самий стан, що й чекбокси в сайдбарі */}
+                        {!!activeCategory?.subcategories.length && (
+                            <div className="flex flex-wrap gap-x-5 gap-y-2 mb-5">
+                                {activeCategory.subcategories.map((sub) => (
+                                    <button
+                                        key={sub.slug}
+                                        type="button"
+                                        onClick={() => handleSubcategoryToggle(sub.slug)}
+                                        className={`font-wix text-sm leading-5 transition-colors ${
+                                            selectedSubcategories.includes(sub.slug)
+                                                ? "text-[#FECC39]"
+                                                : "text-white hover:text-[#FECC39]"
+                                        }`}
+                                    >
+                                        {sub.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Чіпи фільтрів і сортування — один рядок над сайдбаром/контентом, як у save-art
+                            (там .active_filters і .sort_list — flex-сусіди з justify-content: space-between). */}
+                        <div className="relative z-30 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4 lg:mb-6">
+                            <div className="min-w-0">
+                                <SelectedFiltersBar
+                                    chips={selectedFilterChips}
+                                    onRemove={handleRemoveFilterChip}
+                                    onClearAll={handleClearAllFilters}
                                 />
                             </div>
+                            <div className="hidden lg:block relative lg:w-[260px] lg:flex-shrink-0">
+                                {sortDropdown}
+                            </div>
+                        </div>
 
-                            {/* Right Side - Sorting and Projects */}
-                            <div className="flex-1 w-full">
-                                <div className="relative z-30 flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6">
+                        <div className="flex flex-col lg:flex-row gap-6">
+                            <div className="hidden lg:block">{sidebar}</div>
+
+                            <div className="flex-1 w-full min-w-0">
+                                <div className="relative z-30 flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6 lg:hidden">
                                     <FiltersButton
                                         className="lg:hidden"
-                                        onClick={() => setIsMobileFiltersOpen(true)}
+                                        onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
                                         isActive={isMobileFiltersOpen}
                                         selectedCount={selectedFilterChips.length}
                                     />
-                                    <div className="relative ml-auto lg:ml-0">
-                                        <button
-                                            onClick={() => setIsSortOpen(!isSortOpen)}
-                                            className="flex items-center gap-1 md:gap-2 h-[44px] md:h-[48px] lg:h-auto px-2 md:px-3 lg:px-4 lg:py-3 text-white font-bold text-sm md:text-base bg-[#343434] hover:text-[#FECC39] transition-colors"
-                                        >
-                                            {sortOption}
-                                            <Image
-                                                src={isSortOpen ? "/yellow_triangle_up.svg" : "/white_triangle_down.svg"}
-                                                alt=""
-                                                width={24}
-                                                height={24}
-                                                className="w-[18px] h-[18px] lg:w-6 lg:h-6 flex-shrink-0"
-                                            />
-                                        </button>
-
-                                        {isSortOpen && (
-                                            <div className="absolute top-full right-0 lg:left-0 lg:right-auto min-w-full w-max z-50 mt-0 lg:mt-1 bg-[#343434] border-2 border-[#1a1a1a]">
-                                                {(["Популярні", "Новіші", "Давніші"] as SortOption[]).map((option) => (
-                                                    <button
-                                                        key={option}
-                                                        onClick={() => handleSortChange(option)}
-                                                        className={`block w-full text-left px-2 md:px-3 lg:px-4 py-2 md:py-3 font-bold text-sm md:text-base whitespace-nowrap transition-colors border-b border-[#1a1a1a] last:border-b-0 ${
-                                                            sortOption === option
-                                                                ? "text-[#FECC39] bg-[#414141]"
-                                                                : "text-white hover:text-[#FECC39] hover:bg-[#414141]"
-                                                        }`}
-                                                    >
-                                                        {option}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
+                                    <div className="relative ml-auto w-[260px] flex-shrink-0">
+                                        {sortDropdown}
                                     </div>
                                 </div>
 
-                                {/* Projects Grid */}
-                                <ListOfProjects projects={currentProjects} disableInteractions={isSortOpen} />
+                                {isMobileFiltersOpen && <div className="lg:hidden mb-6">{sidebar}</div>}
+
+                                {loading && !hasLoaded ? (
+                                    <div className="w-full min-h-[420px] flex items-center justify-center">
+                                        <p className="font-wix text-white text-lg md:text-2xl">Завантаження...</p>
+                                    </div>
+                                ) : (
+                                    <ListOfProjects projects={projects} disableInteractions={isSortOpen} />
+                                )}
                             </div>
                         </div>
                     </section>
-                    {hasResults && (
+                    {meta.last_page > 1 && (
                         <PaginationSection
-                            currentPage={currentPage}
-                            totalPages={totalPages}
+                            currentPage={meta.current_page}
+                            totalPages={meta.last_page}
                             onPageChange={handlePageChange}
                         />
                     )}
                 </>
-            )}
-            {isMobileFiltersOpen && (
-                <FiltersModal
-                    onClose={() => setIsMobileFiltersOpen(false)}
-                    filters={projectsFilters}
-                    initialSelectedFilters={initialSelectedFilters}
-                    getResultCount={getModalResultCount}
-                    onApply={handleFilterChange}
-                    onCancel={handleClearAllFilters}
-                />
             )}
             <LatestNews />
             <JoinCommunityWrapper />

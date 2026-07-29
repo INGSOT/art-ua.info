@@ -15,11 +15,11 @@ export default function SelectedFiltersBar({ chips, onRemove, onClearAll }: Sele
     }
 
     return (
-        <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="flex flex-wrap items-center gap-2 mb-4">
             <button
                 type="button"
                 onClick={onClearAll}
-                className="text-[#FECC39] font-normal text-sm md:text-base underline hover:opacity-80 transition-opacity"
+                className="font-wix text-[#FECC39] font-normal text-xs leading-4 underline hover:opacity-80 transition-opacity"
             >
                 Скинути все
             </button>
@@ -27,9 +27,9 @@ export default function SelectedFiltersBar({ chips, onRemove, onClearAll }: Sele
             {chips.map((chip) => (
                 <div
                     key={chip.id}
-                    className="flex items-center gap-2 bg-[#343434] px-3 py-2"
+                    className="flex items-center gap-1.5 bg-[#343434] px-2 py-1.5"
                 >
-                    <span className="text-white font-bold text-sm md:text-base whitespace-nowrap">
+                    <span className="font-wix text-white font-normal text-xs leading-4 whitespace-nowrap">
                         {chip.label}
                     </span>
                     <button
@@ -41,8 +41,8 @@ export default function SelectedFiltersBar({ chips, onRemove, onClearAll }: Sele
                         <Image
                             src="/yellow_cross.svg"
                             alt=""
-                            width={16}
-                            height={16}
+                            width={12}
+                            height={12}
                         />
                     </button>
                 </div>
