@@ -11,14 +11,18 @@ interface ProjectPublicationProps {
   // сама сторінка (ProjectCreating) відповідає за розбір 422-помилок по полях і
   // перемикання на вкладку з помилкою.
   onPublish: () => Promise<{ type: "success" | "error"; text: string }>;
+  onSaveDraft: () => Promise<{ type: "success" | "error"; text: string }>;
+  onDelete: () => Promise<{ type: "success" | "error"; text: string }>;
 }
 
-export default function ProjectPublication({ onPublish }: ProjectPublicationProps) {
+export default function ProjectPublication({ onPublish, onSaveDraft, onDelete }: ProjectPublicationProps) {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isTermsHovered, setIsTermsHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
   const [isDraftHovered, setIsDraftHovered] = useState(false);
   const [isPublishHovered, setIsPublishHovered] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [notification, setNotification] = useState<{ type: "error" | "success"; text: string } | null>(null);
 
   const handlePublish = async (e: React.FormEvent) => {
@@ -37,6 +41,23 @@ export default function ProjectPublication({ onPublish }: ProjectPublicationProp
     if (result.type === "success") {
       setAcceptedTerms(false);
     }
+  };
+
+  const handleSaveDraftClick = async () => {
+    setNotification(null);
+    setIsSavingDraft(true);
+    const result = await onSaveDraft();
+    setIsSavingDraft(false);
+    setNotification(result);
+  };
+
+  const handleDeleteClick = async () => {
+    if (!window.confirm("Видалити проєкт? Цю дію не можна скасувати.")) return;
+    setNotification(null);
+    setIsDeleting(true);
+    const result = await onDelete();
+    setIsDeleting(false);
+    setNotification(result);
   };
 
   return (
@@ -91,9 +112,11 @@ export default function ProjectPublication({ onPublish }: ProjectPublicationProp
         {/* Delete Button */}
         <button
           type="button"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
           onMouseEnter={() => setIsDeleteHovered(true)}
           onMouseLeave={() => setIsDeleteHovered(false)}
-          className={`h-[60px] flex items-stretch transition-all duration-300 w-full md:flex-1 ${
+          className={`h-[60px] flex items-stretch transition-all duration-300 w-full md:flex-1 disabled:opacity-60 ${
             isDeleteHovered ? "bg-[#FECC39]" : "bg-[#343434]"
           }`}
         >
@@ -121,9 +144,11 @@ export default function ProjectPublication({ onPublish }: ProjectPublicationProp
         {/* Save Draft Button */}
         <button
           type="button"
+          onClick={handleSaveDraftClick}
+          disabled={isSavingDraft}
           onMouseEnter={() => setIsDraftHovered(true)}
           onMouseLeave={() => setIsDraftHovered(false)}
-          className={`h-[60px] flex items-stretch transition-all duration-300 w-full md:flex-1 ${
+          className={`h-[60px] flex items-stretch transition-all duration-300 w-full md:flex-1 disabled:opacity-60 ${
             isDraftHovered ? "bg-[#FECC39]" : "bg-[#343434]"
           }`}
         >

@@ -10,11 +10,17 @@ function absoluteUrl(path: string | null | undefined): string | null {
 }
 
 // Зворотне до absoluteUrl: перед відправкою на бекенд вже завантажене (не base64)
-// зображення повертаємо у відносний шлях — інакше бекенд збереже абсолютний URL
-// "як є" і задвоїть домен при наступному Storage::url() на цьому ж полі.
+// зображення повертаємо у "голий" шлях відносно диску (без домену й без "/storage" —
+// саме так шлях зберігається в БД, а Storage::url() сам додає "/storage" при читанні).
+// Якщо цього не зробити, "/storage" задвоюється на кожному наступному збереженні.
 export function toApiRelativePath(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
-  return url.startsWith(API_BASE) ? url.slice(API_BASE.length) : url;
+  const relative = url.startsWith(API_BASE) ? url.slice(API_BASE.length) : url;
+  const segments = relative.split("/").filter(Boolean);
+  while (segments[0] === "storage") {
+    segments.shift();
+  }
+  return segments.join("/");
 }
 
 export interface PublicProjectListItem {
@@ -50,9 +56,21 @@ export interface CreateProjectResponse {
   status: string;
 }
 
+// Додаткова інформація про проєкт — блоки заголовок/текст/зображення/посилання
+// (точний аналог content_blocks-редактора з save-art).
 export interface ArtUaInfoContentBlock {
-  type: "paragraph" | "image" | "link";
+  type: "heading" | "paragraph" | "image" | "link";
+  heading_level?: string;
+  heading_text?: { uk?: string; en?: string };
   paragraph_text?: { uk?: string; en?: string };
+  image?: string;
+  url?: string;
+}
+
+// Робота (галерея зображень + посилання на відео), яку показуємо в прев'ю проєкту —
+// окреме поле final_result, не плутати з content_blocks (додатковою інформацією).
+export interface ArtUaInfoFinalResultItem {
+  type: "image" | "link";
   image?: string;
   url?: string;
 }
@@ -67,12 +85,15 @@ export interface CreateArtUaInfoProjectPayload {
   status?: "new" | "draft" | "moderation";
   user_type: "personal" | "legal";
   title: { uk: string; en?: string };
+  short_description?: { uk?: string; en?: string };
   art_category?: string;
   art_subcategory?: string;
   parameters?: ArtUaInfoParameterAnswer[];
   cover?: string | null;
+  final_result?: ArtUaInfoFinalResultItem[];
   content_blocks?: ArtUaInfoContentBlock[];
   tags?: { uk?: string; en?: string };
+  sold_externally?: boolean;
 }
 
 // Оновлення (без status — редагування не змінює completed/approved)
@@ -89,8 +110,16 @@ export interface Bilingual {
 }
 
 export interface MyProjectContentBlock {
-  type: "paragraph" | "image" | "link";
+  type: "heading" | "paragraph" | "image" | "link";
+  heading_level?: string | null;
+  heading_text?: Bilingual | null;
   paragraph_text?: Bilingual | null;
+  image?: string | null;
+  url?: string | null;
+}
+
+export interface MyProjectFinalResultItem {
+  type: "image" | "link";
   image?: string | null;
   url?: string | null;
 }
@@ -108,12 +137,15 @@ export interface MyProjectDetail {
   source: "save_art" | "art_ua_info";
   status: string;
   title: Bilingual;
+  shortDescription: Bilingual;
   artCategory: string | null;
   artSubcategory: string | null;
   tags: Bilingual;
   coverUrl: string | null;
   authorType: "personal" | "legal" | string;
   contentBlocks: MyProjectContentBlock[];
+  finalResult: MyProjectFinalResultItem[];
+  soldExternally: boolean;
   parameters: MyProjectParameterAnswer[];
 }
 
@@ -123,12 +155,15 @@ interface RawMyProjectDetail {
   source: "save_art" | "art_ua_info";
   status: string;
   title: Bilingual | null;
+  short_description: Bilingual | null;
   art_category: string | null;
   art_subcategory: string | null;
   tags: Bilingual | null;
   cover_url: string | null;
   author: { type: string };
+  sold_externally: boolean;
   content_blocks: MyProjectContentBlock[] | null;
+  final_result: MyProjectFinalResultItem[] | null;
   parameters: MyProjectParameterAnswer[] | null;
 }
 
@@ -240,6 +275,12 @@ export const projectsAPI = {
     return response.data.data;
   },
 
+  // Видалення проєкту/чернетки — той самий Project, що й у save-art,
+  // тож переюзаємо спільний ендпоінт DELETE /v1/my/projects/{slug}.
+  myDelete: async (slug: string): Promise<void> => {
+    await api.delete(`/v1/my/projects/${slug}`);
+  },
+
   // Повні (нелокалізовані, {uk, en}) дані власного проєкту для форми редагування —
   // GET /v1/my/projects/{slug} без ?language.
   myShow: async (slug: string): Promise<MyProjectDetail> => {
@@ -251,6 +292,7 @@ export const projectsAPI = {
       source: raw.source,
       status: raw.status,
       title: raw.title ?? {},
+      shortDescription: raw.short_description ?? {},
       artCategory: raw.art_category,
       artSubcategory: raw.art_subcategory,
       tags: raw.tags ?? {},
@@ -259,6 +301,10 @@ export const projectsAPI = {
       contentBlocks: (raw.content_blocks ?? []).map((block) =>
         block.type === "image" ? { ...block, image: absoluteUrl(block.image) } : block
       ),
+      finalResult: (raw.final_result ?? []).map((item) =>
+        item.type === "image" ? { ...item, image: absoluteUrl(item.image) } : item
+      ),
+      soldExternally: Boolean(raw.sold_externally),
       parameters: raw.parameters ?? [],
     };
   },
@@ -355,6 +401,7 @@ export interface PublicProjectDetail {
   author: ProjectAuthor;
   additionalInfo: string;
   contentBlocks: ProjectContentBlock[];
+  finalResult: { type: "image" | "link"; image: string | null; url: string | null }[];
   stages: ProjectStage[];
   bonuses: ProjectBonus[];
   parameters: ProjectParameterValue[];
@@ -449,6 +496,7 @@ interface RawProjectDetail {
   author: RawProjectAuthor;
   additional_info: LocalizedText | null;
   content_blocks: RawProjectContentBlock[] | null;
+  final_result: { type: "image" | "link"; image?: string | null; url?: string | null }[] | null;
   stages: RawProjectStage[];
   bonuses: RawProjectBonus[];
   parameters: RawProjectParameter[];
@@ -509,6 +557,11 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
       imageAlt: localize(block.image_alt),
       imageCaption: localize(block.image_caption),
       url: block.url,
+    })),
+    finalResult: (raw.final_result ?? []).map((item) => ({
+      type: item.type,
+      image: absoluteUrl(item.image),
+      url: item.url ?? null,
     })),
     stages: (raw.stages ?? []).map((stage) => ({
       id: stage.id,

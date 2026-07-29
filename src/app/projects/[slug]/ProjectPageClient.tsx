@@ -123,7 +123,7 @@ export default function ProjectPageClient({ project }: ProjectPageClientProps) {
 
           {canEdit && (
             <Link
-              href={`/profile/${user!.slug}/create-project?edit=${project.slug}`}
+              href={`/profile/${user!.slug}/edit-project?edit=${project.slug}`}
               className="flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors mb-8"
             >
               <span className="flex items-center justify-center flex-1 px-6 font-bold text-[#343434] whitespace-nowrap">

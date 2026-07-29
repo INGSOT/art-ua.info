@@ -10,9 +10,12 @@ import {
   projectsAPI,
   toApiRelativePath,
   type ArtUaInfoContentBlock,
+  type ArtUaInfoFinalResultItem,
   type ArtUaInfoParameterAnswer,
+  type MyProjectContentBlock,
 } from "../../../../lib/api/projects";
 import { getApiErrorMessage, getApiFieldErrors } from "../../../../lib/apiError";
+import { withProfileId } from "../../../../lib/authorQuery";
 import { catalogsAPI, type Parameter } from "../../../../lib/api/catalogs";
 import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 import AddProjectCover from "./AddProjectCover";
@@ -28,6 +31,8 @@ import MediaSection from "./MediaSection";
 import DescriptionSection from "./DescriptionSection";
 import SpecificationsSection, { type ParameterAnswers } from "./SpecificationsSection";
 import SoldProject from "./SoldProject";
+import ContentBlocksSection from "./ContentBlocksSection";
+import type { AdditionalContentBlock } from "./additionalContentBlock";
 import PublicationPreviewSection from "./PublicationPreviewSection";
 import ProjectPublication from "./ProjectPublication";
 
@@ -47,20 +52,49 @@ function findSubcategoryLabel(subcategoryId: string | null | undefined): string 
   return undefined;
 }
 
-// content_blocks з бекенду (image/link) -> елементи галереї роботи візарда.
-// "paragraph"-блоки цей майстер сам не створює (лише image/link), тож ігноруємо їх при завантаженні.
-function contentBlocksToGalleryItems(
-  blocks: { type: string; image?: string | null; url?: string | null }[]
+// final_result з бекенду (image/link) -> елементи галереї роботи візарда.
+function finalResultToGalleryItems(
+  items: { type: string; image?: string | null; url?: string | null }[]
 ): ProjectWorkMediaItem[] {
-  const items: ProjectWorkMediaItem[] = [];
-  for (const block of blocks) {
-    if (block.type === "image" && block.image) {
-      items.push({ kind: "image", src: block.image });
-    } else if (block.type === "link" && block.url) {
-      items.push({ kind: "video", url: block.url });
+  const gallery: ProjectWorkMediaItem[] = [];
+  for (const item of items) {
+    if (item.type === "image" && item.image) {
+      gallery.push({ kind: "image", src: item.image });
+    } else if (item.type === "link" && item.url) {
+      gallery.push({ kind: "video", url: item.url });
     }
   }
-  return items;
+  return gallery;
+}
+
+// content_blocks з бекенду (заголовок/текст/зображення/посилання) -> блоки редактора
+// додаткової інформації.
+function contentBlocksToAdditionalBlocks(
+  blocks: MyProjectContentBlock[]
+): AdditionalContentBlock[] {
+  const result: AdditionalContentBlock[] = [];
+  blocks.forEach((block, index) => {
+    if (block.type === "heading") {
+      result.push({
+        id: index,
+        type: "heading",
+        headingUk: block.heading_text?.uk ?? "",
+        headingEn: block.heading_text?.en ?? "",
+      });
+    } else if (block.type === "paragraph") {
+      result.push({
+        id: index,
+        type: "paragraph",
+        paragraphUk: block.paragraph_text?.uk ?? "",
+        paragraphEn: block.paragraph_text?.en ?? "",
+      });
+    } else if (block.type === "image" && block.image) {
+      result.push({ id: index, type: "image", image: block.image });
+    } else if (block.type === "link" && block.url) {
+      result.push({ id: index, type: "link", url: block.url });
+    }
+  });
+  return result;
 }
 
 // Бекенд-ключі полів (з 422-відповіді POST /v1/art-ua-info/projects), згруповані по
@@ -69,7 +103,8 @@ function contentBlocksToGalleryItems(
 const TAB_FIELD_KEYS: Partial<Record<NewProjectTab, string[]>> = {
   owner: ["user_type"],
   name: ["title", "title.uk", "title.en", "art_category"],
-  media: ["content_blocks"],
+  media: ["final_result"],
+  description: ["short_description", "short_description.uk", "short_description.en"],
   characteristics: ["parameters"],
 };
 
@@ -83,7 +118,7 @@ export default function ProjectCreating() {
     "additional",
     "publication",
   ];
-  const { aboutMe } = useProfileView();
+  const { aboutMe, slug: profileSlug } = useProfileView();
   const router = useRouter();
   const searchParams = useSearchParams();
   const editSlug = searchParams.get("edit");
@@ -115,6 +150,8 @@ export default function ProjectCreating() {
   const [parameterCatalog, setParameterCatalog] = useState<Parameter[]>([]);
   const [isLoadingParameters, setIsLoadingParameters] = useState(false);
   const [parameterAnswers, setParameterAnswers] = useState<ParameterAnswers>({});
+  const [additionalBlocks, setAdditionalBlocks] = useState<AdditionalContentBlock[]>([]);
+  const [isSoldExternally, setIsSoldExternally] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const clearFieldErrors = (keys: string[]) => {
@@ -139,10 +176,14 @@ export default function ProjectCreating() {
         setSelectedOwner(project.authorType === "legal" ? "legal-entity" : "author");
         setProjectNameUa(project.title.uk ?? "");
         setProjectNameEn(project.title.en ?? "");
+        setDescriptionUa(project.shortDescription.uk ?? "");
+        setDescriptionEn(project.shortDescription.en ?? "");
         setTagsUa(project.tags.uk ?? "");
         setTagsEn(project.tags.en ?? "");
         setProjectCover(project.coverUrl);
-        setWorkGalleryItems(contentBlocksToGalleryItems(project.contentBlocks));
+        setWorkGalleryItems(finalResultToGalleryItems(project.finalResult));
+        setAdditionalBlocks(contentBlocksToAdditionalBlocks(project.contentBlocks));
+        setIsSoldExternally(project.soldExternally);
         if (project.artSubcategory) {
           const label = findSubcategoryLabel(project.artSubcategory);
           if (label) setSelectedArtField({ id: project.artSubcategory, label });
@@ -185,6 +226,8 @@ export default function ProjectCreating() {
       selectedArtField,
       projectCover,
       workGalleryItems,
+      additionalBlocks,
+      isSoldExternally,
       parameterAnswers,
     };
     try {
@@ -196,13 +239,13 @@ export default function ProjectCreating() {
       try {
         localStorage.setItem(
           'projectData',
-          JSON.stringify({ ...projectData, projectCover: null, workGalleryItems: [] })
+          JSON.stringify({ ...projectData, projectCover: null, workGalleryItems: [], additionalBlocks: [] })
         );
       } catch {
         // Квота вичерпана навіть без медіа — пропускаємо збереження цього знімку.
       }
     }
-  }, [editSlug, selectedOwner, projectNameUa, projectNameEn, descriptionUa, descriptionEn, tagsUa, tagsEn, selectedArtField, projectCover, workGalleryItems, parameterAnswers]);
+  }, [editSlug, selectedOwner, projectNameUa, projectNameEn, descriptionUa, descriptionEn, tagsUa, tagsEn, selectedArtField, projectCover, workGalleryItems, additionalBlocks, isSoldExternally, parameterAnswers]);
 
   // Check if projectData was deleted from localStorage (after successful submit) and clear form
   useEffect(() => {
@@ -221,6 +264,8 @@ export default function ProjectCreating() {
         setSelectedArtField(null);
         setProjectCover(null);
         setWorkGalleryItems([]);
+        setAdditionalBlocks([]);
+        setIsSoldExternally(false);
         setParameterAnswers({});
         clearInterval(checkIfCleared);
       }
@@ -237,6 +282,16 @@ export default function ProjectCreating() {
   const handleProjectNameEnChange = (value: string) => {
     clearFieldErrors(["title.en"]);
     setProjectNameEn(value);
+  };
+
+  const handleDescriptionUaChange = (value: string) => {
+    clearFieldErrors(["short_description", "short_description.uk"]);
+    setDescriptionUa(value);
+  };
+
+  const handleDescriptionEnChange = (value: string) => {
+    clearFieldErrors(["short_description", "short_description.en"]);
+    setDescriptionEn(value);
   };
 
   const handleSelectArtField = (id: string, label: string) => {
@@ -293,7 +348,7 @@ export default function ProjectCreating() {
   const updateWorkGalleryItems = (
     items: ProjectWorkMediaItem[] | ((prev: ProjectWorkMediaItem[]) => ProjectWorkMediaItem[])
   ) => {
-    clearFieldErrors(["content_blocks"]);
+    clearFieldErrors(["final_result"]);
     setWorkGalleryItems(items);
   };
 
@@ -375,8 +430,22 @@ export default function ProjectCreating() {
     }
 
     if (activeTab === "media" && workGalleryItems.length === 0) {
-      setFieldErrors((prev) => ({ ...prev, content_blocks: ["Додайте роботу."] }));
+      setFieldErrors((prev) => ({ ...prev, final_result: ["Додайте роботу."] }));
       return;
+    }
+
+    if (activeTab === "description") {
+      const errors: Record<string, string[]> = {};
+      if (!descriptionUa.trim()) {
+        errors["short_description.uk"] = ["Введіть опис проєкту українською."];
+      }
+      if (!descriptionEn.trim()) {
+        errors["short_description.en"] = ["Введіть опис проєкту англійською."];
+      }
+      if (Object.keys(errors).length > 0) {
+        setFieldErrors((prev) => ({ ...prev, ...errors }));
+        return;
+      }
     }
 
     if (activeTab === "characteristics") {
@@ -401,32 +470,80 @@ export default function ProjectCreating() {
     }
   };
 
-  const handlePublish = async (): Promise<{ type: "success" | "error"; text: string }> => {
-    // toApiRelativePath: якщо це вже завантажене (не base64) зображення з бекенду,
-    // повертаємо відносний шлях назад — інакше бекенд збереже абсолютний URL "як є"
-    // і задвоїть домен при наступному завантаженні цього ж проєкту.
-    const contentBlocks: ArtUaInfoContentBlock[] = workGalleryItems.map((item) =>
+  // toApiRelativePath: якщо це вже завантажене (не base64) зображення з бекенду,
+  // повертаємо відносний шлях назад — інакше бекенд збереже абсолютний URL "як є"
+  // і задвоїть домен при наступному завантаженні цього ж проєкту.
+  const buildCommonPayload = () => {
+    const finalResult: ArtUaInfoFinalResultItem[] = workGalleryItems.map((item) =>
       item.kind === "image"
         ? { type: "image", image: toApiRelativePath(item.src) }
         : { type: "link", url: item.url }
     );
 
-    const commonPayload = {
+    const contentBlocks: ArtUaInfoContentBlock[] = additionalBlocks.map((block) => {
+      if (block.type === "heading") {
+        return {
+          type: "heading",
+          heading_level: "h2",
+          heading_text: { uk: block.headingUk, en: block.headingEn || undefined },
+        };
+      }
+      if (block.type === "paragraph") {
+        return {
+          type: "paragraph",
+          paragraph_text: { uk: block.paragraphUk, en: block.paragraphEn || undefined },
+        };
+      }
+      if (block.type === "image") {
+        return { type: "image", image: toApiRelativePath(block.image) };
+      }
+      return { type: "link", url: block.url };
+    });
+
+    return {
       user_type: (selectedOwner === "legal-entity" ? "legal" : "personal") as "legal" | "personal",
       title: {
         uk: projectNameUa.trim(),
         en: projectNameEn.trim(),
       },
+      short_description: {
+        uk: descriptionUa.trim() || undefined,
+        en: descriptionEn.trim() || undefined,
+      },
       art_category: findArtCategoryIdForSubcategory(selectedArtField?.id),
       art_subcategory: selectedArtField?.id,
       cover: toApiRelativePath(projectCover || undefined),
+      final_result: finalResult.length ? finalResult : undefined,
       content_blocks: contentBlocks.length ? contentBlocks : undefined,
       parameters: parameterCatalog.length ? buildParametersPayload() : undefined,
       tags: {
         uk: tagsUa?.trim() || undefined,
         en: tagsEn?.trim() || undefined,
       },
+      sold_externally: isSoldExternally,
     };
+  };
+
+  const resetFormState = () => {
+    localStorage.removeItem("projectData");
+    setSelectedOwner(null);
+    setProjectNameUa("");
+    setProjectNameEn("");
+    setDescriptionUa("");
+    setDescriptionEn("");
+    setTagsUa("");
+    setTagsEn("");
+    setSelectedArtField(null);
+    setProjectCover(null);
+    setWorkGalleryItems([]);
+    setAdditionalBlocks([]);
+    setIsSoldExternally(false);
+    setParameterAnswers({});
+    setFieldErrors({});
+  };
+
+  const handlePublish = async (): Promise<{ type: "success" | "error"; text: string }> => {
+    const commonPayload = buildCommonPayload();
 
     try {
       if (editSlug) {
@@ -436,20 +553,7 @@ export default function ProjectCreating() {
       }
 
       await projectsAPI.createArtUaInfoProject({ ...commonPayload, status: "moderation" });
-
-      localStorage.removeItem("projectData");
-      setSelectedOwner(null);
-      setProjectNameUa("");
-      setProjectNameEn("");
-      setDescriptionUa("");
-      setDescriptionEn("");
-      setTagsUa("");
-      setTagsEn("");
-      setSelectedArtField(null);
-      setProjectCover(null);
-      setWorkGalleryItems([]);
-      setParameterAnswers({});
-      setFieldErrors({});
+      resetFormState();
 
       return { type: "success", text: "Проект відправлено на модерацію" };
     } catch (error) {
@@ -468,6 +572,47 @@ export default function ProjectCreating() {
       }
 
       return { type: "error", text: getApiErrorMessage(error, "Помилка при надісланні проекту") };
+    }
+  };
+
+  // Зберегти чернетку: для нового проєкту — POST зі status "draft", для вже
+  // збереженого (editSlug) — звичайне оновлення без зміни статусу (редагування
+  // draft/moderation/rejected не чіпає завершені/продані проєкти, це контролює бекенд).
+  const handleSaveDraft = async (): Promise<{ type: "success" | "error"; text: string }> => {
+    const commonPayload = buildCommonPayload();
+
+    try {
+      if (editSlug) {
+        await projectsAPI.updateArtUaInfoProject(editSlug, commonPayload);
+        return { type: "success", text: "Зміни збережено" };
+      }
+
+      await projectsAPI.createArtUaInfoProject({ ...commonPayload, status: "draft" });
+      resetFormState();
+
+      return { type: "success", text: "Чернетку збережено" };
+    } catch (error) {
+      const errors = getApiFieldErrors(error);
+      if (errors) setFieldErrors(errors);
+      return { type: "error", text: getApiErrorMessage(error, "Не вдалося зберегти чернетку") };
+    }
+  };
+
+  // Видалення проєкту: якщо проєкт ще не збережений на сервері (немає editSlug) —
+  // просто очищаємо локальну форму, інакше видаляємо через спільний ендпоінт
+  // DELETE /v1/my/projects/{slug} (той самий Project, що й у save-art).
+  const handleDelete = async (): Promise<{ type: "success" | "error"; text: string }> => {
+    if (!editSlug) {
+      resetFormState();
+      return { type: "success", text: "Форму очищено" };
+    }
+
+    try {
+      await projectsAPI.myDelete(editSlug);
+      router.push(withProfileId("/profile/projects", profileSlug));
+      return { type: "success", text: "Проєкт видалено" };
+    } catch (error) {
+      return { type: "error", text: getApiErrorMessage(error, "Не вдалося видалити проєкт") };
     }
   };
 
@@ -593,7 +738,7 @@ export default function ProjectCreating() {
           tagsPlaceholder={newProjectTexts.tagsPlaceholder}
           tagsPlaceholderEn={newProjectTexts.tagsPlaceholderEn}
           tagsHint={newProjectTexts.tagsHint}
-          workError={fieldErrors.content_blocks?.[0]}
+          workError={fieldErrors.final_result?.[0]}
           onOpenCoverModal={() => setIsCoverModalOpen(true)}
           onOpenGalleryModal={() => setIsGalleryModalOpen(true)}
           onOpenWorkModal={() => setIsWorkModalOpen(true)}
@@ -606,8 +751,10 @@ export default function ProjectCreating() {
         <DescriptionSection
           descriptionUa={descriptionUa}
           descriptionEn={descriptionEn}
-          onDescriptionUaChange={setDescriptionUa}
-          onDescriptionEnChange={setDescriptionEn}
+          onDescriptionUaChange={handleDescriptionUaChange}
+          onDescriptionEnChange={handleDescriptionEnChange}
+          errorUa={fieldErrors["short_description.uk"]?.[0] || fieldErrors.short_description?.[0]}
+          errorEn={fieldErrors["short_description.en"]?.[0]}
         />
       )}
 
@@ -627,7 +774,12 @@ export default function ProjectCreating() {
         />
       )}
 
-      {activeTab === "additional" && <SoldProject />}
+      {activeTab === "additional" && (
+        <div className="w-full flex flex-col items-center gap-8">
+          <ContentBlocksSection blocks={additionalBlocks} onBlocksChange={setAdditionalBlocks} />
+          <SoldProject isSold={isSoldExternally} onToggle={setIsSoldExternally} />
+        </div>
+      )}
       {activeTab === "publication" && (
         <>
           <PublicationPreviewSection
@@ -638,7 +790,11 @@ export default function ProjectCreating() {
             parameterCatalog={parameterCatalog}
             parameterAnswers={parameterAnswers}
           />
-          <ProjectPublication onPublish={handlePublish} />
+          <ProjectPublication
+            onPublish={handlePublish}
+            onSaveDraft={handleSaveDraft}
+            onDelete={handleDelete}
+          />
         </>
       )}
 

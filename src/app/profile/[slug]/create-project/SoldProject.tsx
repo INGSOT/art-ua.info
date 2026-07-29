@@ -4,8 +4,12 @@ import { useState } from "react";
 import Image from "next/image";
 import { newProjectTexts } from "../../../../data/newProjectData";
 
-export default function SoldProject() {
-  const [isSold, setIsSold] = useState(false);
+interface SoldProjectProps {
+  isSold: boolean;
+  onToggle: (value: boolean) => void;
+}
+
+export default function SoldProject({ isSold, onToggle }: SoldProjectProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -18,7 +22,7 @@ export default function SoldProject() {
       {/* Sold Project Button */}
       <button
         type="button"
-        onClick={() => setIsSold(!isSold)}
+        onClick={() => onToggle(!isSold)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="flex items-center gap-3 px-6 py-4 bg-[#343434] h-[60px] w-full md:w-[320px]"

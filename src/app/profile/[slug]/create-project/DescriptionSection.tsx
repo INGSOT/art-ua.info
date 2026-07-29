@@ -5,6 +5,8 @@ interface DescriptionSectionProps {
   descriptionEn: string;
   onDescriptionUaChange: (value: string) => void;
   onDescriptionEnChange: (value: string) => void;
+  errorUa?: string;
+  errorEn?: string;
 }
 
 export default function DescriptionSection({
@@ -12,6 +14,8 @@ export default function DescriptionSection({
   descriptionEn,
   onDescriptionUaChange,
   onDescriptionEnChange,
+  errorUa,
+  errorEn,
 }: DescriptionSectionProps) {
   const maxCharacters = 500;
   const remainingUa = maxCharacters - descriptionUa.length;
@@ -22,7 +26,7 @@ export default function DescriptionSection({
       <label className="font-wix text-white text-sm">Короткий опис проєкту</label>
 
       <div className="flex flex-col gap-1">
-        <div className="relative">
+        <div className={`relative ${errorUa ? "border-2 border-red-500" : ""}`}>
           <textarea
             value={descriptionUa}
             onChange={(e) => onDescriptionUaChange(e.target.value)}
@@ -34,11 +38,12 @@ export default function DescriptionSection({
             <Image src="/ua.svg" alt="UA" width={24} height={24} />
           </div>
         </div>
+        {errorUa && <p className="text-red-500 text-sm">{errorUa}</p>}
         <p className="text-white text-sm text-right">Залишилось {remainingUa} символів</p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <div className="relative">
+        <div className={`relative ${errorEn ? "border-2 border-red-500" : ""}`}>
           <textarea
             value={descriptionEn}
             onChange={(e) => onDescriptionEnChange(e.target.value)}
@@ -50,6 +55,7 @@ export default function DescriptionSection({
             <Image src="/en.svg" alt="EN" width={24} height={24} />
           </div>
         </div>
+        {errorEn && <p className="text-red-500 text-sm">{errorEn}</p>}
         <p className="text-white text-sm text-right">{remainingEn} characters remaining</p>
       </div>
     </div>

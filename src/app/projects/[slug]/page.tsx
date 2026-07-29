@@ -45,9 +45,9 @@ function mapToProject(raw: PublicProjectDetail): Project {
   // ProjectPageClient сам розрізняє їх через getVideoInfo() і рендерить або <Image>, або плеєр.
   const slides = [
     raw.coverUrl,
-    ...raw.contentBlocks
-      .filter((block) => (block.type === "image" && block.image) || (block.type === "link" && block.url))
-      .map((block) => (block.type === "image" ? block.image : block.url) as string),
+    ...raw.finalResult
+      .filter((item) => (item.type === "image" && item.image) || (item.type === "link" && item.url))
+      .map((item) => (item.type === "image" ? item.image : item.url) as string),
   ].filter((src): src is string => !!src);
 
   const finalSlides = slides.length > 0 ? slides : [FALLBACK_IMAGE];
