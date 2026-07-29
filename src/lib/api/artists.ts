@@ -142,14 +142,14 @@ export const artistsAPI = {
     per_page?: number;
     page?: number;
   }): Promise<PublicArtist[]> => {
-    const response = await api.get<ArtistsListResponse>("/v1/artists", {
+    const response = await api.get<ArtistsListResponse>("/v1/art-ua-info/artists", {
       params: { language: "uk", ...params },
     });
     return response.data.data.map(mapArtist);
   },
 
   get: async (slug: string): Promise<PublicArtist> => {
-    const response = await api.get<ArtistResponse>(`/v1/artists/${slug}`, {
+    const response = await api.get<ArtistResponse>(`/v1/art-ua-info/artists/${slug}`, {
       params: { language: "uk" },
     });
     return mapArtist(response.data.data);
@@ -159,9 +159,12 @@ export const artistsAPI = {
     slug: string,
     params?: { status?: string; per_page?: number; page?: number }
   ): Promise<PublicArtistProject[]> => {
-    const response = await api.get<ArtistProjectsResponse>(`/v1/artists/${slug}/projects`, {
-      params: { language: "uk", ...params },
-    });
+    const response = await api.get<ArtistProjectsResponse>(
+      `/v1/art-ua-info/artists/${slug}/projects`,
+      {
+        params: { language: "uk", ...params },
+      }
+    );
     return response.data.data.map(mapArtistProject);
   },
 };

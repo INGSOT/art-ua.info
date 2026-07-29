@@ -108,7 +108,7 @@ export type UpdateArtUaInfoProjectPayload = Omit<CreateArtUaInfoProjectPayload, 
 };
 
 // ---------------------------------------------------------------------------
-// Мій проєкт для редагування (GET /v1/my/projects/{slug} без ?language —
+// Мій проєкт для редагування (GET /v1/art-ua-info/my/projects/{slug} без ?language —
 // повертає всі мультимовні поля повністю, {uk, en}, а не локалізований рядок)
 // ---------------------------------------------------------------------------
 
@@ -229,25 +229,27 @@ function mapMyProjectListItem(project: RawMyProjectListItem): MyProjectListItem 
 
 export const projectsAPI = {
   myList: async (params?: Record<string, string | number>): Promise<MyProjectListItem[]> => {
-    const response = await api.get<MyProjectsListResponse>("/v1/my/projects", {
+    const response = await api.get<MyProjectsListResponse>("/v1/art-ua-info/my/projects", {
       params: { language: "uk", ...params },
     });
     return response.data.data.map(mapMyProjectListItem);
   },
 
-  // Завершені проєкти (completed, sold) незалежно від джерела створення
-  // (save-art або майстер art-ua-info) — GET /v1/my/projects/completed.
+  // Завершені art-ua-info-проєкти — GET /v1/art-ua-info/my/projects/completed.
   myCompletedList: async (
     params?: Record<string, string | number>
   ): Promise<MyProjectListItem[]> => {
-    const response = await api.get<MyProjectsListResponse>("/v1/my/projects/completed", {
-      params: { language: "uk", ...params },
-    });
+    const response = await api.get<MyProjectsListResponse>(
+      "/v1/art-ua-info/my/projects/completed",
+      {
+        params: { language: "uk", ...params },
+      }
+    );
     return response.data.data.map(mapMyProjectListItem);
   },
 
   list: async (params?: Record<string, string | number>): Promise<PublicProjectListItem[]> => {
-    const response = await api.get<ProjectsListResponse>("/v1/projects", {
+    const response = await api.get<ProjectsListResponse>("/v1/art-ua-info/projects", {
       params: { language: "uk", ...params },
     });
     return response.data.data.map((project) => ({
@@ -257,9 +259,12 @@ export const projectsAPI = {
   },
 
   show: async (slug: string): Promise<PublicProjectDetail> => {
-    const response = await api.get<{ data: RawProjectDetail }>(`/v1/projects/${slug}`, {
-      params: { language: "uk" },
-    });
+    const response = await api.get<{ data: RawProjectDetail }>(
+      `/v1/art-ua-info/projects/${slug}`,
+      {
+        params: { language: "uk" },
+      }
+    );
     return mapProjectDetail(response.data.data);
   },
 
@@ -267,14 +272,12 @@ export const projectsAPI = {
     slug: string,
     params?: { per_page?: number; page?: number }
   ): Promise<ProjectDonor[]> => {
-    const response = await api.get<ProjectDonorsResponse>(`/v1/projects/${slug}/donors`, {
-      params,
-    });
-    return response.data.data;
-  },
-
-  myCreate: async (payload: CreateProjectPayload): Promise<CreateProjectResponse> => {
-    const response = await api.post<{ data: CreateProjectResponse }>("/v1/my/projects", payload);
+    const response = await api.get<ProjectDonorsResponse>(
+      `/v1/art-ua-info/projects/${slug}/donors`,
+      {
+        params,
+      }
+    );
     return response.data.data;
   },
 
@@ -299,28 +302,30 @@ export const projectsAPI = {
     return response.data.data;
   },
 
-  // Видалення проєкту/чернетки — той самий Project, що й у save-art,
-  // тож переюзаємо спільний ендпоінт DELETE /v1/my/projects/{slug}.
   myDelete: async (slug: string): Promise<void> => {
-    await api.delete(`/v1/my/projects/${slug}`);
+    await api.delete(`/v1/art-ua-info/my/projects/${slug}`);
   },
 
   // Project::getRouteKeyName() === 'slug', тож {project} у роуті лайка
-  // резолвиться по slug, а не по числовому id (як і в save-art: project.slug || project.id).
+  // резолвиться по slug, а не по числовому id.
   like: async (projectSlug: string): Promise<LikeResponse> => {
-    const response = await api.post<LikeResponse>(`/v1/projects/${projectSlug}/like`);
+    const response = await api.post<LikeResponse>(`/v1/art-ua-info/projects/${projectSlug}/like`);
     return response.data;
   },
 
   unlike: async (projectSlug: string): Promise<LikeResponse> => {
-    const response = await api.delete<LikeResponse>(`/v1/projects/${projectSlug}/like`);
+    const response = await api.delete<LikeResponse>(
+      `/v1/art-ua-info/projects/${projectSlug}/like`
+    );
     return response.data;
   },
 
   // Повні (нелокалізовані, {uk, en}) дані власного проєкту для форми редагування —
-  // GET /v1/my/projects/{slug} без ?language.
+  // GET /v1/art-ua-info/my/projects/{slug} без ?language.
   myShow: async (slug: string): Promise<MyProjectDetail> => {
-    const response = await api.get<{ data: RawMyProjectDetail }>(`/v1/my/projects/${slug}`);
+    const response = await api.get<{ data: RawMyProjectDetail }>(
+      `/v1/art-ua-info/my/projects/${slug}`
+    );
     const raw = response.data.data;
     return {
       id: raw.id,
@@ -350,7 +355,7 @@ export const projectsAPI = {
 };
 
 // ---------------------------------------------------------------------------
-// Project detail (GET /v1/projects/{slug})
+// Project detail (GET /v1/art-ua-info/projects/{slug})
 // ---------------------------------------------------------------------------
 
 export interface ProjectAuthor {
@@ -654,7 +659,7 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
 }
 
 // ---------------------------------------------------------------------------
-// Project donors (GET /v1/projects/{slug}/donors)
+// Project donors (GET /v1/art-ua-info/projects/{slug}/donors)
 // ---------------------------------------------------------------------------
 
 export interface ProjectDonor {

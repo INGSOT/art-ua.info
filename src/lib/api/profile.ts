@@ -91,7 +91,7 @@ function mapEditData(data: GetProfileResponse): MyProfileEditData {
 
 export const profileAPI = {
   getMyProfileInfo: async (): Promise<MyProfileInfo> => {
-    const response = await api.get<GetProfileResponse>("/v1/profile");
+    const response = await api.get<GetProfileResponse>("/v1/art-ua-info/profile");
     const { profilePersonal, profileSocial } = response.data;
 
     const socialLinks: ProfileSocialLink[] = SOCIAL_ICONS.filter(
@@ -117,12 +117,12 @@ export const profileAPI = {
   },
 
   getMyProfileEditData: async (): Promise<MyProfileEditData> => {
-    const response = await api.get<GetProfileResponse>("/v1/profile");
+    const response = await api.get<GetProfileResponse>("/v1/art-ua-info/profile");
     return mapEditData(response.data);
   },
 
   updateProfile: async (data: MyProfileEditData): Promise<void> => {
-    await api.put("/v1/profile/personal", {
+    await api.put("/v1/art-ua-info/profile/personal", {
       avatar: data.avatar || undefined,
       full_name: { uk: data.fullNameUk, en: data.fullNameEn || undefined },
       profession: { uk: data.professionUk, en: data.professionEn || undefined },
@@ -131,7 +131,7 @@ export const profileAPI = {
       description: { uk: data.descriptionUk, en: data.descriptionEn || undefined },
     });
 
-    await api.put("/v1/profile/social", {
+    await api.put("/v1/art-ua-info/profile/social", {
       website: data.website || undefined,
       facebook: data.facebook || undefined,
       instagram: data.instagram || undefined,

@@ -42,14 +42,14 @@ interface ParametersResponse {
 
 export const catalogsAPI = {
   categories: async (params?: { language?: "uk" | "en" }): Promise<ArtCategory[]> => {
-    const response = await api.get<CategoriesResponse>("/v1/categories", {
+    const response = await api.get<CategoriesResponse>("/v1/art-ua-info/categories", {
       params: { language: "uk", ...params },
     });
     return response.data.data;
   },
 
   regions: async (params?: { language?: "uk" | "en" }): Promise<RegionOption[]> => {
-    const response = await api.get<RegionsResponse>("/v1/regions", {
+    const response = await api.get<RegionsResponse>("/v1/art-ua-info/regions", {
       params: { language: "uk", ...params },
     });
     return response.data.data;
@@ -63,7 +63,7 @@ export const catalogsAPI = {
     art_subcategory?: string;
     language?: "uk" | "en";
   }): Promise<Parameter[]> => {
-    const response = await api.get<ParametersResponse>("/v1/parameters", { params });
+    const response = await api.get<ParametersResponse>("/v1/art-ua-info/parameters", { params });
     return response.data.data;
   },
 };

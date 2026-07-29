@@ -73,7 +73,7 @@ interface AuthResponse {
 
 export const authAPI = {
   login: async (email: string, password: string, device_name = "Web Browser"): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>("/v1/auth/login", { email, password, device_name });
+    const response = await api.post<AuthResponse>("/v1/art-ua-info/auth/login", { email, password, device_name });
     return response.data;
   },
 
@@ -84,7 +84,7 @@ export const authAPI = {
     password_confirmation: string,
     device_name = "Web Browser"
   ): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>("/v1/auth/register", {
+    const response = await api.post<AuthResponse>("/v1/art-ua-info/auth/register", {
       name,
       email,
       password,
@@ -95,17 +95,17 @@ export const authAPI = {
   },
 
   logout: async (): Promise<{ message: string }> => {
-    const response = await api.post("/v1/auth/logout");
+    const response = await api.post("/v1/art-ua-info/auth/logout");
     return response.data;
   },
 
   getMe: async (): Promise<{ user: AuthUser }> => {
-    const response = await api.get("/v1/auth/me");
+    const response = await api.get("/v1/art-ua-info/auth/me");
     return response.data;
   },
 
   forgotPassword: async (email: string, locale?: string): Promise<{ message: string }> => {
-    const response = await api.post("/v1/auth/forgot-password", { email, locale });
+    const response = await api.post("/v1/art-ua-info/auth/forgot-password", { email, locale });
     return response.data;
   },
 
@@ -115,7 +115,7 @@ export const authAPI = {
     password: string,
     password_confirmation: string
   ): Promise<{ message: string }> => {
-    const response = await api.post("/v1/auth/reset-password", {
+    const response = await api.post("/v1/art-ua-info/auth/reset-password", {
       token,
       email,
       password,

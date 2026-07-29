@@ -127,7 +127,7 @@ export const newsAPI = {
     category?: NewsCategory;
     language?: "uk" | "en";
   }): Promise<NewsListResult> => {
-    const response = await api.get<NewsListResponse>("/v1/news", {
+    const response = await api.get<NewsListResponse>("/v1/art-ua-info/news", {
       params: { language: "uk", ...params },
     });
     return {
@@ -137,7 +137,7 @@ export const newsAPI = {
   },
 
   get: async (slug: string, language: "uk" | "en" = "uk"): Promise<PublicNewsDetail> => {
-    const response = await api.get<NewsDetailResponse>(`/v1/news/${slug}`, {
+    const response = await api.get<NewsDetailResponse>(`/v1/art-ua-info/news/${slug}`, {
       params: { language },
     });
     return mapDetail(response.data.data);

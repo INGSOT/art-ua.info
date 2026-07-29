@@ -69,7 +69,7 @@ function buildPayload(payload: SaveServicePayload) {
 
 export const myServicesAPI = {
   list: async (): Promise<MyService[]> => {
-    const response = await api.get<MyServicesResponse>("/v1/my/services", {
+    const response = await api.get<MyServicesResponse>("/v1/art-ua-info/my/services", {
       params: { language: "uk" },
     });
     return response.data.data.map(mapService);
@@ -77,7 +77,7 @@ export const myServicesAPI = {
 
   create: async (payload: SaveServicePayload): Promise<MyService> => {
     const response = await api.post<{ data: RawMyService }>(
-      "/v1/my/services",
+      "/v1/art-ua-info/my/services",
       buildPayload(payload),
       { params: { language: "uk" } }
     );
@@ -86,7 +86,7 @@ export const myServicesAPI = {
 
   update: async (slug: string, payload: SaveServicePayload): Promise<MyService> => {
     const response = await api.put<{ data: RawMyService }>(
-      `/v1/my/services/${slug}`,
+      `/v1/art-ua-info/my/services/${slug}`,
       buildPayload(payload),
       { params: { language: "uk" } }
     );
@@ -94,6 +94,6 @@ export const myServicesAPI = {
   },
 
   remove: async (slug: string): Promise<void> => {
-    await api.delete(`/v1/my/services/${slug}`);
+    await api.delete(`/v1/art-ua-info/my/services/${slug}`);
   },
 };

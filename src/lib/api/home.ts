@@ -32,7 +32,7 @@ function localize(value: LocalizedText | null | undefined): string {
 
 export const homeAPI = {
   getPartners: async (): Promise<{ title: string; items: HomePartner[] }> => {
-    const response = await api.get<HomeResponse>("/home", {
+    const response = await api.get<HomeResponse>("/v1/art-ua-info/home", {
       params: { language: "uk" },
     });
     const { title, items } = response.data.data.partners;

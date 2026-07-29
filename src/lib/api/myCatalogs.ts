@@ -42,7 +42,7 @@ function mapCatalog(raw: RawMyCatalog): MyCatalog {
 
 export const myCatalogsAPI = {
   list: async (): Promise<MyCatalog[]> => {
-    const response = await api.get<MyCatalogsResponse>("/v1/my/catalogs");
+    const response = await api.get<MyCatalogsResponse>("/v1/art-ua-info/my/catalogs");
     return response.data.data.map(mapCatalog);
   },
 
@@ -52,18 +52,18 @@ export const myCatalogsAPI = {
     form.append("image", params.image);
     form.append("pdf_file", params.pdfFile);
 
-    const response = await api.post<{ data: RawMyCatalog }>("/v1/my/catalogs", form, {
+    const response = await api.post<{ data: RawMyCatalog }>("/v1/art-ua-info/my/catalogs", form, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return mapCatalog(response.data.data);
   },
 
   remove: async (id: number): Promise<void> => {
-    await api.delete(`/v1/my/catalogs/${id}`);
+    await api.delete(`/v1/art-ua-info/my/catalogs/${id}`);
   },
 
   setPrimary: async (id: number): Promise<MyCatalog> => {
-    const response = await api.post<{ data: RawMyCatalog }>(`/v1/my/catalogs/${id}/primary`);
+    const response = await api.post<{ data: RawMyCatalog }>(`/v1/art-ua-info/my/catalogs/${id}/primary`);
     return mapCatalog(response.data.data);
   },
 };

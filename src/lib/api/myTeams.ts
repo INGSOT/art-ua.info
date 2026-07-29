@@ -99,14 +99,14 @@ function buildPayload(payload: SaveTeamPayload) {
 
 export const myTeamsAPI = {
   list: async (): Promise<MyTeam[]> => {
-    const response = await api.get<MyTeamsResponse>("/v1/my/teams", {
+    const response = await api.get<MyTeamsResponse>("/v1/art-ua-info/my/teams", {
       params: { language: "uk" },
     });
     return response.data.data.map(mapTeam);
   },
 
   create: async (payload: SaveTeamPayload): Promise<MyTeam> => {
-    const response = await api.post<{ data: RawMyTeam }>("/v1/my/teams", buildPayload(payload), {
+    const response = await api.post<{ data: RawMyTeam }>("/v1/art-ua-info/my/teams", buildPayload(payload), {
       params: { language: "uk" },
     });
     return mapTeam(response.data.data);
@@ -114,7 +114,7 @@ export const myTeamsAPI = {
 
   update: async (slug: string, payload: SaveTeamPayload): Promise<MyTeam> => {
     const response = await api.put<{ data: RawMyTeam }>(
-      `/v1/my/teams/${slug}`,
+      `/v1/art-ua-info/my/teams/${slug}`,
       buildPayload(payload),
       { params: { language: "uk" } }
     );
@@ -122,10 +122,10 @@ export const myTeamsAPI = {
   },
 
   remove: async (slug: string): Promise<void> => {
-    await api.delete(`/v1/my/teams/${slug}`);
+    await api.delete(`/v1/art-ua-info/my/teams/${slug}`);
   },
 
   leave: async (slug: string): Promise<void> => {
-    await api.post(`/v1/my/teams/${slug}/leave`);
+    await api.post(`/v1/art-ua-info/my/teams/${slug}/leave`);
   },
 };

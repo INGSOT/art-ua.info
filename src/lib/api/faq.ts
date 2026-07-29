@@ -21,7 +21,7 @@ interface FaqResponse {
 
 export const faqAPI = {
   list: async (): Promise<PublicFaqCategory[]> => {
-    const response = await api.get<FaqResponse>("/v1/faq", {
+    const response = await api.get<FaqResponse>("/v1/art-ua-info/faq", {
       params: { language: "uk" },
     });
     return response.data.data.categories;
