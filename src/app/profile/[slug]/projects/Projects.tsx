@@ -104,6 +104,12 @@ export default function Projects() {
                         {/* Darkening overlay on hover */}
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
 
+                        {(project.status === "sold" || project.soldExternally) && (
+                          <div className="absolute left-3 top-3 z-10">
+                            <Image src="/sold.webp" alt="Продано" width={80} height={40} />
+                          </div>
+                        )}
+
                         {/* Centered arrow on hover */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                           <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />

@@ -196,6 +196,7 @@ export interface MyProjectListItem {
   title: string;
   coverUrl: string | null;
   likesCount: number;
+  soldExternally: boolean;
 }
 
 interface RawMyProjectListItem {
@@ -206,6 +207,7 @@ interface RawMyProjectListItem {
   title: string;
   cover_url: string | null;
   likes_count: number;
+  sold_externally?: boolean;
 }
 
 interface MyProjectsListResponse {
@@ -218,6 +220,7 @@ function mapMyProjectListItem(project: RawMyProjectListItem): MyProjectListItem 
     slug: project.slug,
     status: project.status,
     statusLabel: project.status_label,
+    soldExternally: Boolean(project.sold_externally),
     title: project.title,
     coverUrl: absoluteUrl(project.cover_url),
     likesCount: project.likes_count,
