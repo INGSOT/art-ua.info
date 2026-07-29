@@ -227,6 +227,117 @@ function mapMyProjectListItem(project: RawMyProjectListItem): MyProjectListItem 
   };
 }
 
+export interface ProjectCardAuthor {
+  id: number;
+  name: string;
+  slug: string | null;
+  avatarUrl: string | null;
+}
+
+export interface ProjectListCardItem {
+  id: number;
+  slug: string;
+  status: string;
+  statusLabel: string;
+  title: string;
+  coverUrl: string | null;
+  artCategory: string | null;
+  artCategoryLabel: string | null;
+  artSubcategory: string | null;
+  likesCount: number;
+  author: ProjectCardAuthor;
+  announcedAt: string | null;
+  plannedCompletionAt: string | null;
+}
+
+interface RawProjectCardAuthor {
+  id: number;
+  name: string;
+  slug: string | null;
+  avatar_url: string | null;
+}
+
+interface RawProjectCardItem {
+  id: number;
+  slug: string;
+  status: string;
+  status_label: string;
+  title: string;
+  cover_url: string | null;
+  art_category: string | null;
+  art_category_label: string | null;
+  art_subcategory: string | null;
+  likes_count: number;
+  author: RawProjectCardAuthor;
+  announced_at: string | null;
+  planned_completion_at: string | null;
+}
+
+export interface ProjectsFilterOption {
+  slug: string;
+  name: string;
+  projects_count?: number;
+}
+
+export interface ProjectsFilterCategory extends ProjectsFilterOption {
+  subcategories: ProjectsFilterOption[];
+}
+
+export interface ProjectsFilterParameterValue {
+  id: number;
+  value: string;
+  projects_count?: number;
+}
+
+export interface ProjectsFilterParameter {
+  id: number;
+  name: string;
+  values: ProjectsFilterParameterValue[];
+}
+
+export interface ProjectsListFilters {
+  sort_options: ProjectsFilterOption[];
+  categories: ProjectsFilterCategory[];
+  statuses: ProjectsFilterOption[];
+  parameters: ProjectsFilterParameter[];
+}
+
+export interface ProjectsListMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface ProjectsBrowseResult {
+  data: ProjectListCardItem[];
+  meta: ProjectsListMeta;
+  filters: ProjectsListFilters;
+}
+
+function mapProjectCardItem(raw: RawProjectCardItem): ProjectListCardItem {
+  return {
+    id: raw.id,
+    slug: raw.slug,
+    status: raw.status,
+    statusLabel: raw.status_label,
+    title: raw.title,
+    coverUrl: absoluteUrl(raw.cover_url),
+    artCategory: raw.art_category,
+    artCategoryLabel: raw.art_category_label,
+    artSubcategory: raw.art_subcategory,
+    likesCount: raw.likes_count,
+    author: {
+      id: raw.author?.id,
+      name: raw.author?.name ?? "",
+      slug: raw.author?.slug ?? null,
+      avatarUrl: absoluteUrl(raw.author?.avatar_url),
+    },
+    announcedAt: raw.announced_at,
+    plannedCompletionAt: raw.planned_completion_at,
+  };
+}
+
 export const projectsAPI = {
   myList: async (params?: Record<string, string | number>): Promise<MyProjectListItem[]> => {
     const response = await api.get<MyProjectsListResponse>("/v1/art-ua-info/my/projects", {
@@ -256,6 +367,23 @@ export const projectsAPI = {
       ...project,
       cover_url: project.cover_url ? `${API_BASE}${project.cover_url}` : null,
     }));
+  },
+
+  // Список публічних проєктів із пагінацією, фільтрами (art_category/art_subcategory/status)
+  // та довідником для UI (categories/statuses/sort_options) — для сторінки /projects.
+  browse: async (params?: Record<string, string | number>): Promise<ProjectsBrowseResult> => {
+    const response = await api.get<{
+      data: RawProjectCardItem[];
+      meta: ProjectsListMeta;
+      filters: ProjectsListFilters;
+    }>("/v1/art-ua-info/projects", {
+      params: { language: "uk", ...params },
+    });
+    return {
+      data: response.data.data.map(mapProjectCardItem),
+      meta: response.data.meta,
+      filters: response.data.filters,
+    };
   },
 
   show: async (slug: string): Promise<PublicProjectDetail> => {
