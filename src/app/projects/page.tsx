@@ -23,9 +23,8 @@ const ITEMS_PER_PAGE = 12;
 
 const DEFAULT_FILTERS: ProjectsListFilters = {
     sort_options: [
-        { slug: "newest", name: "Найновіші" },
-        { slug: "popular", name: "Популярні" },
-        { slug: "ending_soon", name: "Скоро завершуються" },
+        { slug: "date", name: "За датою" },
+        { slug: "name", name: "За назвою" },
     ],
     categories: [],
     statuses: [],
@@ -47,7 +46,7 @@ export default function ProjectsPage() {
     const selectedStatuses = statusParam ? statusParam.split(",").filter(Boolean) : [];
     const parameterValueParam = searchParams.get("parameter_value_id") ?? "";
     const selectedParameterValueIds = parameterValueParam ? parameterValueParam.split(",").filter(Boolean) : [];
-    const sortBy = searchParams.get("sort_by") ?? "newest";
+    const sortBy = searchParams.get("sort_by") ?? "date";
     const currentPage = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
     const [searchInput, setSearchInput] = useState(searchQueryParam);
