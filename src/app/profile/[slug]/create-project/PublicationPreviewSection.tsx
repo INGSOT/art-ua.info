@@ -41,6 +41,7 @@ interface PublicationPreviewSectionProps {
   parameterCatalog: Parameter[];
   parameterAnswers: ParameterAnswers;
   additionalBlocks: AdditionalContentBlock[];
+  likesCount?: number;
 }
 
 export default function PublicationPreviewSection({
@@ -51,6 +52,7 @@ export default function PublicationPreviewSection({
   parameterCatalog,
   parameterAnswers,
   additionalBlocks,
+  likesCount = 0,
 }: PublicationPreviewSectionProps) {
   const profile = useProfileView();
 
@@ -80,8 +82,7 @@ export default function PublicationPreviewSection({
       title={previewTitle}
       tags={[{ text: previewGenre }]}
       slides={slides}
-      saveArtLinkText={saveArtButton ? `Проєкт на ${saveArtButton.label}` : undefined}
-      likesCount={0}
+      likesCount={likesCount}
       author={{
         avatarUrl: profile.aboutMe.avatar,
         name: profile.aboutMe.name,

@@ -138,7 +138,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <>
       <Header isHomePage={false} />
-      <ProjectPageClient project={project} />
+      <ProjectPageClient project={project} initialIsLiked={raw.isLiked} />
     </>
   );
 }

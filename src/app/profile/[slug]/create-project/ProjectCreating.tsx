@@ -157,6 +157,7 @@ export default function ProjectCreating() {
   const [additionalBlocks, setAdditionalBlocks] = useState<AdditionalContentBlock[]>([]);
   const [isSoldExternally, setIsSoldExternally] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [likesCount, setLikesCount] = useState(0);
 
   const clearFieldErrors = (keys: string[]) => {
     setFieldErrors((prev) => {
@@ -188,6 +189,7 @@ export default function ProjectCreating() {
         setWorkGalleryItems(finalResultToGalleryItems(project.finalResult));
         setAdditionalBlocks(contentBlocksToAdditionalBlocks(project.contentBlocks));
         setIsSoldExternally(project.soldExternally);
+        setLikesCount(project.likesCount);
         if (project.artSubcategory) {
           const label = findSubcategoryLabel(project.artSubcategory);
           if (label) setSelectedArtField({ id: project.artSubcategory, label });
@@ -803,6 +805,7 @@ export default function ProjectCreating() {
             parameterCatalog={parameterCatalog}
             parameterAnswers={parameterAnswers}
             additionalBlocks={additionalBlocks}
+            likesCount={likesCount}
           />
           <ProjectPublication
             onPublish={handlePublish}

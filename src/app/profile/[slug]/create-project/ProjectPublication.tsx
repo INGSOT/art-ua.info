@@ -16,8 +16,6 @@ interface ProjectPublicationProps {
 }
 
 export default function ProjectPublication({ onPublish, onSaveDraft, onDelete }: ProjectPublicationProps) {
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [isTermsHovered, setIsTermsHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
   const [isDraftHovered, setIsDraftHovered] = useState(false);
   const [isPublishHovered, setIsPublishHovered] = useState(false);
@@ -29,18 +27,8 @@ export default function ProjectPublication({ onPublish, onSaveDraft, onDelete }:
     e.preventDefault();
     setNotification(null);
 
-    // Прийняття умов публікації — суто клієнтська згода на дію, не дані проєкту,
-    // тож на сервер не надсилається і серверною валідацією не покривається.
-    if (!acceptedTerms) {
-      setNotification({ type: "error", text: "Прийміть умови публікації" });
-      return;
-    }
-
     const result = await onPublish();
     setNotification(result);
-    if (result.type === "success") {
-      setAcceptedTerms(false);
-    }
   };
 
   const handleSaveDraftClick = async () => {
@@ -70,43 +58,6 @@ export default function ProjectPublication({ onPublish, onSaveDraft, onDelete }:
         />
       )}
       <form onSubmit={handlePublish} className="flex flex-col items-center w-full max-w-[1000px] px-4 md:px-10 lg:px-[75px]">
-      {/* Accept Terms Checkbox */}
-      <button
-        type="button"
-        onClick={() => setAcceptedTerms(!acceptedTerms)}
-        onMouseEnter={() => setIsTermsHovered(true)}
-        onMouseLeave={() => setIsTermsHovered(false)}
-        className="flex items-center gap-3 px-6 py-4 bg-[#343434] min-h-[60px] mb-6"
-      >
-        {/* Checkmark */}
-        <div
-          className={`w-5 h-5 flex-shrink-0 flex items-center justify-center transition-colors ${
-            acceptedTerms ? "bg-[#FFD700]" : "bg-[#414141]"
-          }`}
-        >
-          <Image
-            src={isTermsHovered && !acceptedTerms ? "/yellow_check.svg" : "/grey_check.svg"}
-            alt="check"
-            width={12}
-            height={12}
-          />
-        </div>
-
-        {/* Label */}
-        <span
-          className={`font-bold transition-colors text-center md:text-left ${
-            acceptedTerms || isTermsHovered ? "text-[#FECC39]" : "text-white"
-          }`}
-        >
-          {newProjectTexts.acceptTermsLabel}
-        </span>
-      </button>
-
-      {/* Publication Notice */}
-      <p className="text-black text-center mb-8 max-w-4xl">
-        {newProjectTexts.publicationNotice}
-      </p>
-
       {/* Action Buttons */}
       <div className="flex flex-col md:flex-row gap-4 w-full max-w-[1000px] justify-between">
         {/* Delete Button */}

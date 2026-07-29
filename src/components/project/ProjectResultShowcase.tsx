@@ -40,10 +40,10 @@ interface ProjectResultShowcaseProps {
   title: string;
   tags: ProjectResultShowcaseTag[];
   slides: string[];
-  saveArtLinkText?: string;
-  artUaLinkText?: string;
   likesCount: number;
+  isLiked?: boolean;
   onLikeClick?: () => void;
+  likeDisabled?: boolean;
   editHref?: string;
   author: ProjectResultShowcaseAuthor;
   socialLinks?: { icon: string; alt: string }[];
@@ -138,10 +138,10 @@ export default function ProjectResultShowcase({
   title,
   tags,
   slides,
-  saveArtLinkText,
-  artUaLinkText,
   likesCount,
+  isLiked,
   onLikeClick,
+  likeDisabled,
   editHref,
   author,
   socialLinks,
@@ -269,25 +269,10 @@ export default function ProjectResultShowcase({
           <div className="w-full aspect-[1000/562] bg-[#2A2A2A]" />
         )}
 
-        {(saveArtLinkText || artUaLinkText) && (
-          <div className="w-full flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center">
-            {saveArtLinkText && (
-              <p className="font-bold text-sm text-white hover:text-[#FECC39] transition-colors">
-                {saveArtLinkText}
-              </p>
-            )}
-            {artUaLinkText && (
-              <p className="font-bold text-sm text-white hover:text-[#FECC39] transition-colors">
-                {artUaLinkText}
-              </p>
-            )}
-          </div>
-        )}
-
         {editHref && (
           <Link
             href={editHref}
-            className="w-full flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors"
+            className="w-[300px] max-w-full flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors"
           >
             <span className="flex items-center justify-center flex-1 px-6 font-bold text-[#343434] whitespace-nowrap">
               Редагувати проект
@@ -306,9 +291,17 @@ export default function ProjectResultShowcase({
           <button
             type="button"
             onClick={onLikeClick}
-            className="flex items-center justify-center w-[60px]"
+            disabled={likeDisabled}
+            className={`flex items-center justify-center w-[60px] transition-colors ${
+              isLiked ? "bg-[#FECC39]" : ""
+            } ${likeDisabled ? "cursor-wait opacity-60" : ""}`}
           >
-            <Image src="/yellow_like.svg" alt="Like" width={24} height={24} />
+            <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M9 16C8.64137 15.8678 0 12.5515 0 5.71041C0 0.615962 5.72931 -1.91752 9 1.70397C12.2362 -1.89649 18 0.574211 18 5.71041C18 12.552 9.35904 15.8682 9 16Z"
+                fill={isLiked ? "#343434" : "#FECC39"}
+              />
+            </svg>
           </button>
         </div>
       </div>

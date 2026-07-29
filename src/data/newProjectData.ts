@@ -91,8 +91,6 @@ export const newProjectTexts = {
   tagsHint: 'Поле не є обов’язковим.',
   soldProjectDescription: `Вкажіть, якщо ваш проєкт вже був проданий через ${ART_UA_COM_DOMAIN} чи будь-яку іншу платформу.`,
   soldProjectLabel: 'Проект проданий',
-  acceptTermsLabel: 'Я приймаю умови використання платформи',
-  publicationNotice: `Проєкт також буде опубліковано у вашому профілі на ${ART_UA_COM_DOMAIN}`,
   deleteButton: 'Видалити',
   saveDraftButton: 'Зберегти чернетку',
   publishButton: 'Опублікувати',

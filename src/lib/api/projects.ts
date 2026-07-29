@@ -154,6 +154,8 @@ export interface MyProjectDetail {
   finalResult: MyProjectFinalResultItem[];
   soldExternally: boolean;
   parameters: MyProjectParameterAnswer[];
+  likesCount: number;
+  isLiked: boolean;
 }
 
 interface RawMyProjectDetail {
@@ -172,6 +174,8 @@ interface RawMyProjectDetail {
   content_blocks: MyProjectContentBlock[] | null;
   final_result: MyProjectFinalResultItem[] | null;
   parameters: MyProjectParameterAnswer[] | null;
+  likes_count: number;
+  is_liked: boolean;
 }
 
 export interface MyProjectListItem {
@@ -288,6 +292,18 @@ export const projectsAPI = {
     await api.delete(`/v1/my/projects/${slug}`);
   },
 
+  // Project::getRouteKeyName() === 'slug', тож {project} у роуті лайка
+  // резолвиться по slug, а не по числовому id (як і в save-art: project.slug || project.id).
+  like: async (projectSlug: string): Promise<LikeResponse> => {
+    const response = await api.post<LikeResponse>(`/v1/projects/${projectSlug}/like`);
+    return response.data;
+  },
+
+  unlike: async (projectSlug: string): Promise<LikeResponse> => {
+    const response = await api.delete<LikeResponse>(`/v1/projects/${projectSlug}/like`);
+    return response.data;
+  },
+
   // Повні (нелокалізовані, {uk, en}) дані власного проєкту для форми редагування —
   // GET /v1/my/projects/{slug} без ?language.
   myShow: async (slug: string): Promise<MyProjectDetail> => {
@@ -313,6 +329,8 @@ export const projectsAPI = {
       ),
       soldExternally: Boolean(raw.sold_externally),
       parameters: raw.parameters ?? [],
+      likesCount: raw.likes_count ?? 0,
+      isLiked: Boolean(raw.is_liked),
     };
   },
 };
@@ -377,6 +395,12 @@ export interface ProjectContentBlock {
   imageAlt?: string;
   imageCaption?: string;
   url?: string | null;
+}
+
+export interface LikeResponse {
+  message: string;
+  is_liked: boolean;
+  likes_count: number;
 }
 
 export interface PublicProjectDetail {
