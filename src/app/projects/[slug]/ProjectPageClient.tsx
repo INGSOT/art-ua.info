@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "../../../data/projectsData";
 import { useAuth } from "../../../context/AuthContext";
+import { getVideoInfo } from "../../../utils/videoUtils";
+import WorkVideoEmbed from "../../profile/[slug]/create-project/WorkVideoEmbed";
 
 interface ProjectPageClientProps {
   project: Project;
@@ -57,21 +59,38 @@ export default function ProjectPageClient({ project }: ProjectPageClientProps) {
 
           <div className="w-full mb-8">
             <div className="relative w-full aspect-video bg-[#2a2a2a] mb-4">
-              <Image src={projectDetails.slides[activeMainSlide]} alt={`Slide ${activeMainSlide + 1}`} fill className="object-cover" />
+              {getVideoInfo(projectDetails.slides[activeMainSlide]) ? (
+                <WorkVideoEmbed workVideoUrl={projectDetails.slides[activeMainSlide]} />
+              ) : (
+                <Image src={projectDetails.slides[activeMainSlide]} alt={`Slide ${activeMainSlide + 1}`} fill className="object-cover" />
+              )}
             </div>
 
             <div className="flex gap-2 md:gap-4 mb-6 justify-center overflow-x-auto">
-              {projectDetails.slides.map((slide, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveMainSlide(index)}
-                  className={`relative w-16 h-12 md:w-20 md:h-14 flex-shrink-0 overflow-hidden ${
-                    activeMainSlide === index ? "border-2 border-[#FECC39]" : "border-2 border-transparent"
-                  }`}
-                >
-                  <Image src={slide} alt={`Thumbnail ${index + 1}`} fill className="object-cover" />
-                </button>
-              ))}
+              {projectDetails.slides.map((slide, index) => {
+                const videoInfo = getVideoInfo(slide);
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setActiveMainSlide(index)}
+                    className={`relative w-16 h-12 md:w-20 md:h-14 flex-shrink-0 overflow-hidden bg-black ${
+                      activeMainSlide === index ? "border-2 border-[#FECC39]" : "border-2 border-transparent"
+                    }`}
+                  >
+                    {videoInfo ? (
+                      videoInfo.thumbnail ? (
+                        <Image src={videoInfo.thumbnail} alt={`Thumbnail ${index + 1}`} fill className="object-cover" unoptimized />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-0 h-0 border-y-[6px] border-y-transparent border-l-[10px] border-l-[#FECC39] ml-1" />
+                        </div>
+                      )
+                    ) : (
+                      <Image src={slide} alt={`Thumbnail ${index + 1}`} fill className="object-cover" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="flex items-center justify-center gap-4">
@@ -208,12 +227,16 @@ export default function ProjectPageClient({ project }: ProjectPageClientProps) {
 
             <div className="w-full mb-8">
               <div className="relative w-full aspect-video bg-[#d0d0d0] mb-6">
-                <Image
-                  src={projectDescriptionData.slides[activeDescriptionSlide]}
-                  alt={`Slide ${activeDescriptionSlide + 1}`}
-                  fill
-                  className="object-cover"
-                />
+                {getVideoInfo(projectDescriptionData.slides[activeDescriptionSlide]) ? (
+                  <WorkVideoEmbed workVideoUrl={projectDescriptionData.slides[activeDescriptionSlide]} />
+                ) : (
+                  <Image
+                    src={projectDescriptionData.slides[activeDescriptionSlide]}
+                    alt={`Slide ${activeDescriptionSlide + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-4">

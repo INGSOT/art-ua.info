@@ -323,6 +323,7 @@ export interface ProjectContentBlock {
   image?: string | null;
   imageAlt?: string;
   imageCaption?: string;
+  url?: string | null;
 }
 
 export interface PublicProjectDetail {
@@ -416,6 +417,7 @@ interface RawProjectContentBlock {
   image?: string | null;
   image_alt?: LocalizedText | null;
   image_caption?: LocalizedText | null;
+  url?: string | null;
 }
 
 interface RawProjectDetail {
@@ -506,6 +508,7 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
       image: absoluteUrl(block.image),
       imageAlt: localize(block.image_alt),
       imageCaption: localize(block.image_caption),
+      url: block.url,
     })),
     stages: (raw.stages ?? []).map((stage) => ({
       id: stage.id,

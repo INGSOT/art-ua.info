@@ -41,9 +41,13 @@ function resolveSalesStatus(status: string): SalesStatus {
  * щоб зберегти без змін верстку `ProjectPageClient`.
  */
 function mapToProject(raw: PublicProjectDetail): Project {
+  // Слайди можуть бути як зображеннями, так і посиланнями на відео (YouTube/Vimeo) —
+  // ProjectPageClient сам розрізняє їх через getVideoInfo() і рендерить або <Image>, або плеєр.
   const slides = [
     raw.coverUrl,
-    ...raw.contentBlocks.filter((block) => block.type === "image" && block.image).map((block) => block.image as string),
+    ...raw.contentBlocks
+      .filter((block) => (block.type === "image" && block.image) || (block.type === "link" && block.url))
+      .map((block) => (block.type === "image" ? block.image : block.url) as string),
   ].filter((src): src is string => !!src);
 
   const finalSlides = slides.length > 0 ? slides : [FALLBACK_IMAGE];
