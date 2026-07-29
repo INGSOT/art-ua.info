@@ -15,6 +15,10 @@ function absoluteUrl(path: string | null | undefined): string | null {
 // Якщо цього не зробити, "/storage" задвоюється на кожному наступному збереженні.
 export function toApiRelativePath(url: string | null | undefined): string | undefined {
   if (!url) return undefined;
+  // Base64 data URL (свіжозавантажене зображення) — не чіпаємо: алфавіт base64
+  // містить "/", тож split("/")-логіка нижче ламає дані, "з'їдаючи" байти на
+  // кожному "//" всередині payload'у.
+  if (url.startsWith("data:")) return url;
   const relative = url.startsWith(API_BASE) ? url.slice(API_BASE.length) : url;
   const segments = relative.split("/").filter(Boolean);
   while (segments[0] === "storage") {
