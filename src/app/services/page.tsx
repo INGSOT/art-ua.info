@@ -5,386 +5,259 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import SearchSection from '../../components/SearchSection';
-import ServicesFilterSection from './ServicesFilterSection';
+import ServicesFilterSidebar from './ServicesFilterSidebar';
 import FiltersButton from '../../components/filters/FiltersButton';
-import ServicesFiltersModal, { ServicesFilterDraft } from '../../components/filters/ServicesFiltersModal';
 import SelectedFiltersBar from '../../components/filters/SelectedFiltersBar';
-import { buildFilterChips, formatPriceRange, removeFilterFromState } from '../../components/filters/filterChipUtils';
+import { formatPriceRange } from '../../components/filters/filterChipUtils';
 import { FilterChip } from '../../components/filters/filterChipUtils';
 import ListOfServices from './ListOfServices';
-import { CurrencyCode, ServicePerformerType, servicesData } from '../../data/servicesData';
-import { servicesFilters } from '../../components/filters/filterConfig';
+import {
+    publicServicesAPI,
+    type PublicService,
+    type ServiceCurrency,
+    type ServicesListFilters,
+} from '../../lib/api/publicServices';
 import PaginationSection from '../../components/PaginationSection';
 import JoinCommunityWrapper from '../../components/JoinCommunityWrapper';
 
+const ITEMS_PER_PAGE = 6;
+const MAX_PRICE = 1000000;
+const DEFAULT_FILTERS: ServicesListFilters = { categories: [] };
+const ALLOWED_CURRENCIES: ServiceCurrency[] = ['UAH', 'USD', 'EUR'];
 
 export default function ServicesPage() {
-    const MAX_PRICE = 1000000;
-    type PerformerFilter = ServicePerformerType | 'all';
-    const [currentPage, setCurrentPage] = useState(1);
-    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
 
-    const itemsPerPage = 6;
-    const artFieldsSection = servicesFilters.find((section) => section.id === 'art-fields');
-    const artItems = artFieldsSection?.subsections?.flatMap((sub) => sub.items ?? []) ?? [];
-
-    const allowedArtCategoryIds = new Set(artItems.map((item) => item.id));
-    const allowedCurrencyCodes: CurrencyCode[] = ['UAH', 'USD', 'EUR'];
-
-    const selectedArtCategoryIds = searchParams
-        .getAll('art_subcategory')
-        .filter((value) => allowedArtCategoryIds.has(value));
-    const selectedCurrencyParam = searchParams.get('currency');
-    const performerParam = searchParams.get('performer');
-    const selectedLocation = searchParams.get('location')?.trim() ?? '';
     const searchQueryParam = searchParams.get('search') ?? '';
-    const selectedCurrency: CurrencyCode | null =
-        selectedCurrencyParam && allowedCurrencyCodes.includes(selectedCurrencyParam as CurrencyCode)
-            ? (selectedCurrencyParam as CurrencyCode)
+    const subcategoryParam = searchParams.get('art_subcategory') ?? '';
+    const selectedSubcategories = subcategoryParam ? subcategoryParam.split(',').filter(Boolean) : [];
+    const currencyParam = searchParams.get('currency');
+    const selectedCurrency: ServiceCurrency | null =
+        currencyParam && ALLOWED_CURRENCIES.includes(currencyParam as ServiceCurrency)
+            ? (currencyParam as ServiceCurrency)
             : null;
-    const selectedPerformerFilter: PerformerFilter =
-        performerParam === 'artist'
-            ? 'artist'
-            : performerParam === 'team'
-                ? 'team'
-                : 'all';
-    const hasPriceFilter = searchParams.has('price_min') || searchParams.has('price_max');
     const priceMinParam = searchParams.get('price_min');
     const priceMaxParam = searchParams.get('price_max');
-    const rawPriceMin = priceMinParam === null ? NaN : Number(priceMinParam);
-    const rawPriceMax = priceMaxParam === null ? NaN : Number(priceMaxParam);
-    const selectedPriceMin = Number.isFinite(rawPriceMin) ? Math.max(0, Math.min(rawPriceMin, MAX_PRICE)) : 0;
-    const selectedPriceMax = Number.isFinite(rawPriceMax)
-        ? Math.max(selectedPriceMin, Math.min(rawPriceMax, MAX_PRICE))
-        : MAX_PRICE;
+    const hasPriceFilter = priceMinParam !== null || priceMaxParam !== null;
+    const initialMinPrice = priceMinParam ? Math.max(0, Math.min(Number(priceMinParam), MAX_PRICE)) : 0;
+    const initialMaxPrice = priceMaxParam ? Math.max(0, Math.min(Number(priceMaxParam), MAX_PRICE)) : MAX_PRICE;
+    const selectedLocation = searchParams.get('location')?.trim() ?? '';
+    const currentPage = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1);
+
     const [searchInput, setSearchInput] = useState(searchQueryParam);
+    const [locationInput, setLocationInput] = useState(selectedLocation);
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+    const [services, setServices] = useState<PublicService[]>([]);
+    const [meta, setMeta] = useState({ current_page: 1, last_page: 1, per_page: ITEMS_PER_PAGE, total: 0 });
+    const [filtersData, setFiltersData] = useState<ServicesListFilters>(DEFAULT_FILTERS);
+    const [loading, setLoading] = useState(true);
+    const [hasLoaded, setHasLoaded] = useState(false);
 
     useEffect(() => {
         setSearchInput(searchQueryParam);
     }, [searchQueryParam]);
 
-    const initialSelectedFilters: Record<string, boolean> = (() => {
-        const base: Record<string, boolean> = {
-            all: false,
-            artists: false,
-            teams: false,
+    useEffect(() => {
+        setLocationInput(selectedLocation);
+    }, [selectedLocation]);
+
+    useEffect(() => {
+        let ignore = false;
+
+        const fetchServices = async () => {
+            setLoading(true);
+            try {
+                const result = await publicServicesAPI.browse({
+                    page: currentPage,
+                    per_page: ITEMS_PER_PAGE,
+                    ...(selectedSubcategories.length ? { art_subcategory: selectedSubcategories.join(',') } : {}),
+                    ...(selectedCurrency ? { currency: selectedCurrency } : {}),
+                    ...(priceMinParam ? { price_min: priceMinParam } : {}),
+                    ...(priceMaxParam ? { price_max: priceMaxParam } : {}),
+                    ...(selectedLocation ? { location: selectedLocation } : {}),
+                    ...(searchQueryParam ? { search: searchQueryParam } : {}),
+                });
+
+                if (ignore) return;
+                setServices(result.data);
+                setMeta(result.meta);
+                setFiltersData(result.filters);
+            } catch (error) {
+                if (ignore) return;
+                console.error('Failed to load services:', error);
+                setServices([]);
+            } finally {
+                if (!ignore) {
+                    setLoading(false);
+                    setHasLoaded(true);
+                }
+            }
         };
 
-        if (selectedPerformerFilter === 'artist') {
-            base.artists = true;
-        } else if (selectedPerformerFilter === 'team') {
-            base.teams = true;
-        } else {
-            base.all = true;
-        }
+        fetchServices();
+        return () => {
+            ignore = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentPage, subcategoryParam, selectedCurrency, priceMinParam, priceMaxParam, selectedLocation, searchQueryParam]);
 
-        artItems.forEach((item) => {
-            base[item.id] = selectedArtCategoryIds.includes(item.id);
+    const pushParams = (mutate: (params: URLSearchParams) => void, resetPage = true) => {
+        const params = new URLSearchParams(searchParams.toString());
+        mutate(params);
+        if (resetPage) {
+            params.delete('page');
+        }
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    };
+
+    const handleSubcategoryToggle = (slug: string) => {
+        pushParams((params) => {
+            const next = selectedSubcategories.includes(slug)
+                ? selectedSubcategories.filter((s) => s !== slug)
+                : [...selectedSubcategories, slug];
+            if (next.length) {
+                params.set('art_subcategory', next.join(','));
+            } else {
+                params.delete('art_subcategory');
+            }
         });
-
-        return base;
-    })();
-
-    const resolvePerformerFilter = (filters: Record<string, boolean>): PerformerFilter => {
-        const artistsSelected = !!filters['artists'];
-        const teamsSelected = !!filters['teams'];
-        const allSelected = !!filters['all'];
-
-        if (artistsSelected && !teamsSelected && !allSelected) {
-            return 'artist';
-        }
-        if (teamsSelected && !artistsSelected && !allSelected) {
-            return 'team';
-        }
-        return 'all';
     };
 
-    const countServicesForDraft = (draft: ServicesFilterDraft) => {
-        const performerFilter = resolvePerformerFilter(draft.filters);
-        const selectedIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!draft.filters[id]);
-
-        let result = performerFilter === 'all'
-            ? servicesData
-            : servicesData.filter((service) => service.performerType === performerFilter);
-
-        if (selectedIds.length) {
-            result = result.filter((service) => selectedIds.includes(service.artSubCategory));
-        }
-
-        if (draft.currency) {
-            result = result.filter((service) => service.currency === draft.currency);
-        }
-
-        if (draft.applyPrice) {
-            result = result.filter((service) => {
-                if (typeof service.price !== 'number') {
-                    return false;
-                }
-
-                return service.price >= draft.minPrice && service.price <= draft.maxPrice;
-            });
-        }
-
-        const normalizedLocation = draft.location.trim().toLowerCase();
-        if (normalizedLocation) {
-            result = result.filter((service) =>
-                service.location.toLowerCase().includes(normalizedLocation)
-            );
-        }
-
-        const normalizedQuery = searchQueryParam.trim().toLowerCase();
-        if (normalizedQuery) {
-            result = result.filter((service) => {
-                const titleMatch = service.title.toLowerCase().includes(normalizedQuery);
-                const descriptionMatch = service.description.toLowerCase().includes(normalizedQuery);
-                const authorOrTeamMatch = service.authorName.toLowerCase().includes(normalizedQuery);
-
-                return titleMatch || descriptionMatch || authorOrTeamMatch;
-            });
-        }
-
-        return result.length;
-    };
-
-    const handleFilterChange = (filters: Record<string, boolean>) => {
-        setCurrentPage(1);
-        const nextPerformerFilter = resolvePerformerFilter(filters);
-
-        const selectedIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!filters[id]);
-
-        const params = new URLSearchParams(searchParams.toString());
-        if (nextPerformerFilter === 'artist') {
-            params.set('performer', 'artist');
-        } else if (nextPerformerFilter === 'team') {
-            params.set('performer', 'team');
-        } else {
-            params.delete('performer');
-        }
-        params.delete('art_subcategory');
-
-        selectedIds.forEach((id) => {
-            params.append('art_subcategory', id);
+    const handleCurrencyChange = (currency: ServiceCurrency | null) => {
+        pushParams((params) => {
+            if (currency) {
+                params.set('currency', currency);
+            } else {
+                params.delete('currency');
+            }
         });
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
-    const handleCurrencyChange = (currency: CurrencyCode | null) => {
-        setCurrentPage(1);
-        const params = new URLSearchParams(searchParams.toString());
-
-        if (currency) {
-            params.set('currency', currency);
-        } else {
-            params.delete('currency');
-        }
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
-    };
-
-    const handlePriceApply = (minPrice: number, maxPrice: number) => {
-        setCurrentPage(1);
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('price_min', String(minPrice));
-        params.set('price_max', String(maxPrice));
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
-    };
-
-    const handleLocationSearch = (location: string) => {
-        setCurrentPage(1);
-        const params = new URLSearchParams(searchParams.toString());
-        const normalizedLocation = location.trim();
-
-        if (normalizedLocation) {
-            params.set('location', normalizedLocation);
-        } else {
-            params.delete('location');
-        }
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
-    };
-
-    const handleMobileFiltersApply = (draft: ServicesFilterDraft) => {
-        setCurrentPage(1);
-        const nextPerformerFilter = resolvePerformerFilter(draft.filters);
-        const selectedIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!draft.filters[id]);
-
-        const params = new URLSearchParams(searchParams.toString());
-
-        if (nextPerformerFilter === 'artist') {
-            params.set('performer', 'artist');
-        } else if (nextPerformerFilter === 'team') {
-            params.set('performer', 'team');
-        } else {
-            params.delete('performer');
-        }
-
-        params.delete('art_subcategory');
-        selectedIds.forEach((id) => {
-            params.append('art_subcategory', id);
+    const applyPrice = (minPrice: number, maxPrice: number) => {
+        pushParams((params) => {
+            if (minPrice > 0) {
+                params.set('price_min', String(minPrice));
+            } else {
+                params.delete('price_min');
+            }
+            if (maxPrice < MAX_PRICE) {
+                params.set('price_max', String(maxPrice));
+            } else {
+                params.delete('price_max');
+            }
         });
+    };
 
-        if (draft.currency) {
-            params.set('currency', draft.currency);
-        } else {
-            params.delete('currency');
-        }
+    const applyLocation = () => {
+        pushParams((params) => {
+            const trimmed = locationInput.trim();
+            if (trimmed) {
+                params.set('location', trimmed);
+            } else {
+                params.delete('location');
+            }
+        });
+    };
 
-        if (draft.applyPrice) {
-            params.set('price_min', String(draft.minPrice));
-            params.set('price_max', String(draft.maxPrice));
-        } else {
-            params.delete('price_min');
-            params.delete('price_max');
-        }
-
-        const normalizedLocation = draft.location.trim();
-        if (normalizedLocation) {
-            params.set('location', normalizedLocation);
-        } else {
-            params.delete('location');
-        }
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    const handlePageChange = (page: number) => {
+        pushParams((params) => {
+            if (page > 1) {
+                params.set('page', String(page));
+            } else {
+                params.delete('page');
+            }
+        }, false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const handleSearch = () => {
-        setCurrentPage(1);
-        const params = new URLSearchParams(searchParams.toString());
-        const trimmedValue = searchInput.trim();
-
-        if (trimmedValue) {
-            params.set('search', trimmedValue);
-        } else {
-            params.delete('search');
-        }
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        pushParams((params) => {
+            const trimmedValue = searchInput.trim();
+            if (trimmedValue) {
+                params.set('search', trimmedValue);
+            } else {
+                params.delete('search');
+            }
+        });
     };
 
     const handleClearSearch = () => {
-        setCurrentPage(1);
         setSearchInput('');
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete('search');
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        pushParams((params) => {
+            params.delete('search');
+        });
     };
 
     const handleClearAllFilters = () => {
-        setCurrentPage(1);
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete('art_subcategory');
-        params.delete('performer');
-        params.delete('currency');
-        params.delete('price_min');
-        params.delete('price_max');
-        params.delete('location');
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
-    };
-
-    const handleRemoveFilter = (chipId: string) => {
-        setCurrentPage(1);
-        const params = new URLSearchParams(searchParams.toString());
-
-        if (chipId === 'currency') {
+        pushParams((params) => {
+            params.delete('art_subcategory');
             params.delete('currency');
-        } else if (chipId === 'price') {
             params.delete('price_min');
             params.delete('price_max');
-        } else if (chipId === 'location') {
             params.delete('location');
-        } else if (['all', 'artists', 'teams'].includes(chipId)) {
-            const newFilters = removeFilterFromState(chipId, initialSelectedFilters, servicesFilters);
-            const nextPerformerFilter = resolvePerformerFilter(newFilters);
-
-            if (nextPerformerFilter === 'artist') {
-                params.set('performer', 'artist');
-            } else if (nextPerformerFilter === 'team') {
-                params.set('performer', 'team');
-            } else {
-                params.delete('performer');
-            }
-        } else {
-            const newFilters = removeFilterFromState(chipId, initialSelectedFilters, servicesFilters);
-            params.delete('art_subcategory');
-            artItems
-                .map((item) => item.id)
-                .filter((id) => !!newFilters[id])
-                .forEach((id) => {
-                    params.append('art_subcategory', id);
-                });
-        }
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        });
     };
 
+    const subcategoryNameMap = Object.fromEntries(
+        filtersData.categories.flatMap((c) =>
+            c.subcategories.length ? c.subcategories.map((s) => [s.slug, s.name]) : [[c.slug, c.name]]
+        )
+    );
+
     const selectedFilterChips: FilterChip[] = [
-        ...buildFilterChips(servicesFilters, initialSelectedFilters),
+        ...selectedSubcategories.map((slug) => ({ id: slug, label: subcategoryNameMap[slug] ?? slug })),
         ...(selectedCurrency ? [{ id: 'currency', label: selectedCurrency }] : []),
         ...(hasPriceFilter
-            ? [{ id: 'price', label: formatPriceRange(selectedPriceMin, selectedPriceMax) }]
+            ? [{
+                  id: 'price',
+                  label: formatPriceRange(
+                      priceMinParam ? Number(priceMinParam) : 0,
+                      priceMaxParam ? Number(priceMaxParam) : MAX_PRICE
+                  ),
+              }]
             : []),
         ...(selectedLocation ? [{ id: 'location', label: selectedLocation }] : []),
     ];
 
-    const servicesByPerformer = selectedPerformerFilter === 'all'
-        ? servicesData
-        : servicesData.filter((service) => service.performerType === selectedPerformerFilter);
-    const servicesByCategory = selectedArtCategoryIds.length
-        ? servicesByPerformer.filter((service) => selectedArtCategoryIds.includes(service.artSubCategory))
-        : servicesByPerformer;
-    const filteredServices = selectedCurrency
-        ? servicesByCategory.filter((service) => service.currency === selectedCurrency)
-        : servicesByCategory;
-    const filteredByPriceServices = hasPriceFilter
-        ? filteredServices.filter((service) => {
-              if (typeof service.price !== 'number') {
-                  return false;
-              }
+    const handleRemoveFilter = (chipId: string) => {
+        if (chipId === 'currency') {
+            handleCurrencyChange(null);
+        } else if (chipId === 'price') {
+            pushParams((params) => {
+                params.delete('price_min');
+                params.delete('price_max');
+            });
+        } else if (chipId === 'location') {
+            pushParams((params) => {
+                params.delete('location');
+            });
+        } else {
+            handleSubcategoryToggle(chipId);
+        }
+    };
 
-              return service.price >= selectedPriceMin && service.price <= selectedPriceMax;
-          })
-        : filteredServices;
+    const normalizedSearchQuery = searchQueryParam.trim();
+    const noSearchResults = hasLoaded && !loading && normalizedSearchQuery && services.length === 0;
 
-    const filteredByLocationServices = selectedLocation
-        ? filteredByPriceServices.filter((service) =>
-              service.location.toLowerCase().includes(selectedLocation.toLowerCase())
-          )
-        : filteredByPriceServices;
-    const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
-    const filteredBySearchServices = normalizedSearchQuery
-        ? filteredByLocationServices.filter((service) => {
-              const titleMatch = service.title.toLowerCase().includes(normalizedSearchQuery);
-              const descriptionMatch = service.description.toLowerCase().includes(normalizedSearchQuery);
-              const authorOrTeamMatch = service.authorName.toLowerCase().includes(normalizedSearchQuery);
-
-              return titleMatch || descriptionMatch || authorOrTeamMatch;
-          })
-        : filteredByLocationServices;
-
-    const hasResults = filteredBySearchServices.length > 0;
-    const totalPages = hasResults ? Math.ceil(filteredBySearchServices.length / itemsPerPage) : 0;
+    const sidebar = (
+        <ServicesFilterSidebar
+            categories={filtersData.categories}
+            selectedSubcategories={selectedSubcategories}
+            onToggleSubcategory={handleSubcategoryToggle}
+            selectedCurrency={selectedCurrency}
+            onCurrencyChange={handleCurrencyChange}
+            initialMinPrice={initialMinPrice}
+            initialMaxPrice={initialMaxPrice}
+            onApplyPrice={applyPrice}
+            locationInput={locationInput}
+            onLocationInputChange={setLocationInput}
+            onApplyLocation={applyLocation}
+        />
+    );
 
     return (
         <div className="min-h-screen bg-[#414141]">
@@ -399,7 +272,7 @@ export default function ServicesPage() {
                     </p>
                 </div>
             )}
-            {normalizedSearchQuery && !hasResults && (
+            {noSearchResults && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pb-8 px-4">
                     <button
                         type="button"
@@ -409,75 +282,56 @@ export default function ServicesPage() {
                         <img src="/yellow_cross.svg" alt="Очистити пошук" className="w-8 h-8 md:w-9 md:h-9" />
                     </button>
                     <h2 className="mt-2 text-white text-xl md:text-3xl font-bold text-center max-w-[800px]">
-                        Нічого не знайдено. Спробуйте іншу назву проєкту або автора.
+                        Нічого не знайдено. Спробуйте іншу назву послуги або автора.
                     </h2>
                 </div>
             )}
 
-            {!(normalizedSearchQuery && !hasResults) && (
-                <div className="flex flex-col gap-4 p-4 md:px-6 lg:pl-8">
-                    <SelectedFiltersBar
-                        chips={selectedFilterChips}
-                        onRemove={handleRemoveFilter}
-                        onClearAll={handleClearAllFilters}
-                    />
-                    <div className="flex flex-col lg:flex-row gap-4">
-                        <ServicesFilterSection
-                            key={`services-filters-${selectedPerformerFilter}-${selectedArtCategoryIds.slice().sort().join(',') || 'all'}-${selectedCurrency ?? 'all-currency'}-${hasPriceFilter ? `${selectedPriceMin}-${selectedPriceMax}` : 'no-price'}-${selectedLocation || 'no-location'}`}
-                            onFilterChange={handleFilterChange}
-                            initialSelectedFilters={initialSelectedFilters}
-                            selectedCurrency={selectedCurrency}
-                            onCurrencyChange={handleCurrencyChange}
-                            initialMinPrice={selectedPriceMin}
-                            initialMaxPrice={selectedPriceMax}
-                            onPriceApply={handlePriceApply}
-                            initialLocationSearch={selectedLocation}
-                            onLocationSearch={handleLocationSearch}
+            {!noSearchResults && (
+                <div className="flex flex-col gap-4 p-4 md:px-6 lg:px-20 lg:pb-20 lg:gap-[30px]">
+                    <div className="sticky top-0 z-40 bg-[#414141] py-2 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-20 lg:px-20">
+                        <div className="flex items-center justify-between gap-2 lg:hidden mb-3">
+                            <FiltersButton
+                                onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                                isActive={isMobileFiltersOpen}
+                                selectedCount={selectedFilterChips.length}
+                            />
+                        </div>
+
+                        <SelectedFiltersBar
+                            chips={selectedFilterChips}
+                            onRemove={handleRemoveFilter}
+                            onClearAll={handleClearAllFilters}
                         />
+                    </div>
+
+                    <div className="flex flex-col lg:flex-row gap-4 lg:gap-[30px]">
+                        <div className="hidden lg:block">{sidebar}</div>
+                        {isMobileFiltersOpen && <div className="lg:hidden">{sidebar}</div>}
 
                         <div className="flex-1 w-full">
-                            <div className="lg:hidden mb-4">
-                                <FiltersButton
-                                    onClick={() => setIsMobileFiltersOpen(true)}
-                                    isActive={isMobileFiltersOpen}
-                                    selectedCount={selectedFilterChips.length}
-                                />
-                            </div>
-                            <ListOfServices
-                                currentPage={currentPage}
-                                itemsPerPage={itemsPerPage}
-                                services={filteredBySearchServices}
-                            />
+                            {loading && !hasLoaded ? (
+                                <div className="w-full min-h-[420px] flex items-center justify-center">
+                                    <p className="font-wix text-white text-lg md:text-2xl">Завантаження...</p>
+                                </div>
+                            ) : (
+                                <ListOfServices services={services} />
+                            )}
                         </div>
                     </div>
                 </div>
             )}
 
-            {hasResults && (
+            {meta.last_page > 1 && (
                 <PaginationSection
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
-            )}
-
-            {isMobileFiltersOpen && (
-                <ServicesFiltersModal
-                    onClose={() => setIsMobileFiltersOpen(false)}
-                    initialSelectedFilters={initialSelectedFilters}
-                    selectedCurrency={selectedCurrency}
-                    initialMinPrice={selectedPriceMin}
-                    initialMaxPrice={selectedPriceMax}
-                    hasPriceFilter={hasPriceFilter}
-                    initialLocation={selectedLocation}
-                    getResultCount={countServicesForDraft}
-                    onApply={handleMobileFiltersApply}
-                    onCancel={handleClearAllFilters}
+                    currentPage={meta.current_page}
+                    totalPages={meta.last_page}
+                    onPageChange={handlePageChange}
                 />
             )}
 
             <JoinCommunityWrapper />
-            
+
             <Footer />
         </div>
     );

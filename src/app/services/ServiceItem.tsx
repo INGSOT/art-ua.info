@@ -3,38 +3,32 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
-import { CurrencyCode, ServiceItemData } from '../../data/servicesData';
-import { getAuthorSlugById } from '../../data/profileData';
-import { teamData } from '../../data/teamData';
+import type { PublicService, ServiceCurrency } from '../../lib/api/publicServices';
 import { withAuthorId, withTeamId } from '../../lib/authorQuery';
 
 interface ServiceItemProps {
-    service: ServiceItemData;
+    service: PublicService;
 }
 
 export default function ServiceItem({ service }: ServiceItemProps) {
     const [isHovered, setIsHovered] = useState(false);
-    const authorHref =
-        service.performerType === 'team'
-            ? (() => {
-                  const team = teamData.find((item) => item.name === service.authorName);
-                  return team ? withTeamId('/team/projects', team.username) : null;
-              })()
-            : typeof service.authorId === 'number'
-              ? withAuthorId('/author/projects', getAuthorSlugById(service.authorId))
-              : null;
+    const authorHref = !service.performerSlug
+        ? null
+        : service.performerType === 'team'
+          ? withTeamId('/team/projects', service.performerSlug)
+          : withAuthorId('/author/projects', service.performerSlug);
     const formattedPrice =
         typeof service.price === 'number'
             ? service.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
             : '';
-    const currencyIconByCode: Record<CurrencyCode, string> = {
+    const currencyIconByCode: Record<ServiceCurrency, string> = {
         UAH: '/hryvnia.svg',
         USD: '/dollar.svg',
         EUR: '/euro.svg',
     };
 
     return (
-        <div className="bg-[#343434] flex flex-col lg:flex-row relative w-full max-w-[1100px]">
+        <div className="bg-[#343434] flex flex-col lg:flex-row relative w-full">
             {/* Left side - Avatar, Image and Content */}
             <div className="flex flex-col lg:flex-row flex-1">
                 {/* Avatar and Image */}
@@ -44,30 +38,30 @@ export default function ServiceItem({ service }: ServiceItemProps) {
                         <Link href={authorHref} className="flex items-center gap-3 p-4 w-fit">
                             <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-600 flex-shrink-0">
                                 <Image
-                                    src={service.authorAvatar}
-                                    alt={service.authorName}
+                                    src={service.performerAvatar ?? ''}
+                                    alt={service.performerName}
                                     width={48}
                                     height={48}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
                             <span className="text-white font-bold text-base">
-                                {service.authorName}
+                                {service.performerName}
                             </span>
                         </Link>
                     ) : (
                         <div className="flex items-center gap-3 p-4">
                             <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-600 flex-shrink-0">
                                 <Image
-                                    src={service.authorAvatar}
-                                    alt={service.authorName}
+                                    src={service.performerAvatar ?? ''}
+                                    alt={service.performerName}
                                     width={48}
                                     height={48}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
                             <span className="text-white font-bold text-base">
-                                {service.authorName}
+                                {service.performerName}
                             </span>
                         </div>
                     )}
@@ -75,7 +69,7 @@ export default function ServiceItem({ service }: ServiceItemProps) {
                     {/* Service image - no padding */}
                     <div className="w-full aspect-square relative overflow-hidden">
                         <Image
-                            src={service.serviceImage}
+                            src={service.image || '/masks.svg'}
                             alt={service.title}
                             fill
                             className="object-cover"
@@ -97,11 +91,12 @@ export default function ServiceItem({ service }: ServiceItemProps) {
 
                     {/* Price and Square button */}
                     <div className="flex items-center gap-3 w-full">
-                        <button className="bg-[#FECC39] hover:bg-white text-black font-bold px-6 py-3 transition-colors">
-                            {service.priceNegotiable ? (
+                        <div className="bg-[#FECC39] text-black font-bold px-6 py-3">
+                            {service.price === null ? (
                                 'Ціна договірна'
                             ) : (
                                 <span className="flex items-center gap-2">
+                                    {service.priceFrom && <span>Від</span>}
                                     <span>{formattedPrice}</span>
                                     {service.currency && (
                                         <Image
@@ -114,7 +109,7 @@ export default function ServiceItem({ service }: ServiceItemProps) {
                                     )}
                                 </span>
                             )}
-                        </button>
+                        </div>
 
                         <Link
                             href={`/services/${service.slug}`}

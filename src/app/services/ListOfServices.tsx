@@ -2,15 +2,13 @@
 
 import Image from 'next/image';
 import ServiceCard from './ServiceItem';
-import { ServiceItemData } from '../../data/servicesData';
+import type { PublicService } from '../../lib/api/publicServices';
 
 interface ListOfServicesProps {
-    currentPage: number;
-    services: ServiceItemData[];
-    itemsPerPage?: number;
+    services: PublicService[];
 }
 
-export default function ListOfServices({ currentPage, services, itemsPerPage = 6 }: ListOfServicesProps) {
+export default function ListOfServices({ services }: ListOfServicesProps) {
     if (services.length === 0) {
         return (
             <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
@@ -20,13 +18,9 @@ export default function ListOfServices({ currentPage, services, itemsPerPage = 6
         );
     }
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentServices = services.slice(startIndex, endIndex);
-
     return (
         <div className="flex flex-col gap-4">
-            {currentServices.map((service) => (
+            {services.map((service) => (
                 <ServiceCard key={service.id} service={service} />
             ))}
         </div>

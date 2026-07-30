@@ -34,14 +34,11 @@ export default function ServiceCard({
       <div className="relative w-full aspect-[705/885]">
         <Image src={image} alt={title} fill className="object-cover" />
         <div className="absolute bottom-6 left-6">
-          <button
-            type="button"
-            className="w-[199px] h-[100px] bg-[#FECC39] hover:bg-white transition-colors"
-          >
+          <div className="w-[199px] h-[100px] bg-[#FECC39] flex items-center justify-center">
             <span className="font-bold text-black text-[18px]">
               {overlayButtonLabel}
             </span>
-          </button>
+          </div>
         </div>
       </div>
 

@@ -87,6 +87,10 @@ textarea:focus {
   outline: none !important;
 }
 
+button:not(:disabled) {
+  cursor: pointer;
+}
+
 /* Slide-in animation for modal */
 @keyframes slide-in {
   from {
