@@ -134,4 +134,17 @@ export const publicServicesAPI = {
     });
     return response.data.data;
   },
+
+  /** Надіслати запит на замовлення послуги — листи виконавцю та замовнику, нічого не зберігається. */
+  order: async (slug: string, payload: OrderServicePayload): Promise<void> => {
+    await api.post(`/v1/services/${slug}/order`, payload);
+  },
 };
+
+export interface OrderServicePayload {
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+  options?: string[];
+}
