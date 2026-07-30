@@ -4,6 +4,7 @@ import type { PublicCatalog } from "../../../lib/api/publicCatalogs";
 import { withAuthorId } from "../../../lib/authorQuery";
 import { siteProfileLabel } from "../../../lib/siteDomains";
 import PdfViewer from "./PdfViewerClient";
+import CatalogLikeButton from "./CatalogLikeButton";
 
 function formatDate(value: string | null): string {
   if (!value) return "";
@@ -64,9 +65,17 @@ export default function CatalogViewer({ catalog }: { catalog: PublicCatalog }) {
           </div>
 
           <div className="bg-[#343434] p-4 flex flex-col gap-3">
-            {catalog.artCategoryName && (
+            {catalog.rootCategoryName && (
               <div className="flex items-center justify-between gap-2">
                 <span className="font-wix text-white/60 text-xs">Напрям</span>
+                <span className="font-wix text-white text-sm font-bold text-right">
+                  {catalog.rootCategoryName}
+                </span>
+              </div>
+            )}
+            {catalog.artCategoryName && catalog.artCategoryName !== catalog.rootCategoryName && (
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-wix text-white/60 text-xs">Категорія</span>
                 <span className="font-wix text-white text-sm font-bold text-right">
                   {catalog.artCategoryName}
                 </span>
@@ -78,14 +87,14 @@ export default function CatalogViewer({ catalog }: { catalog: PublicCatalog }) {
                 <span className="font-wix text-white text-sm font-bold">{publishedDate}</span>
               </div>
             )}
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-wix text-white/60 text-xs">Вподобання</span>
-              <span className="flex items-center gap-1.5">
-                <span className="font-wix text-white text-sm font-bold">{catalog.likes}</span>
-                <Image src="/like.svg" alt="" width={18} height={18} />
-              </span>
-            </div>
           </div>
+
+          <CatalogLikeButton
+            catalogId={catalog.id}
+            initialLikes={catalog.likes}
+            initialIsLiked={catalog.isLiked}
+            className="self-center"
+          />
 
           {catalog.pdfUrl && (
             <div className="flex flex-col gap-px">

@@ -22,6 +22,8 @@ export interface PublicCatalog {
   authorSlug: string | null;
   authorProfession: string | null;
   artCategoryName: string | null;
+  rootCategoryName: string | null;
+  isLiked: boolean;
 }
 
 interface RawPublicCatalog {
@@ -30,9 +32,10 @@ interface RawPublicCatalog {
   image_url: string;
   pdf_url: string | null;
   likes_count: number;
+  is_liked: boolean;
   art_category_slug: string | null;
   art_subcategory_slug: string | null;
-  art_category: { slug: string; name: string } | null;
+  art_category: { slug: string; name: string; root_name: string } | null;
   published_at: string | null;
   author: { id: number; name: string; slug: string; avatar_url: string | null; profession: string | null } | null;
 }
@@ -90,6 +93,8 @@ function mapCatalog(raw: RawPublicCatalog): PublicCatalog {
     authorSlug: raw.author?.slug ?? null,
     authorProfession: raw.author?.profession ?? null,
     artCategoryName: raw.art_category?.name ?? null,
+    rootCategoryName: raw.art_category?.root_name ?? null,
+    isLiked: raw.is_liked,
   };
 }
 
@@ -113,4 +118,20 @@ export const publicCatalogsAPI = {
     });
     return mapCatalog(response.data.data);
   },
+
+  like: async (id: number | string): Promise<CatalogLikeResponse> => {
+    const response = await api.post<CatalogLikeResponse>(`/v1/art-ua-info/catalogs/${id}/like`);
+    return response.data;
+  },
+
+  unlike: async (id: number | string): Promise<CatalogLikeResponse> => {
+    const response = await api.delete<CatalogLikeResponse>(`/v1/art-ua-info/catalogs/${id}/like`);
+    return response.data;
+  },
 };
+
+export interface CatalogLikeResponse {
+  message: string;
+  is_liked: boolean;
+  likes_count: number;
+}
