@@ -104,7 +104,7 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
             )}
             {/* Author info */}
             <Link
-              href={withAuthorId("/author/projects", catalog.authorSlug ?? "")}
+              href={withAuthorId("/author/catalogs", catalog.authorSlug ?? "")}
               className="flex items-center gap-2 md:gap-3 w-fit"
             >
               <div className="w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border-2 border-yellow-500">
