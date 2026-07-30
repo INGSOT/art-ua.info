@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
-import type { ServicesFilterCategory, ServiceCurrency } from "../../lib/api/publicServices";
+import { publicServicesAPI, type ServicesFilterCategory, type ServiceCurrency } from "../../lib/api/publicServices";
 
 const MAX_PRICE = 1000000;
 
@@ -19,6 +19,7 @@ interface ServicesFilterSidebarProps {
   locationInput: string;
   onLocationInputChange: (value: string) => void;
   onApplyLocation: () => void;
+  onSelectLocation: (city: string) => void;
 }
 
 const CURRENCIES: { id: ServiceCurrency; defaultIcon: string; activeIcon: string; width: number; height: number }[] = [
@@ -40,11 +41,42 @@ export default function ServicesFilterSidebar({
   locationInput,
   onLocationInputChange,
   onApplyLocation,
+  onSelectLocation,
 }: ServicesFilterSidebarProps) {
   const [minPrice, setMinPrice] = useState(initialMinPrice);
   const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
   const [minPriceInput, setMinPriceInput] = useState(String(initialMinPrice));
   const [maxPriceInput, setMaxPriceInput] = useState(String(initialMaxPrice));
+  const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
+  const [isLocationFocused, setIsLocationFocused] = useState(false);
+
+  useEffect(() => {
+    const query = locationInput.trim();
+    if (!query) {
+      setLocationSuggestions([]);
+      return;
+    }
+
+    let ignore = false;
+    const timeout = setTimeout(async () => {
+      try {
+        const results = await publicServicesAPI.locations(query);
+        if (!ignore) setLocationSuggestions(results);
+      } catch {
+        if (!ignore) setLocationSuggestions([]);
+      }
+    }, 300);
+
+    return () => {
+      ignore = true;
+      clearTimeout(timeout);
+    };
+  }, [locationInput]);
+
+  const selectLocation = (city: string) => {
+    setLocationSuggestions([]);
+    onSelectLocation(city);
+  };
 
   useEffect(() => {
     setMinPrice(initialMinPrice);
@@ -232,25 +264,56 @@ export default function ServicesFilterSidebar({
       </Unit>
 
       <Unit title="Місцезнаходження" isLast={false}>
-        <div className="relative w-full h-[50px]">
-          <input
-            type="text"
-            placeholder="Пошук"
-            value={locationInput}
-            onChange={(e) => onLocationInputChange(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") onApplyLocation();
-            }}
-            className="font-wix w-full h-full bg-[#343434] text-white placeholder-gray-400 px-4 pr-12"
-          />
-          <button
-            type="button"
-            onClick={onApplyLocation}
-            className="absolute right-4 top-1/2 -translate-y-1/2"
-            aria-label="Search by location"
-          >
-            <Image src="/search.svg" alt="Search" width={20} height={20} />
-          </button>
+        <div className="relative w-full">
+          <div className="relative w-full h-[50px]">
+            <input
+              type="text"
+              placeholder="Пошук"
+              value={locationInput}
+              onChange={(e) => onLocationInputChange(e.target.value)}
+              onFocus={() => setIsLocationFocused(true)}
+              onBlur={() => setIsLocationFocused(false)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onApplyLocation();
+              }}
+              className="font-wix w-full h-full bg-[#343434] text-white placeholder-gray-400 px-4 pr-12"
+            />
+            <button
+              type="button"
+              onClick={onApplyLocation}
+              className="absolute right-4 top-1/2 -translate-y-1/2"
+              aria-label="Search by location"
+            >
+              <Image src="/search.svg" alt="Search" width={20} height={20} />
+            </button>
+          </div>
+
+          {isLocationFocused && locationSuggestions.length > 0 && (
+            <div className="flex flex-col gap-px mt-px">
+              {locationSuggestions.map((city) => {
+                const query = locationInput.trim();
+                const matchIndex = query ? city.toLowerCase().indexOf(query.toLowerCase()) : -1;
+                const matched = matchIndex === 0 ? city.slice(0, query.length) : "";
+                const rest = matchIndex === 0 ? city.slice(query.length) : city;
+
+                return (
+                  <button
+                    key={city}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => selectLocation(city)}
+                    className="w-full min-h-[50px] px-3 py-3 flex items-center justify-between gap-3 bg-[#343434] text-left transition-colors hover:bg-[#3a3a3a]"
+                  >
+                    <span className="text-sm font-bold">
+                      <span className="text-[#FECC39]">{matched}</span>
+                      <span className="text-white">{rest}</span>
+                    </span>
+                    <Image src="/yellow_plus.svg" alt="" width={16} height={16} className="flex-shrink-0" />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </Unit>
 

@@ -152,15 +152,20 @@ export default function ServicesPage() {
         });
     };
 
-    const applyLocation = () => {
+    const applyLocation = (value?: string) => {
+        const trimmed = (value ?? locationInput).trim();
         pushParams((params) => {
-            const trimmed = locationInput.trim();
             if (trimmed) {
                 params.set('location', trimmed);
             } else {
                 params.delete('location');
             }
         });
+    };
+
+    const handleSelectLocation = (city: string) => {
+        setLocationInput(city);
+        applyLocation(city);
     };
 
     const handlePageChange = (page: number) => {
@@ -255,7 +260,8 @@ export default function ServicesPage() {
             onApplyPrice={applyPrice}
             locationInput={locationInput}
             onLocationInputChange={setLocationInput}
-            onApplyLocation={applyLocation}
+            onApplyLocation={() => applyLocation()}
+            onSelectLocation={handleSelectLocation}
         />
     );
 

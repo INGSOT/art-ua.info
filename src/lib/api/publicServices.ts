@@ -126,4 +126,12 @@ export const publicServicesAPI = {
     });
     return mapService(response.data.data);
   },
+
+  /** Підказки міст (серед виконавців, що мають хоча б одну послугу) для автодоповнення пошуку за локацією. */
+  locations: async (search: string): Promise<string[]> => {
+    const response = await api.get<{ data: string[] }>("/v1/services/locations", {
+      params: { language: "uk", search },
+    });
+    return response.data.data;
+  },
 };
