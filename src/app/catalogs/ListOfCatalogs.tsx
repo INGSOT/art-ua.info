@@ -28,8 +28,8 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
       }`}
     >
       {catalogs.map((catalog) => {
-        const pdfHref = catalog.pdfUrl;
-        const openable = Boolean(pdfHref) && !disableInteractions;
+        const pdfHref = `/catalogs/${catalog.id}`;
+        const openable = !disableInteractions;
 
         return (
         <Card
@@ -39,11 +39,9 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
           }${openable ? "cursor-pointer" : ""}`}
         >
           <CardContent className="p-0 flex flex-col gap-2 md:gap-3">
-            {pdfHref && !disableInteractions ? (
-              <a
+            {openable ? (
+              <Link
                 href={pdfHref}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="flex flex-col gap-2 md:gap-3 no-underline text-inherit"
               >
                 {/* Catalog image with likes overlay */}
@@ -68,7 +66,7 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
                 <h3 className="font-h6 font-bold text-white text-base md:text-lg lg:text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
                   {catalog.title}
                 </h3>
-              </a>
+              </Link>
             ) : (
               <>
                 <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">

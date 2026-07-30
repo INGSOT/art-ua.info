@@ -20,6 +20,8 @@ export interface PublicCatalog {
   authorName: string;
   authorAvatar: string;
   authorSlug: string | null;
+  authorProfession: string | null;
+  artCategoryName: string | null;
 }
 
 interface RawPublicCatalog {
@@ -30,8 +32,9 @@ interface RawPublicCatalog {
   likes_count: number;
   art_category_slug: string | null;
   art_subcategory_slug: string | null;
+  art_category: { slug: string; name: string } | null;
   published_at: string | null;
-  author: { id: number; name: string; slug: string; avatar_url: string | null } | null;
+  author: { id: number; name: string; slug: string; avatar_url: string | null; profession: string | null } | null;
 }
 
 export interface CatalogsFilterOption {
@@ -67,6 +70,10 @@ interface RawCatalogsListResponse {
   filters: CatalogsListFilters;
 }
 
+interface RawCatalogResponse {
+  data: RawPublicCatalog;
+}
+
 function mapCatalog(raw: RawPublicCatalog): PublicCatalog {
   return {
     id: raw.id,
@@ -81,6 +88,8 @@ function mapCatalog(raw: RawPublicCatalog): PublicCatalog {
     authorName: raw.author?.name ?? "",
     authorAvatar: absoluteUrl(raw.author?.avatar_url) ?? "",
     authorSlug: raw.author?.slug ?? null,
+    authorProfession: raw.author?.profession ?? null,
+    artCategoryName: raw.art_category?.name ?? null,
   };
 }
 
@@ -95,5 +104,13 @@ export const publicCatalogsAPI = {
       meta: response.data.meta,
       filters: response.data.filters,
     };
+  },
+
+  /** Один каталог за id — для сторінки перегляду PDF. */
+  show: async (id: number | string): Promise<PublicCatalog> => {
+    const response = await api.get<RawCatalogResponse>(`/v1/art-ua-info/catalogs/${id}`, {
+      params: { language: "uk" },
+    });
+    return mapCatalog(response.data.data);
   },
 };
