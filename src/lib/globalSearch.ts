@@ -41,7 +41,7 @@ const PARTICIPANTS_PATH = "/authors";
 const PROJECTS_PATH = "/projects";
 const SERVICES_PATH = "/services";
 const CATALOGS_PATH = "/catalogs";
-const NEWS_PATH = "/news_events";
+const NEWS_PATH = "/news-events";
 
 const LABEL_PARTICIPANTS = "Учасники";
 const LABEL_PROJECTS = "Проєкти";

@@ -127,6 +127,6 @@ export const linkMap: Record<string, string> = {
   "Каталоги": "/catalogs",
   "Проєкти": "/projects",
   "Послуги": "/services",
-  "Новини та події": "/news_events",
+  "Новини та події": "/news-events",
   "Часті питання": "/faq",
 };

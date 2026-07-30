@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
 
-export const NEWS_IMAGE_PLACEHOLDER = "/news/news-image-1.png";
+const NEWS_IMAGE_PLACEHOLDER = "/news/no-image-news.png";
 
 export interface NewsListCardItem {
   id: number;
@@ -25,7 +25,7 @@ export default function ListOfNews({ news, disableHover = false }: ListOfNewsPro
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {news.map((newsItem) => (
         <Link
-          href={`/news_events/${newsItem.slug}`}
+          href={`/news-events/${newsItem.slug}`}
           key={newsItem.id}
           onClick={(event) => {
             if (disableHover) {
@@ -45,7 +45,7 @@ export default function ListOfNews({ news, disableHover = false }: ListOfNewsPro
                   src={newsItem.mainImage ?? NEWS_IMAGE_PLACEHOLDER}
                   alt={newsItem.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                 />
                 {/* Darkening overlay on hover */}
                 <div className={`absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ${disableHover ? "" : "group-hover:opacity-50"}`}></div>

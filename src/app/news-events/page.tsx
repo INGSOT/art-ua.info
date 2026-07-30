@@ -31,7 +31,6 @@ const mapToCardItem = (item: PublicNewsListItem): NewsListCardItem => ({
 
 export default function NewsEventsPage() {
     const [currentPage, setCurrentPage] = useState(1);
-    const [sortOption, setSortOption] = useState<SortOption>("Новіші");
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [allNews, setAllNews] = useState<PublicNewsListItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -39,6 +38,8 @@ export default function NewsEventsPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
+
+    const sortOption: SortOption = searchParams.get("sort") === "old" ? "Давніші" : "Новіші";
 
     const searchQueryParam = searchParams.get("search") ?? "";
     const [searchInput, setSearchInput] = useState(searchQueryParam);
@@ -98,9 +99,18 @@ export default function NewsEventsPage() {
     };
 
     const handleSortChange = (option: SortOption) => {
-        setSortOption(option);
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (option === "Давніші") {
+            params.set("sort", "old");
+        } else {
+            params.delete("sort");
+        }
+
         setCurrentPage(1);
         setIsSortOpen(false);
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
     const handleSearch = () => {

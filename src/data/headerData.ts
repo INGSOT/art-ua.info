@@ -18,7 +18,7 @@ export const navigationItems: NavigationItem[] = [
   { label: "Мистецтво", href: "/projects" },
   { label: "Послуги", href: "/services" },
   { label: "Каталоги", href: "/catalogs" },
-  { label: "Новини та події", href: "/news_events" },
+  { label: "Новини та події", href: "/news-events" },
 ];
 
 export const socialIcons: SocialIcon[] = [

@@ -13,20 +13,6 @@ export interface NewsItem {
   textBlocks: NewsTextBlock[];
 }
 
-export interface NewsSocialLink {
-  name: string;
-  url: string;
-  icon: string;
-}
-
-export const newsSocialLinks: NewsSocialLink[] = [
-  { name: "DeviantArt", url: "", icon: "/socials/deviantart_yellow.svg" },
-  { name: "Facebook", url: "https://facebook.com", icon: "/socials/facebook_yellow.svg" },
-  { name: "X (Twitter)", url: "https://twitter.com", icon: "/socials/x_yellow.svg" },
-  { name: "Pinterest", url: "https://pinterest.com", icon: "/socials/pinterest_yellow.svg" },
-  { name: "LinkedIn", url: "https://linkedin.com", icon: "/socials/linked_in_yellow.svg" },
-];
-
 export const newsData: NewsItem[] = [
   {
     id: 1,

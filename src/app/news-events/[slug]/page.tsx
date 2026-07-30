@@ -40,7 +40,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         />
       </div>
 
-      <SocialLinksBar />
+      <SocialLinksBar slug={article.slug} title={article.title} />
       <JoinCommunityWrapper />
     </>
   );
