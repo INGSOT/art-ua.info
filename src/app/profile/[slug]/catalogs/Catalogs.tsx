@@ -15,6 +15,7 @@ export default function Catalogs() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [catalogToDelete, setCatalogToDelete] = useState<number | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingCatalog, setEditingCatalog] = useState<MyCatalog | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,15 +69,40 @@ export default function Catalogs() {
     titleEn: string;
     artCategory: string;
     artSubcategory: string | null;
-    image: string;
-    pdfFile: File;
+    image: string | null;
+    pdfFile: File | null;
   }) => {
-    const created = await myCatalogsAPI.create(params);
+    const created = await myCatalogsAPI.create({
+      ...params,
+      image: params.image as string,
+      pdfFile: params.pdfFile as File,
+    });
     setCatalogs((prev) => [...prev, created]);
   };
 
   const handleAddCancel = () => {
     setIsAddModalOpen(false);
+  };
+
+  const handleEditClick = (catalog: MyCatalog) => {
+    setEditingCatalog(catalog);
+  };
+
+  const handleEditCatalog = async (params: {
+    titleUk: string;
+    titleEn: string;
+    artCategory: string;
+    artSubcategory: string | null;
+    image: string | null;
+    pdfFile: File | null;
+  }) => {
+    if (!editingCatalog) return;
+    const updated = await myCatalogsAPI.update(editingCatalog.id, params);
+    setCatalogs((prev) => prev.map((catalog) => (catalog.id === updated.id ? updated : catalog)));
+  };
+
+  const handleEditCancel = () => {
+    setEditingCatalog(null);
   };
 
   if (loading) {
@@ -97,7 +123,7 @@ export default function Catalogs() {
         <AddCatalog
           isOpen={isAddModalOpen}
           onClose={handleAddCancel}
-          onAdd={handleAddCatalog}
+          onSubmit={handleAddCatalog}
         />
       </section>
     );
@@ -182,11 +208,22 @@ export default function Catalogs() {
                 </div>
               </div>
 
-              {/* Delete button in top-right corner */}
-              <div className="absolute top-3 right-3 z-20">
+              {/* Edit/Delete buttons in top-right corner */}
+              <div className="absolute top-3 right-3 z-20 flex gap-2">
+                <button
+                  onClick={() => handleEditClick(catalog)}
+                  className="bg-[#343434] p-2 hover:bg-[#272727] transition-colors cursor-pointer"
+                >
+                  <Image
+                    src="/edit_yellow.svg"
+                    alt={catalogsTexts.editIconAlt}
+                    width={20}
+                    height={20}
+                  />
+                </button>
                 <button
                   onClick={(e) => handleDeleteClick(catalog.id, e)}
-                  className="bg-[#343434] p-2 hover:bg-[#272727] transition-colors"
+                  className="bg-[#343434] p-2 hover:bg-[#272727] transition-colors cursor-pointer"
                 >
                   <Image
                     src="/yellow_cross.svg"
@@ -225,7 +262,28 @@ export default function Catalogs() {
       <AddCatalog
         isOpen={isAddModalOpen}
         onClose={handleAddCancel}
-        onAdd={handleAddCatalog}
+        onSubmit={handleAddCatalog}
+      />
+
+      {/* Edit Catalog Modal */}
+      <AddCatalog
+        key={editingCatalog?.id ?? "edit"}
+        isOpen={editingCatalog !== null}
+        onClose={handleEditCancel}
+        onSubmit={handleEditCatalog}
+        initialData={
+          editingCatalog
+            ? {
+                titleUk: editingCatalog.titleUk,
+                titleEn: editingCatalog.titleEn,
+                artCategory: editingCatalog.artCategory ?? "",
+                artSubcategory: editingCatalog.artSubcategory,
+                categoryLabel: editingCatalog.categoryLabel,
+                imageUrl: editingCatalog.imageUrl,
+                pdfUrl: editingCatalog.pdfUrl,
+              }
+            : undefined
+        }
       />
     </section>
   );

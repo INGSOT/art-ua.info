@@ -97,6 +97,7 @@ export interface CatalogsTexts {
   addCatalogButton: string;
   addCatalogButtonIconAlt: string;
   tooltip: string;
+  editIconAlt: string;
   deleteIconAlt: string;
   likeIconAlt: string;
 }
@@ -105,6 +106,7 @@ export const catalogsTexts: CatalogsTexts = {
   addCatalogButton: "Додати каталог",
   addCatalogButtonIconAlt: "Plus",
   tooltip: "Зробити основним (для відображення на головній та сторінці митців).",
+  editIconAlt: "Edit",
   deleteIconAlt: "Delete",
   likeIconAlt: "Like",
 };
@@ -118,6 +120,7 @@ export const catalogEmptyState = {
 // Add Catalog Modal
 export interface AddCatalogTexts {
   title: string;
+  editTitle: string;
   closeAlt: string;
   titleUkLabel: string;
   titleUkPlaceholder: string;
@@ -131,10 +134,12 @@ export interface AddCatalogTexts {
   catalogRemoveAlt: string;
   uploadIconAlt: string;
   addButton: string;
+  saveButton: string;
 }
 
 export const addCatalogTexts: AddCatalogTexts = {
   title: "Новий каталог",
+  editTitle: "Редагувати каталог",
   closeAlt: "Close",
   titleUkLabel: "Назва каталогу (укр.)",
   titleUkPlaceholder: "Введіть назву українською",
@@ -148,6 +153,7 @@ export const addCatalogTexts: AddCatalogTexts = {
   catalogRemoveAlt: "Remove catalog",
   uploadIconAlt: "Upload",
   addButton: "Додати",
+  saveButton: "Зберегти",
 };
 
 // Delete Catalog Modal

@@ -10,32 +10,54 @@ import SelectCatalogCategoryForm from "./SelectCatalogCategoryForm";
 const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
 const MAX_PDF_SIZE_BYTES = 20 * 1024 * 1024;
 
+interface AddCatalogInitialData {
+  titleUk: string;
+  titleEn: string;
+  artCategory: string;
+  artSubcategory: string | null;
+  categoryLabel: string | null;
+  imageUrl: string;
+  pdfUrl: string | null;
+}
+
 interface AddCatalogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (params: {
+  initialData?: AddCatalogInitialData;
+  onSubmit: (params: {
     titleUk: string;
     titleEn: string;
     artCategory: string;
     artSubcategory: string | null;
-    image: string;
-    pdfFile: File;
+    image: string | null;
+    pdfFile: File | null;
   }) => Promise<void>;
+}
+
+function pdfNameFromUrl(url: string | null): string | null {
+  if (!url) return null;
+  const fileName = url.split("/").pop();
+  return fileName ? decodeURIComponent(fileName) : null;
 }
 
 export default function AddCatalog({
   isOpen,
   onClose,
-  onAdd,
+  initialData,
+  onSubmit,
 }: AddCatalogProps) {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const isEditMode = Boolean(initialData);
+  const [selectedImage, setSelectedImage] = useState<string | null>(initialData?.imageUrl ?? null);
   const [catalogFile, setCatalogFile] = useState<File | null>(null);
+  const [existingPdfName, setExistingPdfName] = useState<string | null>(
+    pdfNameFromUrl(initialData?.pdfUrl ?? null)
+  );
   const [isHoveringCatalogButton, setIsHoveringCatalogButton] = useState(false);
-  const [titleUk, setTitleUk] = useState("");
-  const [titleEn, setTitleEn] = useState("");
-  const [artCategory, setArtCategory] = useState("");
-  const [artSubcategory, setArtSubcategory] = useState<string | null>(null);
-  const [categoryLabel, setCategoryLabel] = useState<string | null>(null);
+  const [titleUk, setTitleUk] = useState(initialData?.titleUk ?? "");
+  const [titleEn, setTitleEn] = useState(initialData?.titleEn ?? "");
+  const [artCategory, setArtCategory] = useState(initialData?.artCategory ?? "");
+  const [artSubcategory, setArtSubcategory] = useState<string | null>(initialData?.artSubcategory ?? null);
+  const [categoryLabel, setCategoryLabel] = useState<string | null>(initialData?.categoryLabel ?? null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [categories, setCategories] = useState<ArtCategory[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -124,6 +146,7 @@ export default function AddCatalog({
   const handleRemoveCatalog = (e: React.MouseEvent) => {
     e.stopPropagation();
     setCatalogFile(null);
+    setExistingPdfName(null);
     if (catalogInputRef.current) {
       catalogInputRef.current.value = "";
     }
@@ -132,6 +155,7 @@ export default function AddCatalog({
   const resetState = () => {
     setSelectedImage(null);
     setCatalogFile(null);
+    setExistingPdfName(null);
     setTitleUk("");
     setTitleEn("");
     setArtCategory("");
@@ -151,18 +175,20 @@ export default function AddCatalog({
   };
 
   const handleAdd = async () => {
-    if (!selectedImage || !catalogFile || isSubmitting) return;
+    if (!selectedImage || (!catalogFile && !existingPdfName) || isSubmitting) return;
 
     setIsSubmitting(true);
     setSubmitError(null);
 
+    const imageChanged = !initialData || selectedImage !== initialData.imageUrl;
+
     try {
-      await onAdd({
+      await onSubmit({
         titleUk,
         titleEn,
         artCategory,
         artSubcategory,
-        image: selectedImage,
+        image: imageChanged ? selectedImage : null,
         pdfFile: catalogFile,
       });
       resetState();
@@ -191,7 +217,7 @@ export default function AddCatalog({
         {/* Header */}
         <div className="flex items-center justify-between p-6">
           <h2 className="text-white text-[18px] font-bold">
-            {addCatalogTexts.title}
+            {isEditMode ? addCatalogTexts.editTitle : addCatalogTexts.title}
           </h2>
           <button
             onClick={handleClose}
@@ -325,7 +351,7 @@ export default function AddCatalog({
           />
 
           {/* Catalog Upload Button/Display */}
-          {!catalogFile ? (
+          {!catalogFile && !existingPdfName ? (
             <button
               onClick={handleCatalogUploadClick}
               className={`w-full h-[160px] bg-[#343434] border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-[#3a3a3a] transition-colors ${
@@ -353,9 +379,9 @@ export default function AddCatalog({
                   : "bg-[#343434] text-[#FECC39]"
               }`}
             >
-              <div className="flex-1 flex items-center justify-center px-6">
-                <span className="font-bold text-[18px] truncate">
-                  {catalogFile.name}
+              <div className="flex-1 min-w-0 flex items-center justify-center px-6">
+                <span dir="rtl" className="font-bold text-[18px] truncate block w-full text-left">
+                  {catalogFile?.name ?? existingPdfName}
                 </span>
               </div>
               <div
@@ -392,10 +418,10 @@ export default function AddCatalog({
           {submitError && <p className="text-red-500 text-sm text-center">{submitError}</p>}
           <button
             onClick={handleAdd}
-            disabled={!selectedImage || !catalogFile || isSubmitting}
+            disabled={!selectedImage || (!catalogFile && !existingPdfName) || isSubmitting}
             className="w-full md:w-[320px] h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[18px] hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {addCatalogTexts.addButton}
+            {isEditMode ? addCatalogTexts.saveButton : addCatalogTexts.addButton}
           </button>
         </div>
       </div>
