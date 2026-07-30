@@ -72,7 +72,7 @@ export default function ServiceCard({
         <button
           type="button"
           onClick={footer.onClick}
-          className="group flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors w-full"
+          className="group flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors w-full cursor-pointer"
         >
           <span className="flex items-center justify-center flex-1 px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)]">
             {footerLabel}

@@ -7,6 +7,7 @@ import AddProjectCover from "../create-project/AddProjectCover";
 import { myServicesAPI } from "../../../../lib/api/myServices";
 import { withProfileId } from "../../../../lib/authorQuery";
 import { useProfileView } from "../../ProfileViewContext";
+import { getApiErrorMessage, getApiFieldErrors } from "../../../../lib/apiError";
 
 interface ServiceFormProps {
   mode?: "create" | "edit";
@@ -56,32 +57,51 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
   const [isPublishHovered, setIsPublishHovered] = useState(false);
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const isEditMode = mode === "edit" && !!editSlug;
+  const isMissingEditTarget = mode === "edit" && !editSlug;
 
   useEffect(() => {
     if (!isEditMode || !editSlug) return;
-    myServicesAPI.list().then((services) => {
-      const service = services.find((s) => s.slug === editSlug);
-      if (!service) return;
-      setServiceCover(service.imageUrl);
-      setServiceNameUa(service.title);
-      setPriceNegotiable(service.price === null);
-      setPriceAmount(service.price !== null ? String(service.price) : "");
-      setSelectedCurrency(service.currency ? CODE_TO_CURRENCY[service.currency] ?? null : null);
-      setDescriptionUa(service.description);
-      if (service.options.length > 0) {
-        setOptions(service.options.map((name, index) => ({ id: String(index + 1), nameUa: name, nameEn: "" })));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    myServicesAPI
+      .show(editSlug)
+      .then((service) => {
+        setServiceCover(service.imageUrl);
+        setServiceNameUa(service.titleUk);
+        setServiceNameEn(service.titleEn);
+        setPriceNegotiable(service.price === null);
+        setPriceAmount(service.price !== null ? String(service.price) : "");
+        setSelectedCurrency(service.currency ? CODE_TO_CURRENCY[service.currency] ?? null : null);
+        setDescriptionUa(service.descriptionUk);
+        setDescriptionEn(service.descriptionEn);
+        if (service.options.length > 0) {
+          setOptions(
+            service.options.map((option, index) => ({
+              id: String(index + 1),
+              nameUa: option.nameUk,
+              nameEn: option.nameEn,
+            }))
+          );
+        }
+      })
+      .catch(() => setError("Не вдалося завантажити послугу"));
   }, [isEditMode, editSlug]);
 
-  const currencies = [
+  const currencies: { id: CurrencyId; icon: string }[] = [
     { id: 'hryvnia', icon: '/hryvnia.svg' },
     { id: 'dollar', icon: '/dollar.svg' },
     { id: 'euro', icon: '/euro.svg' },
   ];
+
+  const clearFieldErrors = (keys: string[]) => {
+    setFieldErrors((prev) => {
+      if (!keys.some((key) => key in prev)) return prev;
+      const next = { ...prev };
+      keys.forEach((key) => delete next[key]);
+      return next;
+    });
+  };
 
   const addOption = () => {
     const newId = (options.length + 1).toString();
@@ -90,6 +110,13 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
 
   const updateOption = (id: string, field: "nameUa" | "nameEn", value: string) => {
     setOptions(options.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt)));
+    setFieldErrors((prev) => {
+      const keys = Object.keys(prev).filter((key) => key.startsWith("options."));
+      if (keys.length === 0) return prev;
+      const next = { ...prev };
+      keys.forEach((key) => delete next[key]);
+      return next;
+    });
   };
 
   const deleteOption = (id: string) => {
@@ -116,8 +143,9 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
 
   const handlePublish = async () => {
     setError(null);
+    setFieldErrors({});
     if (!serviceNameUa.trim()) {
-      setError("Вкажіть назву послуги");
+      setFieldErrors({ "title.uk": ["Вкажіть назву послуги"] });
       return;
     }
 
@@ -139,8 +167,10 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
         await myServicesAPI.create(payload);
       }
       router.push(withProfileId("/profile/services", profileSlug));
-    } catch {
-      setError("Не вдалося зберегти послугу");
+    } catch (err) {
+      const errors = getApiFieldErrors(err);
+      if (errors) setFieldErrors(errors);
+      setError(getApiErrorMessage(err, "Не вдалося зберегти послугу"));
     }
   };
 
@@ -154,6 +184,23 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
     }
   };
 
+  const imageError = fieldErrors.image?.[0];
+  const titleUaError = fieldErrors["title.uk"]?.[0] || fieldErrors.title?.[0];
+  const titleEnError = fieldErrors["title.en"]?.[0];
+  const priceError = fieldErrors.price?.[0];
+  const currencyError = fieldErrors.currency?.[0];
+  const descriptionUaError = fieldErrors["description.uk"]?.[0];
+  const descriptionEnError = fieldErrors["description.en"]?.[0];
+  const optionsError = Object.entries(fieldErrors).find(([key]) => key.startsWith("options."))?.[1]?.[0];
+
+  if (isMissingEditTarget) {
+    return (
+      <div className="flex flex-col items-center gap-4 px-4 py-10 bg-[#414141] min-h-screen">
+        <p className="text-white">Послугу не знайдено</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center gap-8 px-4 py-10 md:px-10 lg:px-[75px] bg-[#414141] min-h-screen">
       {error && (
@@ -163,12 +210,12 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
       )}
       <form className="flex flex-col items-center gap-8 w-full max-w-[1000px]">
         {/* Cover Upload */}
-        <div className="w-full flex justify-center">
+        <div className="w-full flex flex-col items-center gap-2">
           <div
             onClick={() => !serviceCover && setIsCoverModalOpen(true)}
             className={`relative flex flex-col items-center justify-center gap-4 w-[400px] h-[400px] bg-[#343434] transition-colors ${
               !serviceCover ? "cursor-pointer hover:bg-[#3a3a3a]" : ""
-            }`}
+            } ${imageError ? "border-2 border-red-500" : ""}`}
           >
             {serviceCover ? (
               <>
@@ -179,6 +226,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
                   className="object-cover"
                 />
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsCoverModalOpen(true);
@@ -197,40 +245,49 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
               <>
                 <Image src="/upload.svg" alt="upload" width={48} height={48} />
                 <p className="text-white text-center">
-                  Додайте обкладинку<br />(обов'язково)
+                  Додайте обкладинку<br />(обов&apos;язково)
                 </p>
               </>
             )}
           </div>
+          {imageError && <p className="text-red-500 text-sm">{imageError}</p>}
         </div>
 
         {/* Service Name */}
         <div className="w-full flex flex-col gap-2">
           <label className="font-wix text-white text-sm">Назва послуги</label>
-          <div className="relative">
+          <div className={`relative ${titleUaError ? "border-2 border-red-500" : ""}`}>
             <div className="absolute left-4 top-1/2 -translate-y-1/2">
               <Image src="/ua.svg" alt="UA" width={24} height={24} />
             </div>
             <input
               type="text"
               value={serviceNameUa}
-              onChange={(e) => setServiceNameUa(e.target.value)}
+              onChange={(e) => {
+                setServiceNameUa(e.target.value);
+                clearFieldErrors(["title.uk", "title"]);
+              }}
               placeholder="Вкажіть повну назву послуги"
               className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
             />
           </div>
-          <div className="relative">
+          {titleUaError && <p className="text-red-500 text-sm">{titleUaError}</p>}
+          <div className={`relative ${titleEnError ? "border-2 border-red-500" : ""}`}>
             <div className="absolute left-4 top-1/2 -translate-y-1/2">
               <Image src="/en.svg" alt="EN" width={24} height={24} />
             </div>
             <input
               type="text"
               value={serviceNameEn}
-              onChange={(e) => setServiceNameEn(e.target.value)}
+              onChange={(e) => {
+                setServiceNameEn(e.target.value);
+                clearFieldErrors(["title.en"]);
+              }}
               placeholder="Please specify the full name of the service"
               className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0]"
             />
           </div>
+          {titleEnError && <p className="text-red-500 text-sm">{titleEnError}</p>}
         </div>
 
         {/* Cost Section */}
@@ -270,22 +327,28 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
             <input
               type="text"
               value={priceAmount}
-              onChange={(e) => setPriceAmount(e.target.value)}
+              onChange={(e) => {
+                setPriceAmount(e.target.value);
+                clearFieldErrors(["price"]);
+              }}
               placeholder="Вкажіть суму"
-              className="font-wix w-[566px] h-[50px] bg-[#343434] text-white px-4 placeholder-[#A0A0A0]"
+              className={`font-wix w-[566px] h-[50px] bg-[#343434] text-white px-4 placeholder-[#A0A0A0] ${
+                priceError ? "border-2 border-red-500" : ""
+              }`}
             />
 
             {/* Currency Selector */}
-            <div className="flex gap-4">
+            <div className={`flex gap-4 ${currencyError ? "border-2 border-red-500" : ""}`}>
               {currencies.map((currency) => (
                 <button
                   key={currency.id}
                   type="button"
                   onClick={() => {
+                    clearFieldErrors(["currency"]);
                     if (selectedCurrency === currency.id) {
                       setSelectedCurrency(null);
                     } else {
-                      setSelectedCurrency(currency.id as any);
+                      setSelectedCurrency(currency.id);
                     }
                   }}
                   className={`w-[100px] h-[50px] flex items-center justify-center transition-colors group ${
@@ -310,6 +373,9 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
               ))}
             </div>
           </div>
+          {(priceError || currencyError) && (
+            <p className="text-red-500 text-sm">{priceError || currencyError}</p>
+          )}
 
           {/* Or divider */}
           <div className="flex justify-center">
@@ -361,29 +427,42 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
             </div>
             <textarea
               value={descriptionUa}
-              onChange={(e) => setDescriptionUa(e.target.value)}
+              onChange={(e) => {
+                setDescriptionUa(e.target.value);
+                clearFieldErrors(["description.uk"]);
+              }}
               placeholder="Детально опишіть послугу"
-              className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none"
+              className={`font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none ${
+                descriptionUaError ? "border-2 border-red-500" : ""
+              }`}
               style={{ width: "1000px", height: "180px" }}
             />
           </div>
+          {descriptionUaError && <p className="text-red-500 text-sm">{descriptionUaError}</p>}
           <div className="relative">
             <div className="absolute left-4 top-4">
               <Image src="/en.svg" alt="EN" width={24} height={24} />
             </div>
             <textarea
               value={descriptionEn}
-              onChange={(e) => setDescriptionEn(e.target.value)}
+              onChange={(e) => {
+                setDescriptionEn(e.target.value);
+                clearFieldErrors(["description.en"]);
+              }}
               placeholder="Describe the service in detail"
-              className="font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none"
+              className={`font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none ${
+                descriptionEnError ? "border-2 border-red-500" : ""
+              }`}
               style={{ width: "1000px", height: "180px" }}
             />
           </div>
+          {descriptionEnError && <p className="text-red-500 text-sm">{descriptionEnError}</p>}
         </div>
 
         {/* Options Section */}
         <div className="w-full flex flex-col gap-6">
           <h2 className="text-white text-[20px] font-bold">Опції</h2>
+          {optionsError && <p className="text-red-500 text-sm">{optionsError}</p>}
 
           {options.map((option, index) => (
             <div key={option.id} className="flex gap-4">
@@ -534,7 +613,10 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
       <AddProjectCover
         isOpen={isCoverModalOpen}
         onClose={() => setIsCoverModalOpen(false)}
-        onImageSelect={(imageUrl) => setServiceCover(imageUrl)}
+        onImageSelect={(imageUrl) => {
+          setServiceCover(imageUrl);
+          clearFieldErrors(["image"]);
+        }}
         onImageRemove={() => setServiceCover(null)}
         currentImage={serviceCover}
         customTitle="Додайте обкладинку"

@@ -43,6 +43,50 @@ function mapService(raw: RawMyService): MyService {
   };
 }
 
+export interface MyServiceDetail {
+  slug: string;
+  titleUk: string;
+  titleEn: string;
+  descriptionUk: string;
+  descriptionEn: string;
+  imageUrl: string | null;
+  price: number | null;
+  currency: string | null;
+  options: { nameUk: string; nameEn: string }[];
+}
+
+interface RawLocalized {
+  uk?: string;
+  en?: string;
+}
+
+interface RawMyServiceDetail {
+  slug: string;
+  title: RawLocalized | null;
+  description: RawLocalized | null;
+  image_url: string | null;
+  price: number | null;
+  currency: string | null;
+  options: RawLocalized[];
+}
+
+function mapServiceDetail(raw: RawMyServiceDetail): MyServiceDetail {
+  return {
+    slug: raw.slug,
+    titleUk: raw.title?.uk ?? "",
+    titleEn: raw.title?.en ?? "",
+    descriptionUk: raw.description?.uk ?? "",
+    descriptionEn: raw.description?.en ?? "",
+    imageUrl: absoluteUrl(raw.image_url),
+    price: raw.price,
+    currency: raw.currency,
+    options: (raw.options ?? []).map((option) => ({
+      nameUk: option.uk ?? "",
+      nameEn: option.en ?? "",
+    })),
+  };
+}
+
 export interface SaveServicePayload {
   titleUk: string;
   titleEn?: string;
@@ -73,6 +117,13 @@ export const myServicesAPI = {
       params: { language: "uk" },
     });
     return response.data.data.map(mapService);
+  },
+
+  show: async (slug: string): Promise<MyServiceDetail> => {
+    const response = await api.get<{ data: RawMyServiceDetail }>(
+      `/v1/art-ua-info/my/services/${slug}`
+    );
+    return mapServiceDetail(response.data.data);
   },
 
   create: async (payload: SaveServicePayload): Promise<MyService> => {
