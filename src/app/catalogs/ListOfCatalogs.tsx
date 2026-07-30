@@ -3,12 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../components/ui/card";
-import { getCatalogPdfUrl, type Catalog } from "../../data/catalogsData";
-import { getAuthorSlugById } from "../../data/profileData";
+import { type PublicCatalog } from "../../lib/api/publicCatalogs";
 import { withAuthorId } from "../../lib/authorQuery";
 
 interface ListOfCatalogsProps {
-  catalogs: Catalog[];
+  catalogs: PublicCatalog[];
   disableInteractions?: boolean;
 }
 
@@ -29,7 +28,7 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
       }`}
     >
       {catalogs.map((catalog) => {
-        const pdfHref = getCatalogPdfUrl(catalog.pdfFile);
+        const pdfHref = catalog.pdfUrl;
         const openable = Boolean(pdfHref) && !disableInteractions;
 
         return (
@@ -105,7 +104,7 @@ export default function ListOfCatalogs({ catalogs, disableInteractions = false }
             )}
             {/* Author info */}
             <Link
-              href={withAuthorId("/author/projects", getAuthorSlugById(catalog.authorId))}
+              href={withAuthorId("/author/projects", catalog.authorSlug ?? "")}
               className="flex items-center gap-2 md:gap-3 w-fit"
             >
               <div className="w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border-2 border-yellow-500">

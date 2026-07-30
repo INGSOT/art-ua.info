@@ -6,175 +6,224 @@ import Header from "../../components/Header";
 import LatestNews from "../../components/LatestNews";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
-import FilterSection from "../../components/filters/FilterSection";
-import FiltersButton from "../../components/filters/FiltersButton";
-import FiltersModal from "../../components/filters/FiltersModal";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
-import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
-import { catalogsFilters } from "../../components/filters/filterConfig";
+import FiltersButton from "../../components/filters/FiltersButton";
+import { FilterChip } from "../../components/filters/filterChipUtils";
 import ListOfCatalogs from "./ListOfCatalogs";
-import { catalogsData } from "../../data/catalogsData";
+import CatalogsFilterSidebar from "./CatalogsFilterSidebar";
 import PaginationSection from "../../components/PaginationSection";
 import Image from "next/image";
+import {
+    publicCatalogsAPI,
+    type PublicCatalog,
+    type CatalogsListFilters,
+} from "../../lib/api/publicCatalogs";
 
 const ITEMS_PER_PAGE = 10;
-type SortOption = "Популярні" | "Новіші" | "Давніші";
 
-const parseCatalogDate = (dateString: string): number => {
-    const [day, month, year] = dateString.split(".").map(Number);
-    return new Date(year, month - 1, day).getTime();
-};
+const SORT_OPTIONS = [
+    { slug: "likes", name: "Популярні" },
+    { slug: "date_desc", name: "Новіші" },
+    { slug: "date_asc", name: "Давніші" },
+] as const;
+type SortSlug = (typeof SORT_OPTIONS)[number]["slug"];
+
+function sortParamsFor(sortSlug: string): { sort_by: string; sort_dir: string } {
+    if (sortSlug === "date_asc") return { sort_by: "date", sort_dir: "asc" };
+    if (sortSlug === "date_desc") return { sort_by: "date", sort_dir: "desc" };
+    return { sort_by: "likes", sort_dir: "desc" };
+}
+
+const DEFAULT_FILTERS: CatalogsListFilters = { categories: [] };
 
 export default function CatalogsPage() {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortOption, setSortOption] = useState<SortOption>("Популярні");
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
 
     const searchQueryParam = searchParams.get("search") ?? "";
-
-    const artFieldsSection = catalogsFilters.find((section) => section.id === "art-fields");
-    const artItems =
-        artFieldsSection?.subsections?.flatMap((sub) => sub.items ?? []) ?? [];
-
-    const allowedArtCategoryIds = new Set(artItems.map((item) => item.id));
-    const selectedArtCategoryIds = searchParams
-        .getAll("art_subcategory")
-        .filter((value) => allowedArtCategoryIds.has(value));
+    const subcategoryParam = searchParams.get("art_subcategory") ?? "";
+    const selectedSubcategories = subcategoryParam ? subcategoryParam.split(",").filter(Boolean) : [];
+    const sortSlug = (searchParams.get("sort") ?? "likes") as SortSlug;
+    const currentPage = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
     const [searchInput, setSearchInput] = useState(searchQueryParam);
+    const [catalogs, setCatalogs] = useState<PublicCatalog[]>([]);
+    const [meta, setMeta] = useState({ current_page: 1, last_page: 1, per_page: ITEMS_PER_PAGE, total: 0 });
+    const [filtersData, setFiltersData] = useState<CatalogsListFilters>(DEFAULT_FILTERS);
+    const [loading, setLoading] = useState(true);
+    const [hasLoaded, setHasLoaded] = useState(false);
 
     useEffect(() => {
         setSearchInput(searchQueryParam);
     }, [searchQueryParam]);
 
-    const initialSelectedFilters: Record<string, boolean> = Object.fromEntries(
-        artItems.map((item) => [item.id, selectedArtCategoryIds.includes(item.id)])
-    );
+    useEffect(() => {
+        let ignore = false;
 
-    const handleFilterChange = (filters: Record<string, boolean>) => {
-        setCurrentPage(1);
+        const fetchCatalogs = async () => {
+            setLoading(true);
+            try {
+                const { sort_by, sort_dir } = sortParamsFor(sortSlug);
+                const result = await publicCatalogsAPI.browse({
+                    page: currentPage,
+                    per_page: ITEMS_PER_PAGE,
+                    ...(selectedSubcategories.length ? { art_subcategory: selectedSubcategories.join(",") } : {}),
+                    sort_by,
+                    sort_dir,
+                    ...(searchQueryParam ? { search: searchQueryParam } : {}),
+                });
 
-        const selectedIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!filters[id]);
+                if (ignore) return;
+                setCatalogs(result.data);
+                setMeta(result.meta);
+                setFiltersData(result.filters);
+            } catch (error) {
+                if (ignore) return;
+                console.error("Failed to load catalogs:", error);
+                setCatalogs([]);
+            } finally {
+                if (!ignore) {
+                    setLoading(false);
+                    setHasLoaded(true);
+                }
+            }
+        };
 
+        fetchCatalogs();
+        return () => {
+            ignore = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentPage, subcategoryParam, sortSlug, searchQueryParam]);
+
+    const pushParams = (mutate: (params: URLSearchParams) => void, resetPage = true) => {
         const params = new URLSearchParams(searchParams.toString());
-        params.delete("art_subcategory");
-
-        selectedIds.forEach((id) => {
-            params.append("art_subcategory", id);
-        });
-
+        mutate(params);
+        if (resetPage) {
+            params.delete("page");
+        }
         const search = params.toString();
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
-    const selectedFilterChips = buildFilterChips(catalogsFilters, initialSelectedFilters);
-
-    const handleRemoveFilter = (chipId: string) => {
-        handleFilterChange(removeFilterFromState(chipId, initialSelectedFilters, catalogsFilters));
+    const handleSubcategoryToggle = (slug: string) => {
+        pushParams((params) => {
+            const next = selectedSubcategories.includes(slug)
+                ? selectedSubcategories.filter((s) => s !== slug)
+                : [...selectedSubcategories, slug];
+            if (next.length) {
+                params.set("art_subcategory", next.join(","));
+            } else {
+                params.delete("art_subcategory");
+            }
+        });
     };
 
-    const handleClearAllFilters = () => {
-        handleFilterChange(getClearedFiltersState(catalogsFilters));
+    const handleSortSelect = (slug: SortSlug) => {
+        setIsSortOpen(false);
+        pushParams((params) => {
+            params.set("sort", slug);
+        }, false);
     };
-
-    const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
-
-    const getModalResultCount = (filters: Record<string, boolean>) => {
-        const selectedIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!filters[id]);
-
-        let result = selectedIds.length
-            ? catalogsData.filter((catalog) => selectedIds.includes(catalog.artSubCategory))
-            : catalogsData;
-
-        if (normalizedSearchQuery) {
-            result = result.filter((catalog) => {
-                const titleMatch = catalog.title.toLowerCase().includes(normalizedSearchQuery);
-                const authorMatch = catalog.authorName.toLowerCase().includes(normalizedSearchQuery);
-                return titleMatch || authorMatch;
-            });
-        }
-
-        return result.length;
-    };
-
-    const filteredCatalogsByCategory = selectedArtCategoryIds.length
-        ? catalogsData.filter((catalog) => selectedArtCategoryIds.includes(catalog.artSubCategory))
-        : catalogsData;
-
-    const filteredCatalogs = normalizedSearchQuery
-        ? filteredCatalogsByCategory.filter((catalog) => {
-            const titleMatch = catalog.title.toLowerCase().includes(normalizedSearchQuery);
-            const authorMatch = catalog.authorName.toLowerCase().includes(normalizedSearchQuery);
-            return titleMatch || authorMatch;
-        })
-        : filteredCatalogsByCategory;
-
-    const sortedCatalogs = [...filteredCatalogs].sort((a, b) => {
-        if (sortOption === "Популярні") {
-            return b.likes - a.likes;
-        }
-
-        const aDate = parseCatalogDate(a.date);
-        const bDate = parseCatalogDate(b.date);
-
-        if (sortOption === "Новіші") {
-            return bDate - aDate;
-        }
-
-        return aDate - bDate;
-    });
-
-    const hasResults = sortedCatalogs.length > 0;
-    const totalPages = hasResults ? Math.ceil(sortedCatalogs.length / ITEMS_PER_PAGE) : 0;
-
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentCatalogs = sortedCatalogs.slice(startIndex, endIndex);
 
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        pushParams((params) => {
+            if (page > 1) {
+                params.set("page", String(page));
+            } else {
+                params.delete("page");
+            }
+        }, false);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const handleSearch = () => {
-        const params = new URLSearchParams(searchParams.toString());
-        const trimmedValue = searchInput.trim();
-
-        if (trimmedValue) {
-            params.set("search", trimmedValue);
-        } else {
-            params.delete("search");
-        }
-
-        setCurrentPage(1);
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        pushParams((params) => {
+            const trimmed = searchInput.trim();
+            if (trimmed) {
+                params.set("search", trimmed);
+            } else {
+                params.delete("search");
+            }
+        });
     };
 
     const handleClearSearch = () => {
         setSearchInput("");
-
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete("search");
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        pushParams((params) => {
+            params.delete("search");
+        });
     };
 
-    const handleSortChange = (option: SortOption) => {
-        setSortOption(option);
-        setIsSortOpen(false);
-        setCurrentPage(1);
+    const handleClearAllFilters = () => {
+        pushParams((params) => {
+            params.delete("art_subcategory");
+        });
     };
+
+    const subcategoryNameMap = Object.fromEntries(
+        filtersData.categories.flatMap((c) =>
+            c.subcategories.length ? c.subcategories.map((s) => [s.slug, s.name]) : [[c.slug, c.name]]
+        )
+    );
+
+    const selectedFilterChips: FilterChip[] = selectedSubcategories.map((slug) => ({
+        id: slug,
+        label: subcategoryNameMap[slug] ?? slug,
+    }));
+
+    const handleRemoveFilterChip = (chipId: string) => {
+        handleSubcategoryToggle(chipId);
+    };
+
+    const normalizedSearchQuery = searchQueryParam.trim();
+    const noSearchResults = hasLoaded && !loading && normalizedSearchQuery && catalogs.length === 0;
+    const activeSortOption = SORT_OPTIONS.find((option) => option.slug === sortSlug) ?? SORT_OPTIONS[0];
+
+    const sidebar = (
+        <CatalogsFilterSidebar
+            categories={filtersData.categories}
+            selectedSubcategories={selectedSubcategories}
+            onToggleSubcategory={handleSubcategoryToggle}
+        />
+    );
+
+    const sortDropdown = (
+        <div className="relative w-full">
+            <button
+                onClick={() => setIsSortOpen(!isSortOpen)}
+                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 text-[#343434] font-bold text-sm bg-[#FECC39] hover:bg-white transition-colors"
+            >
+                {activeSortOption.name}
+                <Image
+                    src="/black_triangle_down.svg"
+                    alt=""
+                    width={12}
+                    height={8}
+                    className={`w-3 h-2 flex-shrink-0 transition-transform ${isSortOpen ? "rotate-180" : ""}`}
+                />
+            </button>
+
+            {isSortOpen && (
+                <div className="absolute top-full right-0 lg:left-0 lg:right-auto w-full z-50 mt-px flex flex-col gap-px">
+                    {SORT_OPTIONS.map((option) => (
+                        <button
+                            key={option.slug}
+                            onClick={() => handleSortSelect(option.slug)}
+                            className={`block w-full text-left px-3 py-3 font-bold text-sm whitespace-nowrap transition-colors bg-[#343434] ${
+                                sortSlug === option.slug ? "text-[#FECC39]" : "text-white hover:text-[#FECC39]"
+                            }`}
+                        >
+                            {option.name}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
 
     return (
         <>
@@ -188,7 +237,7 @@ export default function CatalogsPage() {
                     </p>
                 </div>
             )}
-            {normalizedSearchQuery && filteredCatalogs.length === 0 && (
+            {noSearchResults && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pb-8 px-4">
                     <button
                         type="button"
@@ -203,11 +252,9 @@ export default function CatalogsPage() {
                 </div>
             )}
 
-            {!(normalizedSearchQuery && filteredCatalogs.length === 0) && (
+            {!noSearchResults && (
                 <>
-                    {/* Main Content Section */}
                     <section className="w-full bg-[#414141] py-8 px-4 sm:px-6 md:px-10 lg:px-20">
-                        {/* Title Section */}
                         <div className="mb-6 md:mb-8">
                             <p className="text-[#FECC39] text-sm font-bold mb-2">Каталоги</p>
                             <h1 className="text-white font-bold text-2xl sm:text-3xl md:text-[40px] leading-tight max-w-[600px] whitespace-normal md:whitespace-nowrap" style={{ fontWeight: 600 }}>
@@ -215,90 +262,59 @@ export default function CatalogsPage() {
                             </h1>
                         </div>
 
-                        <SelectedFiltersBar
-                            chips={selectedFilterChips}
-                            onRemove={handleRemoveFilter}
-                            onClearAll={handleClearAllFilters}
-                        />
-
-                        {/* Filter and Content Section */}
-                        <div className="flex flex-col lg:flex-row gap-6">
-                            <div className="hidden lg:block">
-                                <FilterSection
-                                    key={`catalogs-filters-${selectedArtCategoryIds.slice().sort().join(",") || "all"}`}
-                                    filters={catalogsFilters}
-                                    onFilterChange={handleFilterChange}
-                                    initialSelectedFilters={initialSelectedFilters}
+                        {/* Фільтри/сортування + чіпи — липкий (sticky) блок, як на сторінці проєктів:
+                            лишається на екрані під час скролу і на мобілці, і на десктопі. */}
+                        <div className="sticky top-0 z-40 bg-[#414141] py-2 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10 lg:-mx-20 lg:px-20 mb-4 lg:mb-6">
+                            <div className="flex items-center justify-between gap-1 md:gap-2 mb-3 lg:hidden">
+                                <FiltersButton
+                                    className="lg:hidden"
+                                    onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
+                                    isActive={isMobileFiltersOpen}
+                                    selectedCount={selectedFilterChips.length}
                                 />
+                                <div className="relative ml-auto min-w-0 flex-1 max-w-[220px] sm:max-w-[260px]">
+                                    {sortDropdown}
+                                </div>
                             </div>
 
-                            {/* Right Side - Sorting and Catalogs */}
-                            <div className="flex-1 w-full">
-                                <div className="relative z-30 flex items-center justify-between gap-1 md:gap-2 mb-4 md:mb-6">
-                                    <FiltersButton
-                                        className="lg:hidden"
-                                        onClick={() => setIsMobileFiltersOpen(true)}
-                                        isActive={isMobileFiltersOpen}
-                                        selectedCount={selectedFilterChips.length}
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                                <div className="min-w-0">
+                                    <SelectedFiltersBar
+                                        chips={selectedFilterChips}
+                                        onRemove={handleRemoveFilterChip}
+                                        onClearAll={handleClearAllFilters}
                                     />
-                                    <div className="relative ml-auto lg:ml-0">
-                                        <button
-                                            onClick={() => setIsSortOpen(!isSortOpen)}
-                                            className="flex items-center gap-1 md:gap-2 h-[44px] md:h-[48px] lg:h-auto px-2 md:px-3 lg:px-4 lg:py-3 text-white font-bold text-sm md:text-base bg-[#343434] hover:text-[#FECC39] transition-colors"
-                                        >
-                                            {sortOption}
-                                            <Image
-                                                src={isSortOpen ? "/yellow_triangle_up.svg" : "/white_triangle_down.svg"}
-                                                alt=""
-                                                width={24}
-                                                height={24}
-                                                className="w-[18px] h-[18px] lg:w-6 lg:h-6 flex-shrink-0"
-                                            />
-                                        </button>
-
-                                        {isSortOpen && (
-                                            <div className="absolute top-full right-0 lg:left-0 lg:right-auto min-w-full w-max z-50 mt-0 lg:mt-1 bg-[#343434] border-2 border-[#1a1a1a]">
-                                                {(["Популярні", "Новіші", "Давніші"] as SortOption[]).map((option) => (
-                                                    <button
-                                                        key={option}
-                                                        onClick={() => handleSortChange(option)}
-                                                        className={`block w-full text-left px-2 md:px-3 lg:px-4 py-2 md:py-3 font-bold text-sm md:text-base whitespace-nowrap transition-colors border-b border-[#1a1a1a] last:border-b-0 ${
-                                                            sortOption === option
-                                                                ? "text-[#FECC39] bg-[#414141]"
-                                                                : "text-white hover:text-[#FECC39] hover:bg-[#414141]"
-                                                        }`}
-                                                    >
-                                                        {option}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
                                 </div>
+                                <div className="hidden lg:block relative lg:w-[260px] lg:flex-shrink-0">
+                                    {sortDropdown}
+                                </div>
+                            </div>
+                        </div>
 
-                                {/* Catalogs Grid */}
-                                <ListOfCatalogs catalogs={currentCatalogs} disableInteractions={isSortOpen} />
+                        <div className="flex flex-col lg:flex-row gap-6">
+                            <div className="hidden lg:block">{sidebar}</div>
+
+                            <div className="flex-1 w-full min-w-0">
+                                {isMobileFiltersOpen && <div className="lg:hidden mb-6">{sidebar}</div>}
+
+                                {loading && !hasLoaded ? (
+                                    <div className="w-full min-h-[420px] flex items-center justify-center">
+                                        <p className="font-wix text-white text-lg md:text-2xl">Завантаження...</p>
+                                    </div>
+                                ) : (
+                                    <ListOfCatalogs catalogs={catalogs} disableInteractions={isSortOpen} />
+                                )}
                             </div>
                         </div>
                     </section>
-                    {hasResults && (
+                    {meta.last_page > 1 && (
                         <PaginationSection
-                            currentPage={currentPage}
-                            totalPages={totalPages}
+                            currentPage={meta.current_page}
+                            totalPages={meta.last_page}
                             onPageChange={handlePageChange}
                         />
                     )}
                 </>
-            )}
-            {isMobileFiltersOpen && (
-                <FiltersModal
-                    onClose={() => setIsMobileFiltersOpen(false)}
-                    filters={catalogsFilters}
-                    initialSelectedFilters={initialSelectedFilters}
-                    getResultCount={getModalResultCount}
-                    onApply={handleFilterChange}
-                    onCancel={handleClearAllFilters}
-                />
             )}
             <LatestNews />
             <JoinCommunityWrapper />
