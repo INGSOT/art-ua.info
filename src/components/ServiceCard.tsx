@@ -31,7 +31,7 @@ export default function ServiceCard({
 
   return (
     <div className="flex flex-col bg-[#272727] w-full">
-      <div className="relative w-full aspect-square">
+      <div className="relative w-full aspect-[705/885]">
         <Image src={image} alt={title} fill className="object-cover" />
         <div className="absolute bottom-6 left-6">
           <button

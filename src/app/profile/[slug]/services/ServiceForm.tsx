@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import AddProjectCover from "../create-project/AddProjectCover";
@@ -8,6 +8,9 @@ import { myServicesAPI } from "../../../../lib/api/myServices";
 import { withProfileId } from "../../../../lib/authorQuery";
 import { useProfileView } from "../../ProfileViewContext";
 import { getApiErrorMessage, getApiFieldErrors } from "../../../../lib/apiError";
+import { catalogsAPI, type ArtCategory } from "../../../../lib/api/catalogs";
+import SelectCatalogCategoryForm from "../catalogs/SelectCatalogCategoryForm";
+import DeleteService from "./DeleteService";
 
 interface ServiceFormProps {
   mode?: "create" | "edit";
@@ -58,9 +61,29 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
   const [isDeleteHovered, setIsDeleteHovered] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [artCategory, setArtCategory] = useState("");
+  const [artSubcategory, setArtSubcategory] = useState<string | null>(null);
+  const [categoryLabel, setCategoryLabel] = useState<string | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [categories, setCategories] = useState<ArtCategory[]>([]);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const coverRef = useRef<HTMLDivElement>(null);
+  const titleUaRef = useRef<HTMLInputElement>(null);
+  const titleEnRef = useRef<HTMLInputElement>(null);
+  const categoryButtonRef = useRef<HTMLButtonElement>(null);
+  const priceRef = useRef<HTMLInputElement>(null);
+  const currencyRef = useRef<HTMLButtonElement>(null);
+  const descriptionUaRef = useRef<HTMLTextAreaElement>(null);
+  const descriptionEnRef = useRef<HTMLTextAreaElement>(null);
+  const firstOptionRef = useRef<HTMLInputElement>(null);
 
   const isEditMode = mode === "edit" && !!editSlug;
   const isMissingEditTarget = mode === "edit" && !editSlug;
+
+  useEffect(() => {
+    catalogsAPI.categories().then(setCategories);
+  }, []);
 
   useEffect(() => {
     if (!isEditMode || !editSlug) return;
@@ -72,9 +95,13 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
         setServiceNameEn(service.titleEn);
         setPriceNegotiable(service.price === null);
         setPriceAmount(service.price !== null ? String(service.price) : "");
+        setPriceFrom(service.priceFrom);
         setSelectedCurrency(service.currency ? CODE_TO_CURRENCY[service.currency] ?? null : null);
         setDescriptionUa(service.descriptionUk);
         setDescriptionEn(service.descriptionEn);
+        setArtCategory(service.artCategory ?? "");
+        setArtSubcategory(service.artSubcategory);
+        setCategoryLabel(service.categoryLabel);
         if (service.options.length > 0) {
           setOptions(
             service.options.map((option, index) => ({
@@ -87,6 +114,13 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
       })
       .catch(() => setError("Не вдалося завантажити послугу"));
   }, [isEditMode, editSlug]);
+
+  const handleSelectCategory = (categorySlug: string, subcategorySlug: string | null, label: string) => {
+    setArtCategory(categorySlug);
+    setArtSubcategory(subcategorySlug);
+    setCategoryLabel(label);
+    clearFieldErrors(["art_category"]);
+  };
 
   const currencies: { id: CurrencyId; icon: string }[] = [
     { id: 'hryvnia', icon: '/hryvnia.svg' },
@@ -148,6 +182,10 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
       setFieldErrors({ "title.uk": ["Вкажіть назву послуги"] });
       return;
     }
+    if (!artCategory) {
+      setFieldErrors({ art_category: ["Оберіть галузь мистецтва"] });
+      return;
+    }
 
     const payload = {
       titleUk: serviceNameUa.trim(),
@@ -155,7 +193,10 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
       descriptionUk: descriptionUa.trim() || undefined,
       descriptionEn: descriptionEn.trim() || undefined,
       image: serviceCover,
+      artCategory,
+      artSubcategory,
       price: priceNegotiable ? null : priceAmount ? Number(priceAmount) : null,
+      priceFrom: priceNegotiable ? false : priceFrom,
       currency: selectedCurrency ? CURRENCY_TO_CODE[selectedCurrency] : null,
       options: options.map((opt) => ({ nameUk: opt.nameUa, nameEn: opt.nameEn || undefined })),
     };
@@ -192,6 +233,39 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
   const descriptionUaError = fieldErrors["description.uk"]?.[0];
   const descriptionEnError = fieldErrors["description.en"]?.[0];
   const optionsError = Object.entries(fieldErrors).find(([key]) => key.startsWith("options."))?.[1]?.[0];
+  const categoryError = fieldErrors.art_category?.[0];
+
+  useEffect(() => {
+    if (imageError) {
+      coverRef.current?.focus();
+    } else if (titleUaError) {
+      titleUaRef.current?.focus();
+    } else if (titleEnError) {
+      titleEnRef.current?.focus();
+    } else if (categoryError) {
+      categoryButtonRef.current?.focus();
+    } else if (priceError) {
+      priceRef.current?.focus();
+    } else if (currencyError) {
+      currencyRef.current?.focus();
+    } else if (descriptionUaError) {
+      descriptionUaRef.current?.focus();
+    } else if (descriptionEnError) {
+      descriptionEnRef.current?.focus();
+    } else if (optionsError) {
+      firstOptionRef.current?.focus();
+    }
+  }, [
+    imageError,
+    titleUaError,
+    titleEnError,
+    categoryError,
+    priceError,
+    currencyError,
+    descriptionUaError,
+    descriptionEnError,
+    optionsError,
+  ]);
 
   if (isMissingEditTarget) {
     return (
@@ -212,8 +286,10 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
         {/* Cover Upload */}
         <div className="w-full flex flex-col items-center gap-2">
           <div
+            ref={coverRef}
+            tabIndex={-1}
             onClick={() => !serviceCover && setIsCoverModalOpen(true)}
-            className={`relative flex flex-col items-center justify-center gap-4 w-[400px] h-[400px] bg-[#343434] transition-colors ${
+            className={`relative flex flex-col items-center justify-center gap-4 w-full max-w-[400px] aspect-square bg-[#343434] transition-colors outline-none ${
               !serviceCover ? "cursor-pointer hover:bg-[#3a3a3a]" : ""
             } ${imageError ? "border-2 border-red-500" : ""}`}
           >
@@ -261,6 +337,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
               <Image src="/ua.svg" alt="UA" width={24} height={24} />
             </div>
             <input
+              ref={titleUaRef}
               type="text"
               value={serviceNameUa}
               onChange={(e) => {
@@ -277,6 +354,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
               <Image src="/en.svg" alt="EN" width={24} height={24} />
             </div>
             <input
+              ref={titleEnRef}
               type="text"
               value={serviceNameEn}
               onChange={(e) => {
@@ -290,18 +368,37 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
           {titleEnError && <p className="text-red-500 text-sm">{titleEnError}</p>}
         </div>
 
+        {/* Art Category */}
+        <div className="w-full flex flex-col gap-2">
+          <label className="font-wix text-white text-sm">
+            Галузь мистецтва <span className="text-red-500">*</span>
+          </label>
+          <button
+            ref={categoryButtonRef}
+            type="button"
+            onClick={() => setIsCategoryModalOpen(true)}
+            className={`font-wix w-full flex items-center justify-between gap-4 px-6 py-4 bg-[#343434] text-white hover:bg-[#3a3a3a] transition-colors ${
+              categoryError ? "border-2 border-red-500" : ""
+            }`}
+          >
+            <span>{categoryLabel || "Оберіть галузь мистецтва"}</span>
+            <Image src="/white_triangle_left.svg" alt="arrow" width={20} height={20} />
+          </button>
+          {categoryError && <p className="text-red-500 text-sm">{categoryError}</p>}
+        </div>
+
         {/* Cost Section */}
         <div className="w-full flex flex-col gap-4">
           <h2 className="text-white text-[20px] font-bold">Вартість</h2>
 
           {/* Price From */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <button
               type="button"
               onClick={() => setPriceFrom(!priceFrom)}
               onMouseEnter={() => setIsFromHovered(true)}
               onMouseLeave={() => setIsFromHovered(false)}
-              className="flex items-center gap-3 px-4 py-3 bg-[#343434] h-[50px]"
+              className="flex items-center gap-3 px-4 py-3 bg-[#343434] h-[50px] flex-shrink-0"
             >
               <div
                 className={`w-5 h-5 flex items-center justify-center transition-colors ${
@@ -325,6 +422,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
             </button>
 
             <input
+              ref={priceRef}
               type="text"
               value={priceAmount}
               onChange={(e) => {
@@ -332,16 +430,17 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
                 clearFieldErrors(["price"]);
               }}
               placeholder="Вкажіть суму"
-              className={`font-wix w-[566px] h-[50px] bg-[#343434] text-white px-4 placeholder-[#A0A0A0] ${
+              className={`font-wix flex-1 min-w-[160px] h-[50px] bg-[#343434] text-white px-4 placeholder-[#A0A0A0] ${
                 priceError ? "border-2 border-red-500" : ""
               }`}
             />
 
             {/* Currency Selector */}
             <div className={`flex gap-4 ${currencyError ? "border-2 border-red-500" : ""}`}>
-              {currencies.map((currency) => (
+              {currencies.map((currency, currencyIndex) => (
                 <button
                   key={currency.id}
+                  ref={currencyIndex === 0 ? currencyRef : undefined}
                   type="button"
                   onClick={() => {
                     clearFieldErrors(["currency"]);
@@ -426,6 +525,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
               <Image src="/ua.svg" alt="UA" width={24} height={24} />
             </div>
             <textarea
+              ref={descriptionUaRef}
               value={descriptionUa}
               onChange={(e) => {
                 setDescriptionUa(e.target.value);
@@ -435,7 +535,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
               className={`font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none ${
                 descriptionUaError ? "border-2 border-red-500" : ""
               }`}
-              style={{ width: "1000px", height: "180px" }}
+              style={{ height: "180px" }}
             />
           </div>
           {descriptionUaError && <p className="text-red-500 text-sm">{descriptionUaError}</p>}
@@ -444,6 +544,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
               <Image src="/en.svg" alt="EN" width={24} height={24} />
             </div>
             <textarea
+              ref={descriptionEnRef}
               value={descriptionEn}
               onChange={(e) => {
                 setDescriptionEn(e.target.value);
@@ -453,7 +554,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
               className={`font-wix w-full pl-14 pr-6 py-4 bg-[#343434] text-white placeholder-[#A0A0A0] resize-none ${
                 descriptionEnError ? "border-2 border-red-500" : ""
               }`}
-              style={{ width: "1000px", height: "180px" }}
+              style={{ height: "180px" }}
             />
           </div>
           {descriptionEnError && <p className="text-red-500 text-sm">{descriptionEnError}</p>}
@@ -474,6 +575,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
                     <Image src="/ua.svg" alt="UA" width={24} height={24} />
                   </div>
                   <input
+                    ref={index === 0 ? firstOptionRef : undefined}
                     type="text"
                     value={option.nameUa}
                     onChange={(e) => updateOption(option.id, "nameUa", e.target.value)}
@@ -580,7 +682,7 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
         {/* Delete Button */}
         <button
           type="button"
-          onClick={handleDelete}
+          onClick={() => setIsDeleteModalOpen(true)}
           onMouseEnter={() => setIsDeleteHovered(true)}
           onMouseLeave={() => setIsDeleteHovered(false)}
           className={`w-[300px] h-[60px] flex items-stretch transition-all duration-300 ${
@@ -620,6 +722,22 @@ export default function ServiceForm({ mode = "create" }: ServiceFormProps) {
         onImageRemove={() => setServiceCover(null)}
         currentImage={serviceCover}
         customTitle="Додайте обкладинку"
+      />
+
+      {/* Category Selection Panel */}
+      <SelectCatalogCategoryForm
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        categories={categories}
+        selectedValue={artSubcategory || artCategory || null}
+        onSelect={handleSelectCategory}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteService
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDelete={handleDelete}
       />
     </div>
   );

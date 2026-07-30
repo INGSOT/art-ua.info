@@ -7,6 +7,21 @@ function absoluteUrl(path: string | null | undefined): string | null {
   return path.startsWith("http") ? path : `${API_BASE}${path}`;
 }
 
+// Зворотне до absoluteUrl: перед відправкою на бекенд вже завантажене (не base64)
+// зображення повертаємо у "голий" шлях відносно диску (без домену й без "/storage" —
+// саме так шлях зберігається в БД, а Storage::url() сам додає "/storage" при читанні).
+// Якщо цього не зробити, домен/"/storage" задвоюється на кожному наступному збереженні.
+function toApiRelativePath(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith("data:")) return url;
+  const relative = url.startsWith(API_BASE) ? url.slice(API_BASE.length) : url;
+  const segments = relative.split("/").filter(Boolean);
+  while (segments[0] === "storage") {
+    segments.shift();
+  }
+  return segments.join("/");
+}
+
 export interface MyService {
   slug: string;
   title: string;
@@ -50,7 +65,11 @@ export interface MyServiceDetail {
   descriptionUk: string;
   descriptionEn: string;
   imageUrl: string | null;
+  artCategory: string | null;
+  artSubcategory: string | null;
+  categoryLabel: string | null;
   price: number | null;
+  priceFrom: boolean;
   currency: string | null;
   options: { nameUk: string; nameEn: string }[];
 }
@@ -65,7 +84,11 @@ interface RawMyServiceDetail {
   title: RawLocalized | null;
   description: RawLocalized | null;
   image_url: string | null;
+  art_category_slug: string | null;
+  art_subcategory_slug: string | null;
+  art_category: { slug: string; name: string } | null;
   price: number | null;
+  price_from: boolean;
   currency: string | null;
   options: RawLocalized[];
 }
@@ -78,7 +101,11 @@ function mapServiceDetail(raw: RawMyServiceDetail): MyServiceDetail {
     descriptionUk: raw.description?.uk ?? "",
     descriptionEn: raw.description?.en ?? "",
     imageUrl: absoluteUrl(raw.image_url),
+    artCategory: raw.art_category_slug,
+    artSubcategory: raw.art_subcategory_slug,
+    categoryLabel: raw.art_category?.name ?? null,
     price: raw.price,
+    priceFrom: raw.price_from,
     currency: raw.currency,
     options: (raw.options ?? []).map((option) => ({
       nameUk: option.uk ?? "",
@@ -93,7 +120,10 @@ export interface SaveServicePayload {
   descriptionUk?: string;
   descriptionEn?: string;
   image?: string | null;
+  artCategory: string;
+  artSubcategory?: string | null;
   price?: number | null;
+  priceFrom?: boolean;
   currency?: "UAH" | "USD" | "EUR" | null;
   options: { nameUk: string; nameEn?: string }[];
 }
@@ -102,8 +132,14 @@ function buildPayload(payload: SaveServicePayload) {
   return {
     title: { uk: payload.titleUk, en: payload.titleEn },
     description: { uk: payload.descriptionUk, en: payload.descriptionEn },
-    image: payload.image ?? undefined,
-    price: payload.price ?? undefined,
+    image: toApiRelativePath(payload.image),
+    art_category: payload.artCategory,
+    art_subcategory: payload.artSubcategory ?? undefined,
+    // payload.price може бути null (означає "ціна договірна") — важливо не
+    // перетворювати його на undefined через "??", інакше поле випаде з
+    // запиту й бекенд не очистить попереднє значення ціни.
+    price: payload.price,
+    price_from: payload.priceFrom ?? false,
     currency: payload.currency ?? undefined,
     options: payload.options
       .filter((option) => option.nameUk.trim())

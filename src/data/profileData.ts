@@ -197,6 +197,15 @@ export const serviceEmptyState = {
   createButtonText: "Додати послугу",
 };
 
+// Delete Service Modal
+export const deleteServiceTexts: DeleteCatalogTexts = {
+  title: "Ви видаляєте послугу",
+  closeAlt: "Close",
+  description: "Ви впевнені, що хочете видалити цю послугу?\nЦю дію неможливо буде відмінити.",
+  deleteButton: "Так, видалити",
+  cancelButton: "Ні, залишити",
+};
+
 // Teams
 export type TeamCardType = "own" | "other";
 
