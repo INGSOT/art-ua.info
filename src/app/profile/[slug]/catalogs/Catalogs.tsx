@@ -63,12 +63,15 @@ export default function Catalogs() {
     setIsAddModalOpen(true);
   };
 
-  const handleAddCatalog = async (imageUrl: string, catalogFile: File, catalogFileName: string) => {
-    const created = await myCatalogsAPI.create({
-      titleUk: catalogFileName.replace(/\.pdf$/i, ""),
-      image: imageUrl,
-      pdfFile: catalogFile,
-    });
+  const handleAddCatalog = async (params: {
+    titleUk: string;
+    titleEn: string;
+    artCategory: string;
+    artSubcategory: string | null;
+    image: string;
+    pdfFile: File;
+  }) => {
+    const created = await myCatalogsAPI.create(params);
     setCatalogs((prev) => [...prev, created]);
   };
 

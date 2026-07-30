@@ -1,13 +1,26 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { addCatalogTexts } from "../../../../data/profileData";
+import { catalogsAPI, type ArtCategory } from "../../../../lib/api/catalogs";
+import { getApiFieldErrors, getApiErrorMessage } from "../../../../lib/apiError";
+import SelectCatalogCategoryForm from "./SelectCatalogCategoryForm";
+
+const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
+const MAX_PDF_SIZE_BYTES = 20 * 1024 * 1024;
 
 interface AddCatalogProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (imageUrl: string, catalogFile: File, catalogFileName: string) => void;
+  onAdd: (params: {
+    titleUk: string;
+    titleEn: string;
+    artCategory: string;
+    artSubcategory: string | null;
+    image: string;
+    pdfFile: File;
+  }) => Promise<void>;
 }
 
 export default function AddCatalog({
@@ -18,25 +31,79 @@ export default function AddCatalog({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [catalogFile, setCatalogFile] = useState<File | null>(null);
   const [isHoveringCatalogButton, setIsHoveringCatalogButton] = useState(false);
+  const [titleUk, setTitleUk] = useState("");
+  const [titleEn, setTitleEn] = useState("");
+  const [artCategory, setArtCategory] = useState("");
+  const [artSubcategory, setArtSubcategory] = useState<string | null>(null);
+  const [categoryLabel, setCategoryLabel] = useState<string | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [categories, setCategories] = useState<ArtCategory[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const catalogInputRef = useRef<HTMLInputElement>(null);
+  const titleUkRef = useRef<HTMLInputElement>(null);
+  const titleEnRef = useRef<HTMLInputElement>(null);
+  const categoryButtonRef = useRef<HTMLButtonElement>(null);
+
+  const errorUk = fieldErrors["title.uk"]?.[0] || fieldErrors.title?.[0];
+  const errorEn = fieldErrors["title.en"]?.[0];
+  const errorCategory = fieldErrors.art_category?.[0];
+
+  useEffect(() => {
+    if (!isOpen) return;
+    catalogsAPI.categories().then(setCategories);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (errorUk) {
+      titleUkRef.current?.focus();
+    } else if (errorEn) {
+      titleEnRef.current?.focus();
+    } else if (errorCategory) {
+      categoryButtonRef.current?.focus();
+    }
+  }, [errorUk, errorEn, errorCategory]);
+
+  const handleSelectCategory = (categorySlug: string, subcategorySlug: string | null, label: string) => {
+    setArtCategory(categorySlug);
+    setArtSubcategory(subcategorySlug);
+    setCategoryLabel(label);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      setImageError(`Обкладинка занадто велика (максимум ${MAX_IMAGE_SIZE_BYTES / 1024 / 1024} МБ)`);
+      e.target.value = "";
+      return;
     }
+
+    setImageError(null);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setSelectedImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleCatalogChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type === "application/pdf") {
-      setCatalogFile(file);
+    if (!file || file.type !== "application/pdf") return;
+
+    if (file.size > MAX_PDF_SIZE_BYTES) {
+      setPdfError(`Файл занадто великий (максимум ${MAX_PDF_SIZE_BYTES / 1024 / 1024} МБ)`);
+      e.target.value = "";
+      return;
     }
+
+    setPdfError(null);
+    setCatalogFile(file);
   };
 
   const handleImageUploadClick = () => {
@@ -62,15 +129,50 @@ export default function AddCatalog({
     }
   };
 
-  const handleAdd = () => {
-    if (selectedImage && catalogFile) {
-      onAdd(selectedImage, catalogFile, catalogFile.name);
-      // Reset state
-      setSelectedImage(null);
-      setCatalogFile(null);
-      if (imageInputRef.current) imageInputRef.current.value = "";
-      if (catalogInputRef.current) catalogInputRef.current.value = "";
+  const resetState = () => {
+    setSelectedImage(null);
+    setCatalogFile(null);
+    setTitleUk("");
+    setTitleEn("");
+    setArtCategory("");
+    setArtSubcategory(null);
+    setCategoryLabel(null);
+    setFieldErrors({});
+    setImageError(null);
+    setPdfError(null);
+    setSubmitError(null);
+    if (imageInputRef.current) imageInputRef.current.value = "";
+    if (catalogInputRef.current) catalogInputRef.current.value = "";
+  };
+
+  const handleClose = () => {
+    resetState();
+    onClose();
+  };
+
+  const handleAdd = async () => {
+    if (!selectedImage || !catalogFile || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      await onAdd({
+        titleUk,
+        titleEn,
+        artCategory,
+        artSubcategory,
+        image: selectedImage,
+        pdfFile: catalogFile,
+      });
+      resetState();
       onClose();
+    } catch (error) {
+      const errors = getApiFieldErrors(error);
+      setFieldErrors(errors ?? {});
+      setSubmitError(getApiErrorMessage(error, "Не вдалося зберегти каталог"));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -81,7 +183,7 @@ export default function AddCatalog({
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/40 z-40"
-        onClick={onClose}
+        onClick={handleClose}
       />
 
       {/* Slide-in Panel */}
@@ -92,7 +194,7 @@ export default function AddCatalog({
             {addCatalogTexts.title}
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="w-10 h-10 flex items-center justify-center hover:bg-[#343434] transition-colors"
           >
             <Image
@@ -105,11 +207,74 @@ export default function AddCatalog({
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-6 flex flex-col gap-6">
+        <div className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
+          {/* Title (UK) */}
+          <div className="flex flex-col gap-2">
+            <label className="text-white text-sm">
+              {addCatalogTexts.titleUkLabel} <span className="text-red-500">*</span>
+            </label>
+            <div className={`relative ${errorUk ? "border-2 border-red-500" : ""}`}>
+              <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                <Image src="/ua.svg" alt="UA" width={24} height={24} />
+              </div>
+              <input
+                ref={titleUkRef}
+                type="text"
+                value={titleUk}
+                onChange={(e) => setTitleUk(e.target.value)}
+                placeholder={addCatalogTexts.titleUkPlaceholder}
+                className="w-full pl-14 pr-4 py-3 bg-[#343434] text-white placeholder-[#A0A0A0]"
+              />
+            </div>
+            {errorUk && <p className="text-red-500 text-sm">{errorUk}</p>}
+          </div>
+
+          {/* Title (EN) */}
+          <div className="flex flex-col gap-2">
+            <label className="text-white text-sm">
+              {addCatalogTexts.titleEnLabel} <span className="text-red-500">*</span>
+            </label>
+            <div className={`relative ${errorEn ? "border-2 border-red-500" : ""}`}>
+              <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                <Image src="/en.svg" alt="EN" width={24} height={24} />
+              </div>
+              <input
+                ref={titleEnRef}
+                type="text"
+                value={titleEn}
+                onChange={(e) => setTitleEn(e.target.value)}
+                placeholder={addCatalogTexts.titleEnPlaceholder}
+                className="w-full pl-14 pr-4 py-3 bg-[#343434] text-white placeholder-[#A0A0A0]"
+              />
+            </div>
+            {errorEn && <p className="text-red-500 text-sm">{errorEn}</p>}
+          </div>
+
+          {/* Art category */}
+          <div className="flex flex-col gap-2">
+            <label className="text-white text-sm">
+              {addCatalogTexts.categoryLabel} <span className="text-red-500">*</span>
+            </label>
+            <button
+              ref={categoryButtonRef}
+              type="button"
+              onClick={() => setIsCategoryModalOpen(true)}
+              className={`w-full flex items-center justify-between gap-4 px-6 py-4 bg-[#343434] text-white hover:bg-[#3a3a3a] transition-colors ${
+                errorCategory ? "border-2 border-red-500" : ""
+              }`}
+            >
+              <span>{categoryLabel || addCatalogTexts.categoryPlaceholder}</span>
+              <Image src="/white_triangle_left.svg" alt="arrow" width={20} height={20} />
+            </button>
+            {errorCategory && <p className="text-red-500 text-sm">{errorCategory}</p>}
+          </div>
+
           {/* Image Upload Area */}
           <div
             onClick={handleImageUploadClick}
-            className="relative w-full h-[280px] bg-[#343434] border-2 border-dashed border-black flex flex-col items-center justify-center cursor-pointer hover:bg-[#3a3a3a] transition-colors"
+            className={`relative w-full h-[280px] bg-[#343434] border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-[#3a3a3a] transition-colors ${
+              imageError ? "border-red-500" : "border-black"
+            }`}
           >
             {selectedImage ? (
               <>
@@ -149,6 +314,7 @@ export default function AddCatalog({
               </>
             )}
           </div>
+          {imageError && <p className="text-red-500 text-sm">{imageError}</p>}
 
           <input
             ref={imageInputRef}
@@ -162,7 +328,9 @@ export default function AddCatalog({
           {!catalogFile ? (
             <button
               onClick={handleCatalogUploadClick}
-              className="w-full h-[160px] bg-[#343434] border-2 border-dashed border-black flex flex-col items-center justify-center cursor-pointer hover:bg-[#3a3a3a] transition-colors"
+              className={`w-full h-[160px] bg-[#343434] border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-[#3a3a3a] transition-colors ${
+                pdfError ? "border-red-500" : "border-black"
+              }`}
             >
               <Image
                 src="/upload.svg"
@@ -208,6 +376,7 @@ export default function AddCatalog({
               </button>
             </div>
           )}
+          {pdfError && <p className="text-red-500 text-sm">{pdfError}</p>}
 
           <input
             ref={catalogInputRef}
@@ -219,16 +388,26 @@ export default function AddCatalog({
         </div>
 
         {/* Footer Button */}
-        <div className="p-6 flex justify-center">
+        <div className="p-6 flex flex-col items-center gap-3">
+          {submitError && <p className="text-red-500 text-sm text-center">{submitError}</p>}
           <button
             onClick={handleAdd}
-            disabled={!selectedImage || !catalogFile}
+            disabled={!selectedImage || !catalogFile || isSubmitting}
             className="w-full md:w-[320px] h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[18px] hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {addCatalogTexts.addButton}
           </button>
         </div>
       </div>
+
+      {/* Category Selection Panel */}
+      <SelectCatalogCategoryForm
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        categories={categories}
+        selectedValue={artSubcategory || artCategory || null}
+        onSelect={handleSelectCategory}
+      />
     </>
   );
 }

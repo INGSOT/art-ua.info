@@ -42,18 +42,33 @@ function mapCatalog(raw: RawMyCatalog): MyCatalog {
 
 export const myCatalogsAPI = {
   list: async (): Promise<MyCatalog[]> => {
-    const response = await api.get<MyCatalogsResponse>("/v1/art-ua-info/my/catalogs");
+    const response = await api.get<MyCatalogsResponse>("/v1/art-ua-info/my/catalogs", {
+      params: { language: "uk" },
+    });
     return response.data.data.map(mapCatalog);
   },
 
-  create: async (params: { titleUk: string; image: string; pdfFile: File }): Promise<MyCatalog> => {
+  create: async (params: {
+    titleUk: string;
+    titleEn: string;
+    artCategory: string;
+    artSubcategory?: string | null;
+    image: string;
+    pdfFile: File;
+  }): Promise<MyCatalog> => {
     const form = new FormData();
     form.append("title[uk]", params.titleUk);
+    form.append("title[en]", params.titleEn);
+    form.append("art_category", params.artCategory);
+    if (params.artSubcategory) {
+      form.append("art_subcategory", params.artSubcategory);
+    }
     form.append("image", params.image);
     form.append("pdf_file", params.pdfFile);
 
     const response = await api.post<{ data: RawMyCatalog }>("/v1/art-ua-info/my/catalogs", form, {
       headers: { "Content-Type": "multipart/form-data" },
+      params: { language: "uk" },
     });
     return mapCatalog(response.data.data);
   },
@@ -63,7 +78,9 @@ export const myCatalogsAPI = {
   },
 
   setPrimary: async (id: number): Promise<MyCatalog> => {
-    const response = await api.post<{ data: RawMyCatalog }>(`/v1/art-ua-info/my/catalogs/${id}/primary`);
+    const response = await api.post<{ data: RawMyCatalog }>(`/v1/art-ua-info/my/catalogs/${id}/primary`, undefined, {
+      params: { language: "uk" },
+    });
     return mapCatalog(response.data.data);
   },
 };

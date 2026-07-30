@@ -119,6 +119,12 @@ export const catalogEmptyState = {
 export interface AddCatalogTexts {
   title: string;
   closeAlt: string;
+  titleUkLabel: string;
+  titleUkPlaceholder: string;
+  titleEnLabel: string;
+  titleEnPlaceholder: string;
+  categoryLabel: string;
+  categoryPlaceholder: string;
   imageUploadText: string;
   imageRemoveAlt: string;
   catalogUploadText: string;
@@ -130,6 +136,12 @@ export interface AddCatalogTexts {
 export const addCatalogTexts: AddCatalogTexts = {
   title: "Новий каталог",
   closeAlt: "Close",
+  titleUkLabel: "Назва каталогу (укр.)",
+  titleUkPlaceholder: "Введіть назву українською",
+  titleEnLabel: "Назва каталогу (англ.)",
+  titleEnPlaceholder: "Введіть назву англійською",
+  categoryLabel: "Галузь мистецтва",
+  categoryPlaceholder: "Оберіть галузь мистецтва",
   imageUploadText: "Додайте обкладинку.\nДобре будуть виглядати зображення зі співвідношенням 4х3.",
   imageRemoveAlt: "Remove",
   catalogUploadText: "Завантажте каталог",
