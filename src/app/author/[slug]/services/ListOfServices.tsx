@@ -7,6 +7,11 @@ import { useAuthorProfile } from "../../AuthorProfileContext";
 
 const FALLBACK_IMAGE = "/masks.svg";
 
+function formatOverlayLabel(service: PublicService): string {
+    if (service.price === null) return "Договірна ціна";
+    return `${service.priceFrom ? "Від " : ""}${service.price} ${service.currency ?? ""}`.trim();
+}
+
 export default function ListOfServices() {
     const { slug, loading: profileLoading, notFound } = useAuthorProfile();
     const [myServices, setMyServices] = useState<PublicService[]>([]);
@@ -55,7 +60,7 @@ export default function ListOfServices() {
                     <ServiceCard
                         key={service.id}
                         image={service.image ?? FALLBACK_IMAGE}
-                        overlayButtonLabel="Замовити послугу"
+                        overlayButtonLabel={formatOverlayLabel(service)}
                         title={service.title}
                         footer={{
                           variant: "order",

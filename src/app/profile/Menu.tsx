@@ -20,7 +20,7 @@ export default function Menu({ activeItem }: MenuProps) {
     { id: "services", label: "Послуги", href: withProfileId("/profile/services", slug) },
     { id: "team", label: "Команда", href: withProfileId("/profile/team", slug) },
     { id: "info", label: "Інформація", href: withProfileId("/profile/info", slug) },
-    { id: "notifications", label: "Сповіщення", href: "#" },
+    { id: "notifications", label: "Сповіщення", href: withProfileId("/profile/notifications", slug) },
   ];
 
   return (

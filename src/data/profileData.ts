@@ -198,6 +198,16 @@ export const serviceEmptyState = {
   createButtonText: "Додати послугу",
 };
 
+export const notificationsEmptyState = {
+  message: "У вас ще немає замовлень послуг",
+  subMessage: "Тут з'являтимуться сповіщення, коли хтось замовить вашу послугу.",
+};
+
+export const notificationsTexts = {
+  closeAlt: "Закрити",
+  viewService: "Переглянути послугу",
+};
+
 // Delete Service Modal
 export const deleteServiceTexts: DeleteCatalogTexts = {
   title: "Ви видаляєте послугу",
