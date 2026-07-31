@@ -7,44 +7,152 @@ import Header from "../../components/Header";
 import LatestNews from "../../components/LatestNews";
 import JoinCommunityWrapper from "../../components/JoinCommunityWrapper";
 import SearchSection from "../../components/SearchSection";
-import FilterSection from "../../components/filters/FilterSection";
-import FiltersButton from "../../components/filters/FiltersButton";
-import FiltersModal from "../../components/filters/FiltersModal";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
-import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
-import { authorsFilters } from "../../components/filters/filterConfig";
+import FiltersButton from "../../components/filters/FiltersButton";
+import { FilterChip } from "../../components/filters/filterChipUtils";
 import Participant from "../../components/Participant";
 import SortingControls from "./SortingControls";
+import AuthorsFilterSidebar, { type ParticipantFilter } from "./AuthorsFilterSidebar";
 import PaginationSection from "../../components/PaginationSection";
-import { type ArtistData } from "../../data/artistsData";
-import { organizationsData } from "../../data/organizationsData";
-import { teamData, type TeamProfile } from "../../data/teamData";
-import { projectsData } from "../../data/projectsData";
-import { artistsAPI } from "../../lib/api/artists";
+import { type PhotoData } from "../../data/artistsData";
+import { artistsAPI, type AuthorsListFilters, type PublicArtist, type PublicArtistProject } from "../../lib/api/artists";
+import { organizationsAPI } from "../../lib/api/organizations";
+import { teamsAPI, type PublicTeam } from "../../lib/api/teams";
 
 const ITEMS_PER_PAGE = 10;
+// "Усі" поєднує 3 незалежно пагіновані джерела — точну наскрізну пагінацію не
+// рахуємо (рішення: точна пагінація лише в межах одного обраного типу), тому тут
+// просто тягнемо перші N з кожного типу без керування сторінками.
+const ALL_TAB_PER_TYPE = 12;
 const FALLBACK_ARTIST_PHOTO = "/artists/artist-photo-5.png";
 
-/**
- * Найпоширеніша непорожня категорія у списку проєктів митця —
- * використовується як фолбек для `artSubCategory`, якого немає в
- * `GET /v1/artists` (беклог не повʼязує митця з конкретною категорією напряму).
- */
-function pickMostCommonSubcategory(values: (string | null)[]): string {
-  const counts = new Map<string, number>();
-  values.forEach((value) => {
-    if (!value) return;
-    counts.set(value, (counts.get(value) ?? 0) + 1);
-  });
-  let best = "";
-  let bestCount = 0;
-  counts.forEach((count, value) => {
-    if (count > bestCount) {
-      best = value;
-      bestCount = count;
-    }
-  });
-  return best;
+interface AuthorCardData {
+    kind: "artist" | "organization" | "team";
+    id: number;
+    slug: string;
+    name: string;
+    avatarUrl: string | null;
+    typeLabel: string;
+    tags: string[];
+    photos: PhotoData[];
+    memberAvatars?: string[];
+}
+
+const EMPTY_FILTERS: AuthorsListFilters = { categories: [], parameters: [], sort_options: [] };
+
+const SORT_FALLBACK_OPTIONS = [
+    { slug: "projects_count", name: "За популярністю" },
+    { slug: "name", name: "За ім'ям" },
+];
+
+function toPhotos(projects: PublicArtistProject[]): PhotoData[] {
+    return projects.map((project) => ({
+        image: project.coverUrl ?? FALLBACK_ARTIST_PHOTO,
+        likes: project.likesCount,
+        slug: project.slug,
+    }));
+}
+
+async function buildAuthorCards(
+    items: PublicArtist[],
+    kind: "artist" | "organization"
+): Promise<AuthorCardData[]> {
+    const api = kind === "artist" ? artistsAPI : organizationsAPI;
+
+    return Promise.all(
+        items.map(async (item) => {
+            let projects: PublicArtistProject[] = [];
+            try {
+                projects = await api.projects(item.slug, { per_page: 5 });
+            } catch (error) {
+                console.error(`Failed to load projects for "${item.slug}":`, error);
+            }
+
+            return {
+                kind,
+                id: item.id,
+                slug: item.slug,
+                name: item.name,
+                avatarUrl: item.avatarUrl,
+                typeLabel: item.profession || (kind === "artist" ? "Митець" : "Організація"),
+                tags: [item.profession, item.city, item.country].filter((v): v is string => !!v),
+                photos: toPhotos(projects),
+            };
+        })
+    );
+}
+
+async function buildTeamCards(teams: PublicTeam[]): Promise<AuthorCardData[]> {
+    return Promise.all(
+        teams.map(async (team) => {
+            let projects: PublicArtistProject[] = [];
+            try {
+                projects = await teamsAPI.projects(team.slug, { per_page: 5 });
+            } catch (error) {
+                console.error(`Failed to load projects for team "${team.slug}":`, error);
+            }
+
+            return {
+                kind: "team" as const,
+                id: team.id,
+                slug: team.slug,
+                name: team.name,
+                avatarUrl: team.avatarUrl,
+                typeLabel: "Творча команда",
+                tags: [team.city, team.country, team.website].filter((v): v is string => !!v),
+                photos: toPhotos(projects),
+                memberAvatars: team.memberAvatars,
+            };
+        })
+    );
+}
+
+function mergeCategoryFilters(a: AuthorsListFilters, b: AuthorsListFilters): AuthorsListFilters {
+    const bySlug = new Map(a.categories.map((c) => [c.slug, { ...c, subcategories: [...c.subcategories] }]));
+
+    b.categories.forEach((category) => {
+        const existing = bySlug.get(category.slug);
+        if (!existing) {
+            bySlug.set(category.slug, { ...category, subcategories: [...category.subcategories] });
+            return;
+        }
+        existing.authors_count = (existing.authors_count ?? 0) + (category.authors_count ?? 0);
+        const subBySlug = new Map(existing.subcategories.map((s) => [s.slug, { ...s }]));
+        category.subcategories.forEach((sub) => {
+            const existingSub = subBySlug.get(sub.slug);
+            if (existingSub) {
+                existingSub.authors_count = (existingSub.authors_count ?? 0) + (sub.authors_count ?? 0);
+            } else {
+                subBySlug.set(sub.slug, { ...sub });
+            }
+        });
+        existing.subcategories = Array.from(subBySlug.values());
+    });
+
+    const parametersById = new Map(a.parameters.map((p) => [p.id, { ...p, values: [...p.values] }]));
+    b.parameters.forEach((parameter) => {
+        const existing = parametersById.get(parameter.id);
+        if (!existing) {
+            parametersById.set(parameter.id, { ...parameter, values: [...parameter.values] });
+            return;
+        }
+        const valueById = new Map(existing.values.map((v) => [v.id, { ...v }]));
+        parameter.values.forEach((value) => {
+            const existingValue = valueById.get(value.id);
+            if (existingValue) {
+                existingValue.authors_count = (existingValue.authors_count ?? 0) + (value.authors_count ?? 0);
+            } else {
+                valueById.set(value.id, { ...value });
+            }
+        });
+        existing.values = Array.from(valueById.values());
+    });
+
+    return {
+        categories: Array.from(bySlug.values()),
+        parameters: Array.from(parametersById.values()),
+        sort_options: a.sort_options.length ? a.sort_options : b.sort_options,
+    };
 }
 
 export default function AuthorsPage() {
@@ -53,295 +161,296 @@ export default function AuthorsPage() {
     const pathname = usePathname();
 
     const participantParam = searchParams.get("participant");
+    const participant: ParticipantFilter =
+        participantParam === "artist" || participantParam === "organization" || participantParam === "team"
+            ? participantParam
+            : "all";
+
     const searchQueryParam = searchParams.get("search") ?? "";
-    const artFieldsSection = authorsFilters.find((section) => section.id === "art-fields");
-    const artItems =
-        artFieldsSection?.subsections?.flatMap((subsection) => subsection.items ?? []) ?? [];
-    const allowedArtCategoryIds = new Set(artItems.map((item) => item.id));
-    const selectedArtCategoryIds = searchParams
-        .getAll("art_subcategory")
-        .filter((value) => allowedArtCategoryIds.has(value));
+    const artCategoryParam = searchParams.get("art_category") ?? "";
+    const subcategoryParam = searchParams.get("art_subcategory") ?? "";
+    const selectedSubcategories = subcategoryParam ? subcategoryParam.split(",").filter(Boolean) : [];
+    const parameterValueParam = searchParams.get("parameter_value_id") ?? "";
+    const selectedParameterValueIds = parameterValueParam ? parameterValueParam.split(",").filter(Boolean) : [];
+    const sortBy = searchParams.get("sort_by") ?? "projects_count";
+    const currentPage = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
-    type ParticipantFilter = "artist" | "organization" | "team" | "all";
-
-    const currentParticipantFilter: ParticipantFilter =
-        participantParam === "artist"
-            ? "artist"
-            : participantParam === "organization"
-                ? "organization"
-            : participantParam === "team"
-                ? "team"
-                : "all";
-
-    const [currentPage, setCurrentPage] = useState(1);
     const [searchInput, setSearchInput] = useState(searchQueryParam);
+    const [items, setItems] = useState<AuthorCardData[]>([]);
+    const [meta, setMeta] = useState<{ current_page: number; last_page: number } | null>(null);
+    const [filtersData, setFiltersData] = useState<AuthorsListFilters>(EMPTY_FILTERS);
+    const [loading, setLoading] = useState(true);
+    const [hasLoaded, setHasLoaded] = useState(false);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-    const [artistsData, setArtistsData] = useState<ArtistData[]>([]);
 
     useEffect(() => {
         setSearchInput(searchQueryParam);
     }, [searchQueryParam]);
 
     useEffect(() => {
-        let isCancelled = false;
+        let ignore = false;
 
         (async () => {
+            setLoading(true);
             try {
-                const artists = await artistsAPI.list({ per_page: 50 });
+                const search = searchQueryParam || undefined;
 
-                const artistsWithProjects = await Promise.all(
-                    artists.map(async (artist) => {
-                        let projects: Awaited<ReturnType<typeof artistsAPI.projects>> = [];
-                        try {
-                            projects = await artistsAPI.projects(artist.slug, { per_page: 5 });
-                        } catch (error) {
-                            console.error(`Failed to load projects for artist "${artist.slug}":`, error);
-                        }
-
-                        const mapped: ArtistData = {
-                            id: artist.id,
-                            slug: artist.slug,
-                            artistPhoto: artist.avatarUrl ?? FALLBACK_ARTIST_PHOTO,
-                            artistName: artist.name,
-                            artistType: artist.profession || "Митець",
-                            artSubCategory: pickMostCommonSubcategory(
-                                projects.map((project) => project.artSubcategory ?? project.artCategory)
-                            ),
-                            tags: [artist.profession, artist.city, artist.country].filter((value): value is string => !!value),
-                            catalogButtonText: "До каталогу робіт",
-                            photos: projects.map((project) => ({
-                                image: project.coverUrl ?? FALLBACK_ARTIST_PHOTO,
-                                likes: project.likesCount,
-                                slug: project.slug,
-                            })),
-                        };
-
-                        return mapped;
-                    })
-                );
-
-                if (!isCancelled) {
-                    setArtistsData(artistsWithProjects);
+                if (participant === "artist" || participant === "organization") {
+                    const api = participant === "artist" ? artistsAPI : organizationsAPI;
+                    const result = await api.browse({
+                        ...(search ? { search } : {}),
+                        ...(artCategoryParam ? { art_category: artCategoryParam } : {}),
+                        ...(selectedSubcategories.length ? { art_subcategory: selectedSubcategories.join(",") } : {}),
+                        ...(selectedParameterValueIds.length
+                            ? { parameter_value_id: selectedParameterValueIds.join(",") }
+                            : {}),
+                        sort_by: sortBy,
+                        page: currentPage,
+                        per_page: ITEMS_PER_PAGE,
+                    });
+                    if (ignore) return;
+                    const cards = await buildAuthorCards(result.data, participant);
+                    if (ignore) return;
+                    setItems(cards);
+                    setMeta(result.meta);
+                    setFiltersData(result.filters);
+                } else if (participant === "team") {
+                    const result = await teamsAPI.browse({
+                        ...(search ? { search } : {}),
+                        page: currentPage,
+                        per_page: ITEMS_PER_PAGE,
+                    });
+                    if (ignore) return;
+                    const cards = await buildTeamCards(result.data);
+                    if (ignore) return;
+                    setItems(cards);
+                    setMeta(result.meta);
+                    setFiltersData(EMPTY_FILTERS);
+                } else {
+                    const authorParams = {
+                        ...(search ? { search } : {}),
+                        ...(artCategoryParam ? { art_category: artCategoryParam } : {}),
+                        ...(selectedSubcategories.length ? { art_subcategory: selectedSubcategories.join(",") } : {}),
+                        ...(selectedParameterValueIds.length
+                            ? { parameter_value_id: selectedParameterValueIds.join(",") }
+                            : {}),
+                        sort_by: sortBy,
+                        per_page: ALL_TAB_PER_TYPE,
+                    };
+                    const [artistsResult, organizationsResult, teamsResult] = await Promise.all([
+                        artistsAPI.browse(authorParams),
+                        organizationsAPI.browse(authorParams),
+                        teamsAPI.browse({ ...(search ? { search } : {}), per_page: ALL_TAB_PER_TYPE }),
+                    ]);
+                    if (ignore) return;
+                    const [artistCards, organizationCards, teamCards] = await Promise.all([
+                        buildAuthorCards(artistsResult.data, "artist"),
+                        buildAuthorCards(organizationsResult.data, "organization"),
+                        buildTeamCards(teamsResult.data),
+                    ]);
+                    if (ignore) return;
+                    setItems([...artistCards, ...organizationCards, ...teamCards]);
+                    setMeta(null);
+                    setFiltersData(mergeCategoryFilters(artistsResult.filters, organizationsResult.filters));
                 }
             } catch (error) {
-                console.error("Failed to load artists:", error);
+                if (ignore) return;
+                console.error("Failed to load authors:", error);
+                setItems([]);
+                setMeta(null);
+            } finally {
+                if (!ignore) {
+                    setLoading(false);
+                    setHasLoaded(true);
+                }
             }
         })();
 
         return () => {
-            isCancelled = true;
+            ignore = true;
         };
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [participant, artCategoryParam, subcategoryParam, parameterValueParam, sortBy, searchQueryParam, currentPage]);
 
-    const initialSelectedFilters: Record<string, boolean> = (() => {
-        const base: Record<string, boolean> = {
-            all: false,
-            artists: false,
-            organizations: false,
-            teams: false,
-        };
-
-        if (currentParticipantFilter === "artist") {
-            base.artists = true;
-        } else if (currentParticipantFilter === "organization") {
-            base.organizations = true;
-        } else if (currentParticipantFilter === "team") {
-            base.teams = true;
-        } else {
-            base.all = true;
-        }
-
-        artItems.forEach((item) => {
-            base[item.id] = selectedArtCategoryIds.includes(item.id);
-        });
-
-        return base;
-    })();
-
-    const handleFilterChange = (filters: Record<string, boolean>) => {
-        setCurrentPage(1);
-
-        const artistsSelected = !!filters["artists"];
-        const organizationsSelected = !!filters["organizations"];
-        const teamsSelected = !!filters["teams"];
-        const allSelected = !!filters["all"];
-
-        let nextFilter: ParticipantFilter = "all";
-
-        if (artistsSelected && !organizationsSelected && !teamsSelected && !allSelected) {
-            nextFilter = "artist";
-        } else if (organizationsSelected && !artistsSelected && !teamsSelected && !allSelected) {
-            nextFilter = "organization";
-        } else if (teamsSelected && !artistsSelected && !organizationsSelected && !allSelected) {
-            nextFilter = "team";
-        } else {
-            nextFilter = "all";
-        }
-
-        const selectedIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!filters[id]);
-
+    const pushParams = (mutate: (params: URLSearchParams) => void, resetPage = true) => {
         const params = new URLSearchParams(searchParams.toString());
-
-        if (nextFilter === "artist") {
-            params.set("participant", "artist");
-        } else if (nextFilter === "organization") {
-            params.set("participant", "organization");
-        } else if (nextFilter === "team") {
-            params.set("participant", "team");
-        } else {
-            params.delete("participant");
+        mutate(params);
+        if (resetPage) {
+            params.delete("page");
         }
-
-        params.delete("art_subcategory");
-        selectedIds.forEach((id) => {
-            params.append("art_subcategory", id);
-        });
-
         const search = params.toString();
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
-    const selectedFilterChips = buildFilterChips(authorsFilters, initialSelectedFilters);
-
-    const handleRemoveFilter = (chipId: string) => {
-        handleFilterChange(removeFilterFromState(chipId, initialSelectedFilters, authorsFilters));
+    const handleParticipantChange = (next: ParticipantFilter) => {
+        pushParams((params) => {
+            if (next === "all") {
+                params.delete("participant");
+            } else {
+                params.set("participant", next);
+            }
+            // Команди не мають власної art_category — скидаємо категорію при переході.
+            if (next === "team") {
+                params.delete("art_category");
+                params.delete("art_subcategory");
+                params.delete("parameter_value_id");
+            }
+        });
     };
 
-    const handleClearAllFilters = () => {
-        handleFilterChange(getClearedFiltersState(authorsFilters));
+    const handleCategoryClick = (slug: string | null) => {
+        pushParams((params) => {
+            if (slug) {
+                params.set("art_category", slug);
+            } else {
+                params.delete("art_category");
+            }
+            params.delete("art_subcategory");
+            params.delete("parameter_value_id");
+        });
     };
 
-    const getAuthorsByParticipantFilter = (participantFilter: ParticipantFilter) => {
-        if (participantFilter === "artist") return artistsData;
-        if (participantFilter === "organization") return organizationsData;
-        if (participantFilter === "team") return teamData;
-        return [...artistsData, ...organizationsData, ...teamData];
+    const handleSubcategoryToggle = (slug: string) => {
+        pushParams((params) => {
+            const next = selectedSubcategories.includes(slug)
+                ? selectedSubcategories.filter((s) => s !== slug)
+                : [...selectedSubcategories, slug];
+            if (next.length) {
+                params.set("art_subcategory", next.join(","));
+            } else {
+                params.delete("art_subcategory");
+            }
+            params.delete("parameter_value_id");
+        });
     };
 
-    const resolveParticipantFilter = (filters: Record<string, boolean>): ParticipantFilter => {
-        const artistsSelected = !!filters["artists"];
-        const organizationsSelected = !!filters["organizations"];
-        const teamsSelected = !!filters["teams"];
-        const allSelected = !!filters["all"];
-
-        if (artistsSelected && !organizationsSelected && !teamsSelected && !allSelected) {
-            return "artist";
-        }
-        if (organizationsSelected && !artistsSelected && !teamsSelected && !allSelected) {
-            return "organization";
-        }
-        if (teamsSelected && !artistsSelected && !organizationsSelected && !allSelected) {
-            return "team";
-        }
-        return "all";
+    const handleParameterValueToggle = (valueId: number) => {
+        pushParams((params) => {
+            const id = String(valueId);
+            const next = selectedParameterValueIds.includes(id)
+                ? selectedParameterValueIds.filter((v) => v !== id)
+                : [...selectedParameterValueIds, id];
+            if (next.length) {
+                params.set("parameter_value_id", next.join(","));
+            } else {
+                params.delete("parameter_value_id");
+            }
+        });
     };
 
-    const activeData: (ArtistData | TeamProfile)[] = getAuthorsByParticipantFilter(currentParticipantFilter);
-
-    const filteredDataByCategory = selectedArtCategoryIds.length
-        ? activeData.filter(
-            (participant): participant is ArtistData =>
-                "artSubCategory" in participant && selectedArtCategoryIds.includes(participant.artSubCategory)
-        )
-        : activeData;
-
-    const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
-
-    const getModalResultCount = (filters: Record<string, boolean>) => {
-        const participantFilter = resolveParticipantFilter(filters);
-        const baseData = getAuthorsByParticipantFilter(participantFilter);
-        const selectedIds = artItems
-            .map((item) => item.id)
-            .filter((id) => !!filters[id]);
-
-        let result = selectedIds.length
-            ? baseData.filter(
-                (participant): participant is ArtistData =>
-                    "artSubCategory" in participant && selectedIds.includes(participant.artSubCategory)
-            )
-            : baseData;
-
-        if (normalizedSearchQuery) {
-            result = result.filter((participant) => {
-                const name =
-                    "artistName" in participant ? participant.artistName : participant.name;
-                const role =
-                    "artistType" in participant ? participant.artistType : participant.category;
-                const nameMatch = name.toLowerCase().includes(normalizedSearchQuery);
-                const typeMatch = role.toLowerCase().includes(normalizedSearchQuery);
-                const tagsMatch = participant.tags.some((tag) =>
-                    tag.toLowerCase().includes(normalizedSearchQuery)
-                );
-
-                return nameMatch || typeMatch || tagsMatch;
-            });
-        }
-
-        return result.length;
+    const handleSortChange = (slug: string) => {
+        pushParams((params) => {
+            params.set("sort_by", slug);
+        }, false);
     };
-
-    const filteredData = normalizedSearchQuery
-        ? filteredDataByCategory.filter((participant) => {
-            const name =
-                "artistName" in participant ? participant.artistName : participant.name;
-            const role =
-                "artistType" in participant ? participant.artistType : participant.category;
-            const nameMatch = name.toLowerCase().includes(normalizedSearchQuery);
-            const typeMatch = role.toLowerCase().includes(normalizedSearchQuery);
-            const tagsMatch = participant.tags.some((tag) =>
-                tag.toLowerCase().includes(normalizedSearchQuery)
-            );
-
-            return nameMatch || typeMatch || tagsMatch;
-        })
-        : filteredDataByCategory;
-
-    const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const currentParticipants = filteredData.slice(startIndex, endIndex);
 
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        pushParams((params) => {
+            if (page > 1) {
+                params.set("page", String(page));
+            } else {
+                params.delete("page");
+            }
+        }, false);
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const handleSearch = () => {
-        const params = new URLSearchParams(searchParams.toString());
-        const trimmedValue = searchInput.trim();
-
-        if (trimmedValue) {
-            params.set("search", trimmedValue);
-        } else {
-            params.delete("search");
-        }
-
-        setCurrentPage(1);
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        pushParams((params) => {
+            const trimmed = searchInput.trim();
+            if (trimmed) {
+                params.set("search", trimmed);
+            } else {
+                params.delete("search");
+            }
+        });
     };
 
     const handleClearSearch = () => {
         setSearchInput("");
-
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete("search");
-
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+        pushParams((params) => {
+            params.delete("search");
+        });
     };
+
+    const handleClearAllFilters = () => {
+        pushParams((params) => {
+            params.delete("participant");
+            params.delete("art_category");
+            params.delete("art_subcategory");
+            params.delete("parameter_value_id");
+        });
+    };
+
+    const participantLabels: Record<ParticipantFilter, string> = {
+        all: "Усі",
+        artist: "Митці",
+        organization: "Організації",
+        team: "Команди",
+    };
+
+    const activeCategory = filtersData.categories.find((c) => c.slug === artCategoryParam);
+    const categoryNameMap = Object.fromEntries(filtersData.categories.map((c) => [c.slug, c.name]));
+    const subcategoryNameMap = Object.fromEntries(
+        filtersData.categories.flatMap((c) => c.subcategories.map((s) => [s.slug, s.name]))
+    );
+    const parameterValueNameMap = Object.fromEntries(
+        filtersData.parameters.flatMap((p) => p.values.map((v) => [String(v.id), v.value]))
+    );
+
+    const selectedFilterChips: FilterChip[] = [
+        ...(participant !== "all" ? [{ id: `participant:${participant}`, label: participantLabels[participant] }] : []),
+        ...(artCategoryParam
+            ? [{ id: `art_category:${artCategoryParam}`, label: categoryNameMap[artCategoryParam] ?? artCategoryParam }]
+            : []),
+        ...selectedSubcategories.map((slug) => ({
+            id: `art_subcategory:${slug}`,
+            label: subcategoryNameMap[slug] ?? slug,
+        })),
+        ...selectedParameterValueIds.map((id) => ({
+            id: `parameter_value_id:${id}`,
+            label: parameterValueNameMap[id] ?? id,
+        })),
+    ];
+
+    const handleRemoveFilterChip = (chipId: string) => {
+        if (chipId.startsWith("participant:")) {
+            handleParticipantChange("all");
+            return;
+        }
+        if (chipId.startsWith("art_category:")) {
+            handleCategoryClick(null);
+            return;
+        }
+        if (chipId.startsWith("art_subcategory:")) {
+            handleSubcategoryToggle(chipId.slice("art_subcategory:".length));
+            return;
+        }
+        if (chipId.startsWith("parameter_value_id:")) {
+            handleParameterValueToggle(Number(chipId.slice("parameter_value_id:".length)));
+        }
+    };
+
+    const normalizedSearchQuery = searchQueryParam.trim();
+    const noSearchResults = hasLoaded && !loading && normalizedSearchQuery && items.length === 0;
+    const sortOptions = filtersData.sort_options.length ? filtersData.sort_options : SORT_FALLBACK_OPTIONS;
+    const showCategoryFilters = participant !== "team";
+
+    const sidebar = (
+        <AuthorsFilterSidebar
+            participant={participant}
+            onParticipantChange={handleParticipantChange}
+            parameters={filtersData.parameters}
+            selectedParameterValueIds={selectedParameterValueIds}
+            onToggleParameterValue={handleParameterValueToggle}
+        />
+    );
 
     return (
         <>
             <Header isHomePage={false} />
-            <SearchSection
-                value={searchInput}
-                onChange={setSearchInput}
-                onSearch={handleSearch}
-            />
+            <SearchSection value={searchInput} onChange={setSearchInput} onSearch={handleSearch} />
+
             {normalizedSearchQuery && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pt-4 pb-6 px-4">
                     <p className="text-white text-center font-wix text-[18px] leading-[24px]">
@@ -349,14 +458,7 @@ export default function AuthorsPage() {
                     </p>
                 </div>
             )}
-            {!normalizedSearchQuery && searchQueryParam && (
-                <div className="bg-[#414141] flex flex-col items-center justify-center pt-4 pb-6 px-4">
-                    <p className="text-white text-center font-wix text-[18px] leading-[24px]">
-                        Результат пошуку
-                    </p>
-                </div>
-            )}
-            {normalizedSearchQuery && filteredData.length === 0 && (
+            {noSearchResults && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pb-8 px-4">
                     <button
                         type="button"
@@ -370,99 +472,143 @@ export default function AuthorsPage() {
                     </h2>
                 </div>
             )}
-            {!(normalizedSearchQuery && filteredData.length === 0) && (
+
+            {!noSearchResults && (
                 <>
-                    <div className="flex flex-col gap-4 lg:gap-8 px-4 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 bg-[#414141] max-w-full overflow-x-hidden">
-                        <SelectedFiltersBar
-                            chips={selectedFilterChips}
-                            onRemove={handleRemoveFilter}
-                            onClearAll={handleClearAllFilters}
-                        />
-                        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-                            <div className="hidden lg:block">
-                                <FilterSection
-                                    key={`authors-filters-${currentParticipantFilter}-${selectedArtCategoryIds.slice().sort().join(",") || "all"}`}
-                                    filters={authorsFilters}
-                                    onFilterChange={handleFilterChange}
-                                    initialSelectedFilters={initialSelectedFilters}
-                                />
-                            </div>
-                            <div className="flex-1 flex flex-col gap-4 md:gap-6 lg:gap-8 min-w-0">
-                            <div className="relative z-30 flex items-center justify-between lg:justify-start gap-1 md:gap-2">
+                    <section className="w-full bg-[#414141] py-8 px-4 sm:px-6 md:px-10 lg:px-20">
+                        {showCategoryFilters && (
+                            <>
+                                {/* Галузі мистецтва — реальні категорії з бекенду (як на /projects) */}
+                                <div className="flex flex-nowrap gap-2 mb-3 overflow-x-auto scrollbar-hide">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleCategoryClick(null)}
+                                        className={`px-5 py-3 font-bold text-[13px] leading-[18px] whitespace-nowrap transition-colors ${
+                                            !artCategoryParam
+                                                ? "bg-[#FECC39] text-[#272727]"
+                                                : "bg-[#343434] text-[#FECC39] hover:bg-[#2a2a2a]"
+                                        }`}
+                                    >
+                                        Усі галузі
+                                    </button>
+                                    {filtersData.categories.map((category) => (
+                                        <button
+                                            key={category.slug}
+                                            type="button"
+                                            onClick={() => handleCategoryClick(category.slug)}
+                                            className={`px-5 py-3 font-bold text-[13px] leading-[18px] whitespace-nowrap transition-colors ${
+                                                artCategoryParam === category.slug
+                                                    ? "bg-[#FECC39] text-[#272727]"
+                                                    : "bg-[#343434] text-[#FECC39] hover:bg-[#2a2a2a]"
+                                            }`}
+                                        >
+                                            {category.name}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {!!activeCategory?.subcategories.length && (
+                                    <div className="flex flex-nowrap gap-x-5 gap-y-2 mb-5 overflow-x-auto scrollbar-hide">
+                                        {activeCategory.subcategories.map((sub) => (
+                                            <button
+                                                key={sub.slug}
+                                                type="button"
+                                                onClick={() => handleSubcategoryToggle(sub.slug)}
+                                                className={`font-wix text-sm leading-5 transition-colors ${
+                                                    selectedSubcategories.includes(sub.slug)
+                                                        ? "text-[#FECC39]"
+                                                        : "text-white hover:text-[#FECC39]"
+                                                }`}
+                                            >
+                                                {sub.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        <div className="sticky top-0 z-40 bg-[#414141] py-2 -mx-4 px-4 sm:-mx-6 sm:px-6 md:-mx-10 md:px-10 lg:-mx-20 lg:px-20 mb-4 lg:mb-6">
+                            <div className="flex items-center justify-between gap-1 md:gap-2 mb-3 lg:hidden">
                                 <FiltersButton
                                     className="lg:hidden"
-                                    onClick={() => setIsMobileFiltersOpen(true)}
+                                    onClick={() => setIsMobileFiltersOpen((prev) => !prev)}
                                     isActive={isMobileFiltersOpen}
                                     selectedCount={selectedFilterChips.length}
                                 />
-                                <SortingControls />
+                                {participant !== "team" && (
+                                    <div className="relative ml-auto min-w-0 flex-1 max-w-[220px] sm:max-w-[260px]">
+                                        <SortingControls options={sortOptions} value={sortBy} onChange={handleSortChange} />
+                                    </div>
+                                )}
                             </div>
-                            {filteredData.length === 0 ? (
-                                <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
-                                    <p className="font-wix text-white text-lg md:text-2xl">Авторів не знайдено</p>
-                                    <Image src="/masks.svg" alt="Авторів не знайдено" width={380} height={285} priority />
+
+                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                                <div className="min-w-0">
+                                    <SelectedFiltersBar
+                                        chips={selectedFilterChips}
+                                        onRemove={handleRemoveFilterChip}
+                                        onClearAll={handleClearAllFilters}
+                                    />
                                 </div>
-                            ) : (
-                                currentParticipants.map((participant) =>
-                                    "artSubCategory" in participant ? (
-                                        <Participant
-                                            key={participant.id}
-                                            artistId={participant.id}
-                                            artistPhoto={participant.artistPhoto}
-                                            artistName={participant.artistName}
-                                            artistType={participant.artistType}
-                                            tags={participant.tags}
-                                            photos={participant.photos}
-                                            catalogButtonText={participant.catalogButtonText}
-                                        />
-                                    ) : (
-                                        <Participant
-                                            key={participant.id}
-                                            artistPhoto={participant.avatar}
-                                            artistName={participant.name}
-                                            artistType={participant.category}
-                                            tags={participant.tags}
-                                            photos={projectsData
-                                                .filter((project) =>
-                                                    participant.members.some(
-                                                        (member) => member.artistId === project.authorId
-                                                    )
-                                                )
-                                                .map((project) => ({
-                                                    image: project.image,
-                                                    likes: project.likes,
-                                                    slug: project.slug,
-                                                }))}
-                                            catalogButtonText=""
-                                            isTeam
-                                            teamSlug={participant.username}
-                                            memberAvatars={participant.members.map((m) => m.avatar)}
-                                        />
-                                    )
-                                )
-                            )}
+                                {participant !== "team" && (
+                                    <div className="hidden lg:block relative lg:w-[260px] lg:flex-shrink-0">
+                                        <SortingControls options={sortOptions} value={sortBy} onChange={handleSortChange} />
+                                    </div>
+                                )}
                             </div>
                         </div>
-                    </div>
-                    <PaginationSection
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                    />
+
+                        <div className="flex flex-col lg:flex-row gap-6">
+                            <div className="hidden lg:block">{sidebar}</div>
+
+                            <div className="flex-1 w-full min-w-0">
+                                {isMobileFiltersOpen && <div className="lg:hidden mb-6">{sidebar}</div>}
+
+                                {loading && !hasLoaded ? (
+                                    <div className="w-full min-h-[420px] flex items-center justify-center">
+                                        <p className="font-wix text-white text-lg md:text-2xl">Завантаження...</p>
+                                    </div>
+                                ) : items.length === 0 ? (
+                                    <div className="w-full min-h-[420px] flex flex-col items-center justify-center gap-8">
+                                        <p className="font-wix text-white text-lg md:text-2xl">Авторів не знайдено</p>
+                                        <Image src="/masks.svg" alt="Авторів не знайдено" width={380} height={285} priority />
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-4 md:gap-6 lg:gap-8">
+                                        {items.map((item) => (
+                                            <Participant
+                                                key={`${item.kind}-${item.id}`}
+                                                artistId={item.kind !== "team" ? item.id : undefined}
+                                                artistPhoto={item.avatarUrl ?? FALLBACK_ARTIST_PHOTO}
+                                                artistName={item.name}
+                                                artistType={item.typeLabel}
+                                                tags={item.tags}
+                                                photos={item.photos}
+                                                catalogButtonText={item.kind === "team" ? "" : "До каталогу робіт"}
+                                                isTeam={item.kind === "team"}
+                                                teamSlug={item.kind === "team" ? item.slug : undefined}
+                                                memberAvatars={item.memberAvatars ?? []}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+
+                    {meta && meta.last_page > 1 && (
+                        <PaginationSection
+                            currentPage={meta.current_page}
+                            totalPages={meta.last_page}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
                 </>
             )}
-            {isMobileFiltersOpen && (
-                <FiltersModal
-                    onClose={() => setIsMobileFiltersOpen(false)}
-                    filters={authorsFilters}
-                    initialSelectedFilters={initialSelectedFilters}
-                    getResultCount={getModalResultCount}
-                    onApply={handleFilterChange}
-                    onCancel={handleClearAllFilters}
-                />
-            )}
+
             <LatestNews />
             <JoinCommunityWrapper />
         </>
-    )
+    );
 }

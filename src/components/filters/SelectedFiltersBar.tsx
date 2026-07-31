@@ -15,11 +15,11 @@ export default function SelectedFiltersBar({ chips, onRemove, onClearAll }: Sele
     }
 
     return (
-        <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="flex flex-nowrap items-center gap-2 mb-4 overflow-x-auto scrollbar-hide">
             <button
                 type="button"
                 onClick={onClearAll}
-                className="font-wix text-[#FECC39] font-normal text-xs leading-4 underline hover:opacity-80 transition-opacity"
+                className="flex-shrink-0 font-wix text-[#FECC39] font-normal text-xs leading-4 underline hover:opacity-80 transition-opacity"
             >
                 Скинути все
             </button>
@@ -27,7 +27,7 @@ export default function SelectedFiltersBar({ chips, onRemove, onClearAll }: Sele
             {chips.map((chip) => (
                 <div
                     key={chip.id}
-                    className="flex items-center gap-1.5 bg-[#343434] px-2 py-1.5"
+                    className="flex flex-shrink-0 items-center gap-1.5 bg-[#343434] px-2 py-1.5"
                 >
                     <span className="font-wix text-white font-normal text-xs leading-4 whitespace-nowrap">
                         {chip.label}
