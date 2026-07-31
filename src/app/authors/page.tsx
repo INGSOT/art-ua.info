@@ -579,7 +579,7 @@ export default function AuthorsPage() {
                                         {items.map((item) => (
                                             <Participant
                                                 key={`${item.kind}-${item.id}`}
-                                                artistId={item.kind !== "team" ? item.id : undefined}
+                                                artistSlug={item.kind !== "team" ? item.slug : undefined}
                                                 artistPhoto={item.avatarUrl ?? FALLBACK_ARTIST_PHOTO}
                                                 artistName={item.name}
                                                 artistType={item.typeLabel}

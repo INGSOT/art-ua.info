@@ -8,7 +8,6 @@ import Link from "next/link";
 
 import { PhotoData } from "../data/artistsData";
 import { withAuthorId } from "../lib/authorQuery";
-import { getAuthorSlugById } from "../data/profileData";
 
 interface ParticipantProps {
   artistPhoto: string;
@@ -17,8 +16,8 @@ interface ParticipantProps {
   tags: string[];
   photos: PhotoData[];
   catalogButtonText: string;
-  /** Для митців: перехід на публічний профіль /author/<slug>/... */
-  artistId?: number;
+  /** Для митців/організацій: перехід на публічний профіль /author/<slug>/... */
+  artistSlug?: string;
   isTeam?: boolean;
   teamSlug?: string;
   memberAvatars?: string[];
@@ -49,7 +48,7 @@ export default function Participant({
   tags,
   photos,
   catalogButtonText,
-  artistId,
+  artistSlug,
   isTeam = false,
   teamSlug,
   memberAvatars = [],
@@ -95,8 +94,8 @@ export default function Participant({
                 ? teamSlug != null && teamSlug !== ""
                   ? `/team/${teamSlug}`
                   : "/team"
-                : artistId != null
-                ? withAuthorId("/author", getAuthorSlugById(artistId))
+                : artistSlug != null && artistSlug !== ""
+                ? withAuthorId("/author", artistSlug)
                 : "/author"
             }
             className="flex items-center gap-3"
@@ -132,7 +131,12 @@ export default function Participant({
         {/* Section 3 & 4: Catalog button / Team members on Mobile/Tablet */}
         {!isTeam ? (
           <div className="flex items-center gap-0 p-3 bg-[#343434] border-b lg:border-b-0 lg:border-r border-[#272727] flex-1 lg:flex-initial lg:p-3">
-            <button
+            <Link
+              href={
+                artistSlug != null && artistSlug !== ""
+                  ? withAuthorId("/author/projects", artistSlug)
+                  : "/author"
+              }
               className="group flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors rounded-none overflow-hidden flex-1 lg:w-auto"
             >
               <span className="flex items-center justify-center flex-1 px-4 sm:px-6 font-button font-bold text-[#343434] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] whitespace-nowrap">
@@ -146,7 +150,7 @@ export default function Participant({
                   height={24}
                 />
               </div>
-            </button>
+            </Link>
 
             {/* Toggle Button - Right of Catalog Button on Mobile/Tablet */}
             <button

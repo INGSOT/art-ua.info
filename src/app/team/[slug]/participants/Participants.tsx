@@ -40,7 +40,7 @@ export default function Participants() {
         {members.map((artist) => (
           <Participant
             key={artist.id}
-            artistId={artist.id}
+            artistSlug={artist.slug}
             artistPhoto={artist.artistPhoto}
             artistName={artist.artistName}
             artistType={artist.artistType}
