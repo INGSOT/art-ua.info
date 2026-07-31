@@ -96,6 +96,18 @@ export default function TeamCard({
           </div>
         ))}
       </div>
+
+      {!readOnly && (
+        <button
+          type="button"
+          onClick={() =>
+            router.push(`${withProfileId("/profile/team/services", slug)}?team=${team.slug}`)
+          }
+          className="self-start text-[#FECC39] text-sm font-bold hover:underline mt-2"
+        >
+          Послуги команди
+        </button>
+      )}
     </article>
   );
 }

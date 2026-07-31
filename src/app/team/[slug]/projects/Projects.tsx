@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../../../components/ui/card";
@@ -8,15 +9,50 @@ import {
   teamProjectFilterButtons,
   teamProjectEmptyState,
 } from "../../../../data/teamData";
-import { projectsData } from "../../../../data/projectsData";
-import { useCurrentTeam } from "../../useCurrentTeam";
+import { teamsAPI } from "../../../../lib/api/teams";
+import type { PublicArtistProject } from "../../../../lib/api/authorProfiles";
+
+const FALLBACK_COVER = "/artists/artist-photo-5.png";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
-  const team = useCurrentTeam();
-  const memberIds = team.members.map((member) => member.artistId);
+  const params = useParams<{ slug?: string }>();
+  const slug = params?.slug ?? "";
+  const [projects, setProjects] = useState<PublicArtistProject[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const projects = projectsData.filter((project) => memberIds.includes(project.authorId));
+  useEffect(() => {
+    if (!slug) return;
+    let ignore = false;
+
+    (async () => {
+      setLoading(true);
+      try {
+        const result = await teamsAPI.projects(slug, { per_page: 50 });
+        if (!ignore) setProjects(result);
+      } catch (error) {
+        if (!ignore) {
+          console.error(`Failed to load projects for team "${slug}":`, error);
+          setProjects([]);
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[300px] flex items-center justify-center">
+        <p className="text-white text-lg">Завантаження...</p>
+      </section>
+    );
+  }
+
   const hasProjects = projects.length > 0;
 
   return (
@@ -56,7 +92,7 @@ export default function Projects() {
                     <CardContent className="p-0 flex flex-col gap-3">
                       <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
                         <Image
-                          src={project.image}
+                          src={project.coverUrl ?? FALLBACK_COVER}
                           alt={project.title}
                           fill
                           className="object-cover"
@@ -72,7 +108,7 @@ export default function Projects() {
                         </div>
                         <div className="absolute right-3 bottom-3 flex items-center gap-2 z-10">
                           <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
-                            {project.likes}
+                            {project.likesCount}
                           </span>
                           <Image src="/like.svg" alt="Like" width={32} height={32} />
                         </div>

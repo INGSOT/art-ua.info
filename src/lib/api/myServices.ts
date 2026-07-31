@@ -171,6 +171,24 @@ export const myServicesAPI = {
     return mapService(response.data.data);
   },
 
+  // Послуги команди — видно й керується тільки учасниками (перевіряється на бекенді).
+  listForTeam: async (teamSlug: string): Promise<MyService[]> => {
+    const response = await api.get<MyServicesResponse>(
+      `/v1/art-ua-info/my/teams/${teamSlug}/services`,
+      { params: { language: "uk" } }
+    );
+    return response.data.data.map(mapService);
+  },
+
+  createForTeam: async (teamSlug: string, payload: SaveServicePayload): Promise<MyService> => {
+    const response = await api.post<{ data: RawMyService }>(
+      `/v1/art-ua-info/my/teams/${teamSlug}/services`,
+      buildPayload(payload),
+      { params: { language: "uk" } }
+    );
+    return mapService(response.data.data);
+  },
+
   update: async (slug: string, payload: SaveServicePayload): Promise<MyService> => {
     const response = await api.put<{ data: RawMyService }>(
       `/v1/art-ua-info/my/services/${slug}`,

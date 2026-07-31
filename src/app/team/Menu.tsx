@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { hrefWithTeam, useCurrentTeam } from "./useCurrentTeam";
+import { useParams } from "next/navigation";
+import { hrefWithTeam } from "./useCurrentTeam";
 
 type MenuProps = {
   activeItem?: string;
@@ -10,7 +11,8 @@ type MenuProps = {
 
 export default function Menu({ activeItem }: MenuProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const teamSlug = useCurrentTeam().username;
+  const params = useParams<{ slug?: string }>();
+  const teamSlug = params?.slug ?? "";
 
   const menuItems = [
     { id: "projects", label: "Проєкти", href: hrefWithTeam("/team/projects", teamSlug) },

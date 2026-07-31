@@ -3,15 +3,37 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
-import { useCurrentTeam } from "./useCurrentTeam";
+import { useTeamProfile } from "./TeamProfileContext";
 import { SITE_URL, siteProfileLabel } from "../../lib/siteDomains";
+
+const FALLBACK_AVATAR = "/artists/artist-photo-5.png";
 
 export default function AboutTeam() {
   const [hoveredButton, setHoveredButton] = useState(false);
-  const team = useCurrentTeam();
+  const { loading, notFound, team } = useTeamProfile();
 
-  const profileUrl = `${SITE_URL}/${team.username}`;
-  const buttonLabel = siteProfileLabel(team.username);
+  if (loading) {
+    return (
+      <section className="w-full bg-[#414141] py-16 px-4">
+        <div className="max-w-4xl mx-auto flex flex-col items-center min-h-[280px] justify-center">
+          <p className="text-white text-lg">Завантаження...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (notFound || !team) {
+    return (
+      <section className="w-full bg-[#414141] py-16 px-4">
+        <div className="max-w-4xl mx-auto flex flex-col items-center min-h-[280px] justify-center">
+          <p className="text-white text-lg">Команду не знайдено</p>
+        </div>
+      </section>
+    );
+  }
+
+  const profileUrl = `${SITE_URL}/${team.slug}`;
+  const buttonLabel = siteProfileLabel(team.slug);
 
   return (
     <section className="w-full bg-[#414141] py-16 px-4">
@@ -19,7 +41,7 @@ export default function AboutTeam() {
         <div className="relative mb-6">
           <div className="w-[160px] h-[160px] relative rounded-full overflow-hidden border-4 border-yellow-500">
             <Image
-              src={team.avatar}
+              src={team.avatarUrl ?? FALLBACK_AVATAR}
               alt={team.name}
               fill
               sizes="160px"
@@ -32,7 +54,9 @@ export default function AboutTeam() {
           {team.name}
         </h1>
 
-        <p className="text-white text-center mb-8">{team.category}</p>
+        {team.specialization && (
+          <p className="text-white text-center mb-8">{team.specialization}</p>
+        )}
 
         <Button
           asChild
