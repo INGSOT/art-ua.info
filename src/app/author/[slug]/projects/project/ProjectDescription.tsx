@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { useAuthorProfile } from "../../../AuthorProfileContext";
+import { useParams } from "next/navigation";
+import { getAuthorProfileBySlug } from "../../../../../data/profileData";
 
 export default function ProjectDescription() {
-  const { projectDescriptionData, id: authorId } = useAuthorProfile();
+  const params = useParams<{ slug?: string }>();
+  const { projectDescriptionData, id: authorId } = useMemo(
+    () => getAuthorProfileBySlug(params?.slug),
+    [params]
+  );
   const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {

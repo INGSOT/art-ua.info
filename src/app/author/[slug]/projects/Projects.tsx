@@ -1,17 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { projectFilterButtons, projectEmptyState } from "../../../../data/profileData";
-import { getMyProjectsByAuthorId } from "../../../../data/projectsData";
+import { artistsAPI, type PublicArtistProject } from "../../../../lib/api/artists";
+import { organizationsAPI } from "../../../../lib/api/organizations";
 import { useAuthorProfile } from "../../AuthorProfileContext";
+
+const FALLBACK_COVER = "/artists/artist-photo-5.png";
 
 export default function Projects() {
   const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
-  const { id: authorId } = useAuthorProfile();
-  const myProjects = getMyProjectsByAuthorId(authorId);
+  const { slug, kind, loading: profileLoading, notFound } = useAuthorProfile();
+  const [myProjects, setMyProjects] = useState<PublicArtistProject[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (profileLoading || !kind) return;
+    let ignore = false;
+
+    (async () => {
+      setLoading(true);
+      try {
+        const api = kind === "artist" ? artistsAPI : organizationsAPI;
+        const result = await api.projects(slug, { per_page: 50 });
+        if (!ignore) setMyProjects(result);
+      } catch (error) {
+        if (!ignore) {
+          console.error(`Failed to load projects for "${slug}":`, error);
+          setMyProjects([]);
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+
+    return () => {
+      ignore = true;
+    };
+  }, [slug, kind, profileLoading]);
+
+  if (notFound) {
+    return null;
+  }
+
+  if (profileLoading || loading) {
+    return (
+      <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[300px] flex items-center justify-center">
+        <p className="text-white text-lg">Завантаження...</p>
+      </section>
+    );
+  }
 
   const hasProjects = myProjects.length > 0;
 
@@ -54,22 +95,22 @@ export default function Projects() {
                       {/* Project image with likes overlay */}
                       <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
                         <Image
-                          src={project.image}
+                          src={project.coverUrl ?? FALLBACK_COVER}
                           alt={project.title}
                           fill
                           className="object-cover"
                         />
                         {/* Darkening overlay on hover */}
                         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
-                        
+
                         {/* Centered arrow on hover */}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                           <Image src="/arrow-chevron-right-white.svg" alt="View" width={48} height={48} />
                         </div>
-                        
+
                         <div className="absolute right-3 bottom-3 flex items-center gap-2 z-10">
                           <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
-                            {project.likes}
+                            {project.likesCount}
                           </span>
                           <Image src="/like.svg" alt="Like" width={32} height={32} />
                         </div>

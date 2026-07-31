@@ -15,8 +15,8 @@ export default function ServiceItem({ service }: ServiceItemProps) {
     const authorHref = !service.performerSlug
         ? null
         : service.performerType === 'team'
-          ? withTeamId('/team/projects', service.performerSlug)
-          : withAuthorId('/author/projects', service.performerSlug);
+          ? withTeamId('/team/services', service.performerSlug)
+          : withAuthorId('/author/services', service.performerSlug);
     const formattedPrice =
         typeof service.price === 'number'
             ? service.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ')

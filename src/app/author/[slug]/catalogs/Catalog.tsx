@@ -2,16 +2,17 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { getCatalogPdfUrl } from "../../../../data/catalogsData";
+import Link from "next/link";
 
 interface CatalogProps {
+  id: number;
   title: string;
-  pdfFile?: string;
+  pdfUrl: string | null;
 }
 
-export default function Catalog({ title, pdfFile }: CatalogProps) {
+export default function Catalog({ id, title, pdfUrl }: CatalogProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const pdfHref = getCatalogPdfUrl(pdfFile);
+  const viewerHref = pdfUrl ? `/catalogs/${id}` : null;
   const buttonClass = `group flex items-stretch h-[60px] w-full md:w-[220px] lg:w-[240px] transition-colors duration-300 rounded-none overflow-hidden ${
     isHovered ? "bg-white" : "bg-[#FECC39]"
   }`;
@@ -25,12 +26,10 @@ export default function Catalog({ title, pdfFile }: CatalogProps) {
         </h3>
       </div>
 
-      {/* Right side - open PDF in a new tab (browser viewer) */}
-      {pdfHref ? (
-        <a
-          href={pdfHref}
-          target="_blank"
-          rel="noopener noreferrer"
+      {/* Right side - open catalog PDF viewer page */}
+      {viewerHref ? (
+        <Link
+          href={viewerHref}
           className={buttonClass}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -46,7 +45,7 @@ export default function Catalog({ title, pdfFile }: CatalogProps) {
               height={24}
             />
           </div>
-        </a>
+        </Link>
       ) : (
         <button
           type="button"
