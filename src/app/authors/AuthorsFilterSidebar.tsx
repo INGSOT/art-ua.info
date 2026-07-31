@@ -7,7 +7,6 @@ import type { AuthorsFilterParameter } from "../../lib/api/authorProfiles";
 export type ParticipantFilter = "artist" | "organization" | "team" | "all";
 
 const PARTICIPANT_OPTIONS: { id: ParticipantFilter; label: string }[] = [
-    { id: "all", label: "Усі" },
     { id: "artist", label: "Митці" },
     { id: "organization", label: "Організації" },
     { id: "team", label: "Команди" },
@@ -40,7 +39,9 @@ export default function AuthorsFilterSidebar({
                         key={option.id}
                         label={option.label}
                         isSelected={participant === option.id}
-                        onToggle={() => onParticipantChange(option.id)}
+                        // Повторний клік по обраному пункту повертає до "Усі" —
+                        // окремого пункту "Усі" в списку більше немає.
+                        onToggle={() => onParticipantChange(participant === option.id ? "all" : option.id)}
                     />
                 ))}
             </Unit>
