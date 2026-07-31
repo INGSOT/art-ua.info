@@ -87,7 +87,8 @@ export interface ArtUaInfoParameterAnswer {
 
 export interface CreateArtUaInfoProjectPayload {
   status?: "new" | "draft" | "moderation";
-  user_type: "personal" | "legal";
+  user_type: "personal" | "legal" | "team";
+  team_id?: number;
   title: { uk: string; en?: string };
   short_description?: { uk?: string; en?: string };
   art_category?: string;
@@ -158,7 +159,8 @@ export interface MyProjectDetail {
   artSubcategory: string | null;
   tags: BilingualTags;
   coverUrl: string | null;
-  authorType: "personal" | "legal" | string;
+  authorType: "personal" | "legal" | "team" | string;
+  authorSlug: string | null;
   contentBlocks: MyProjectContentBlock[];
   finalResult: MyProjectFinalResultItem[];
   soldExternally: boolean;
@@ -179,7 +181,7 @@ interface RawMyProjectDetail {
   art_subcategory: string | null;
   tags: BilingualTags | null;
   cover_url: string | null;
-  author: { type: string };
+  author: { type: string; slug: string | null };
   sold_externally: boolean;
   content_blocks: MyProjectContentBlock[] | null;
   final_result: MyProjectFinalResultItem[] | null;
@@ -468,6 +470,7 @@ export const projectsAPI = {
       tags: { uk: raw.tags?.uk ?? [], en: raw.tags?.en ?? [] },
       coverUrl: absoluteUrl(raw.cover_url),
       authorType: raw.author?.type ?? "personal",
+      authorSlug: raw.author?.slug ?? null,
       contentBlocks: (raw.content_blocks ?? []).map((block) =>
         block.type === "image" ? { ...block, image: absoluteUrl(block.image) } : block
       ),

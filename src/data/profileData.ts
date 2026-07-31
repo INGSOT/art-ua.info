@@ -12,6 +12,7 @@ import { ART_UA_COM_DOMAIN, SAVE_ART_DOMAIN, artUaComProfileUrl, saveArtProfileU
 
 // About Me
 export interface Team {
+  id?: number;
   name: string;
   icon: string;
   slug: string;

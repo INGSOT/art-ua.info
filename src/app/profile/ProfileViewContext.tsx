@@ -48,6 +48,7 @@ export function ProfileViewProvider({ children }: { children: ReactNode }) {
         artistType: professionLabel,
         avatar: getImageUrl(user.avatar_url) || mockFallback.aboutMe.avatar,
         teams: (user.teams ?? []).map((team) => ({
+          id: team.id,
           name: typeof team.name === "string" ? team.name : team.name?.uk ?? "",
           icon: getImageUrl(team.avatar) || mockFallback.aboutMe.avatar,
           slug: team.slug,

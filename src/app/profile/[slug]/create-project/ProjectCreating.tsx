@@ -180,7 +180,14 @@ export default function ProjectCreating() {
       .myShow(editSlug)
       .then((project) => {
         if (cancelled) return;
-        setSelectedOwner(project.authorType === "legal" ? "legal-entity" : "author");
+        if (project.authorType === "legal") {
+          setSelectedOwner("legal-entity");
+        } else if (project.authorType === "team") {
+          const teamIndex = aboutMe.teams.findIndex((team) => team.slug === project.authorSlug);
+          setSelectedOwner(teamIndex >= 0 ? `team-${teamIndex}` : "author");
+        } else {
+          setSelectedOwner("author");
+        }
         setProjectNameUa(project.title.uk ?? "");
         setProjectNameEn(project.title.en ?? "");
         setDescriptionUa(project.shortDescription.uk ?? "");
@@ -519,8 +526,18 @@ export default function ProjectCreating() {
       return { type: "link", url: block.url };
     });
 
+    const selectedTeamIndex = selectedOwner?.startsWith("team-")
+      ? Number(selectedOwner.slice("team-".length))
+      : -1;
+    const selectedTeam = aboutMe.teams[selectedTeamIndex];
+
     return {
-      user_type: (selectedOwner === "legal-entity" ? "legal" : "personal") as "legal" | "personal",
+      user_type: (selectedOwner === "legal-entity"
+        ? "legal"
+        : selectedTeam
+          ? "team"
+          : "personal") as "legal" | "personal" | "team",
+      team_id: selectedTeam?.id,
       title: {
         uk: projectNameUa.trim(),
         en: projectNameEn.trim(),
