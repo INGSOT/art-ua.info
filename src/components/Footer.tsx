@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "../components/ui/button";
+import ApplicationModal from "./ApplicationModal";
 import {
   footerSocialIcons,
   expertiseItems,
@@ -12,6 +16,8 @@ import {
 import { SITE_DOMAIN } from "../lib/siteDomains";
 
 export default function Footer() {
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+
   return (
     <footer className="flex flex-col w-full items-start gap-6 md:gap-[30px] p-4 md:p-10 lg:p-20 relative bg-[#FFFCF5]">
       <section className="flex flex-col items-start w-full">
@@ -54,7 +60,10 @@ export default function Footer() {
               </div>
             ))}
           </div>
-          <Button className="w-[300px] h-[60px] bg-[#343434] hover:bg-[#FECC39] text-[#FECC39] hover:text-[#343434] font-button font-bold text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none transition-colors">
+          <Button
+            onClick={() => setIsApplicationModalOpen(true)}
+            className="w-[300px] h-[60px] bg-[#343434] hover:bg-[#FECC39] text-[#FECC39] hover:text-[#343434] font-button font-bold text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none transition-colors"
+          >
             {footerContent.expertiseSection.buttonLabel}
           </Button>
         </div>
@@ -147,6 +156,11 @@ export default function Footer() {
           </div>
         </div>
       </div>
+
+      <ApplicationModal
+        isOpen={isApplicationModalOpen}
+        onClose={() => setIsApplicationModalOpen(false)}
+      />
     </footer>
   );
 }
