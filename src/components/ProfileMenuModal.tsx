@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AuthUser } from "../lib/api/auth";
 import { socialIcons } from "../data/headerData";
 import { getImageUrl } from "../lib/url";
+import AvatarPlaceholder from "./ui/AvatarPlaceholder";
 import { ART_UA_COM_DOMAIN, ART_UA_COM_URL, SAVE_ART_DOMAIN, SAVE_ART_URL, SITE_DOMAIN } from "../lib/siteDomains";
 
 interface ProfileMenuModalProps {
@@ -61,9 +62,7 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
                 className="w-12 h-12 rounded-full object-cover"
               />
             ) : (
-              <span className="w-12 h-12 rounded-full bg-[#FECC39] text-[#343434] font-bold text-[16px] flex items-center justify-center shrink-0">
-                {user.name.charAt(0).toUpperCase()}
-              </span>
+              <AvatarPlaceholder name={user.name} className="w-12 h-12" textClassName="text-[16px]" />
             )}
             <p className="font-bold text-[#343434] text-[16px] font-[family-name:var(--font-unbounded)]">
               {user.name}

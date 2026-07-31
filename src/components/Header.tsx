@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { navigationItems, socialIcons, languageOptions } from "../data/headerData";
@@ -13,6 +14,7 @@ import { useAuth } from "../context/AuthContext";
 import { SITE_DOMAIN } from "../lib/siteDomains";
 import { useToast } from "../context/ToastContext";
 import { getImageUrl } from "../lib/url";
+import AvatarPlaceholder from "./ui/AvatarPlaceholder";
 
 interface HeaderProps {
   isHomePage?: boolean;
@@ -21,6 +23,7 @@ interface HeaderProps {
 export default function Header({ isHomePage = false }: HeaderProps) {
     const { user, logout } = useAuth();
     const { showToast } = useToast();
+    const pathname = usePathname();
 
     const handleLogout = async () => {
       await logout();
@@ -55,9 +58,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
             className="w-9 h-9 rounded-full object-cover"
           />
         ) : (
-          <span className="w-9 h-9 rounded-full bg-[#FECC39] text-[#343434] font-bold text-[14px] flex items-center justify-center">
-            {user.name.charAt(0).toUpperCase()}
-          </span>
+          <AvatarPlaceholder name={user.name} className="w-9 h-9" textClassName="text-[14px]" />
         )}
         <span className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-[#4CAF50] border-2 border-[#414141]" />
       </button>
@@ -91,26 +92,34 @@ export default function Header({ isHomePage = false }: HeaderProps) {
 
         <div className="hidden lg:flex h-10 items-center gap-[30px] flex-1">
           <nav className="flex items-center gap-[30px] flex-1">
-            {navigationItems.map((item, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                className="group inline-flex items-start p-0 h-auto hover:bg-transparent"
-                asChild={Boolean(item.href)}
-              >
-                {item.href ? (
-                  <Link href={item.href} className="inline-flex">
+            {navigationItems.map((item, index) => {
+              const isActive = Boolean(item.href) && (pathname === item.href || pathname.startsWith(`${item.href}/`));
+
+              return (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  className="group inline-flex items-start p-0 h-auto hover:bg-transparent"
+                  asChild={Boolean(item.href)}
+                >
+                  {item.href ? (
+                    <Link href={item.href} className="inline-flex">
+                      <div
+                        className={`w-fit font-bold text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39] ${
+                          isActive ? "text-[#FECC39]" : "text-white"
+                        }`}
+                      >
+                        {item.label}
+                      </div>
+                    </Link>
+                  ) : (
                     <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39]">
                       {item.label}
                     </div>
-                  </Link>
-                ) : (
-                  <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39]">
-                    {item.label}
-                  </div>
-                )}
-              </Button>
-            ))}
+                  )}
+                </Button>
+              );
+            })}
           </nav>
 
           <div className="inline-flex items-center justify-end gap-[30px]">
