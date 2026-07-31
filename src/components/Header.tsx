@@ -11,10 +11,10 @@ import RegistrationModal from "./RegistrationModal";
 import ResetPassModal from "./ResetPassModal";
 import ProfileMenuModal from "./ProfileMenuModal";
 import { useAuth } from "../context/AuthContext";
-import { SITE_DOMAIN } from "../lib/siteDomains";
 import { useToast } from "../context/ToastContext";
 import { getImageUrl } from "../lib/url";
 import AvatarPlaceholder from "./ui/AvatarPlaceholder";
+import SiteSwitcher from "./SiteSwitcher";
 
 interface HeaderProps {
   isHomePage?: boolean;
@@ -76,19 +76,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
     return (
     <>
     <header className={`flex items-center gap-4 md:gap-[30px] p-4 md:p-[30px] flex-wrap lg:flex-nowrap ${isHomePage ? 'bg-transparent' : 'bg-[#414141]'}`}>
-        <Link href="/" className="inline-flex items-center gap-2 flex-[0_0_auto] group">
-          <img className="w-11 h-11" alt="Logos" src="/logos.svg" />
-
-          <div className="inline-flex items-start">
-            <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39]">
-              {SITE_DOMAIN}
-            </div>
-          </div>
-
-          <div className="w-6 h-6 flex items-center justify-center">
-            <img className="w-6 h-6" alt="Ui" src="/white_triangle_down.svg" />
-          </div>
-        </Link>
+        <SiteSwitcher />
 
         <div className="hidden lg:flex h-10 items-center gap-[30px] flex-1">
           <nav className="flex items-center gap-[30px] flex-1">
