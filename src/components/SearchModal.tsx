@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import SearchSection from './SearchSection';
@@ -59,8 +59,32 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [categories, setCategories] = useState<GlobalSearchCategoryResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [suggestions, setSuggestions] = useState<GlobalSearchSuggestion[]>([]);
+  const suggestionsRequestId = useRef(0);
 
-  const suggestions = useMemo(() => getGlobalSearchSuggestions(value), [value]);
+  // Дебаунс + захист від застарілої відповіді: користувач може ввести новий
+  // символ раніше, ніж прийде відповідь на попередній запит підказок.
+  // Порожній запит не викликає окремого setState — рендер сам не показує
+  // застарілі suggestions, коли value порожнє (див. visibleSuggestions).
+  useEffect(() => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const requestId = ++suggestionsRequestId.current;
+    const timeout = setTimeout(() => {
+      getGlobalSearchSuggestions(trimmed)
+        .then((items) => {
+          if (suggestionsRequestId.current === requestId) setSuggestions(items);
+        })
+        .catch(() => {
+          if (suggestionsRequestId.current === requestId) setSuggestions([]);
+        });
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [value]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -68,6 +92,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     setSubmittedQuery('');
     setCategories([]);
     setHasSearched(false);
+    setSuggestions([]);
   }, [isOpen]);
 
   useEffect(() => {
@@ -86,7 +111,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     onClose();
   };
 
-  const runSearch = () => {
+  const runSearch = async () => {
     const trimmed = value.trim();
     if (!trimmed) {
       setHasSearched(false);
@@ -95,7 +120,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       return;
     }
 
-    const results = getGlobalSearchResults(trimmed);
+    const results = await getGlobalSearchResults(trimmed);
     const withHits = results.filter((r) => r.count > 0);
 
     if (withHits.length === 1) {
@@ -111,6 +136,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
   if (!isOpen) return null;
 
+  const visibleSuggestions = value.trim() ? suggestions : [];
   const withHits = categories.filter((c) => c.count > 0);
   const nothingFound = hasSearched && withHits.length === 0 && submittedQuery;
 
@@ -165,7 +191,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               <div className="mx-auto flex w-full max-w-[600px] flex-col items-center gap-4">
                 {searchBlock}
                 <SuggestionsList
-                  items={suggestions}
+                  items={visibleSuggestions}
                   onPick={openSuggestion}
                   listId="search-modal-suggestions-initial"
                 />
@@ -177,7 +203,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 <div className="mx-auto flex w-full max-w-[600px] flex-col gap-4">
                   {searchBlock}
                   <SuggestionsList
-                    items={suggestions}
+                    items={visibleSuggestions}
                     onPick={openSuggestion}
                     listId="search-modal-suggestions-after"
                   />

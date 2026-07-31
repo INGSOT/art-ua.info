@@ -1,16 +1,10 @@
-import type { ArtistData } from "../data/artistsData";
-import { artistsData } from "../data/artistsData";
-import { organizationsData } from "../data/organizationsData";
-import type { TeamProfile } from "../data/teamData";
-import { teamData } from "../data/teamData";
-import type { Project } from "../data/projectsData";
-import { projectsData } from "../data/projectsData";
-import type { ServiceItemData } from "../data/servicesData";
-import { servicesData } from "../data/servicesData";
-import type { Catalog } from "../data/catalogsData";
-import { catalogsData } from "../data/catalogsData";
-import type { NewsItem } from "../data/newsData";
-import { newsData } from "../data/newsData";
+import { artistsAPI } from "./api/artists";
+import { organizationsAPI } from "./api/organizations";
+import { teamsAPI } from "./api/teams";
+import { projectsAPI } from "./api/projects";
+import { publicServicesAPI } from "./api/publicServices";
+import { publicCatalogsAPI } from "./api/publicCatalogs";
+import { newsAPI, type PublicNewsListItem } from "./api/news";
 
 export type GlobalSearchCategoryId =
   | "participants"
@@ -49,195 +43,8 @@ const LABEL_SERVICES = "Послуги";
 const LABEL_CATALOGS = "Каталоги";
 const LABEL_NEWS = "Новини та події";
 
-/** Максимум підказок загалом (щоб список не перевантажував DOM). */
-const MAX_SUGGESTIONS = 60;
-
-function normalizeQuery(raw: string): string {
-  return raw.trim().toLowerCase();
-}
-
-type Participant = ArtistData | TeamProfile;
-
-function participantMatchesQuery(participant: Participant, normalizedQuery: string): boolean {
-  if (!normalizedQuery) return false;
-  const name =
-    "artistName" in participant ? participant.artistName : participant.name;
-  const role =
-    "artistType" in participant ? participant.artistType : participant.category;
-  const nameMatch = name.toLowerCase().includes(normalizedQuery);
-  const typeMatch = role.toLowerCase().includes(normalizedQuery);
-  const tagsMatch = participant.tags.some((tag) =>
-    tag.toLowerCase().includes(normalizedQuery)
-  );
-  return nameMatch || typeMatch || tagsMatch;
-}
-
-function projectMatchesQuery(project: Project, normalizedQuery: string): boolean {
-  if (!normalizedQuery) return false;
-  const titleMatch = project.title.toLowerCase().includes(normalizedQuery);
-  const authorMatch = project.authorName.toLowerCase().includes(normalizedQuery);
-  return titleMatch || authorMatch;
-}
-
-function serviceMatchesQuery(service: ServiceItemData, normalizedQuery: string): boolean {
-  if (!normalizedQuery) return false;
-  const titleMatch = service.title.toLowerCase().includes(normalizedQuery);
-  const descriptionMatch = service.description.toLowerCase().includes(normalizedQuery);
-  const authorOrTeamMatch = service.authorName.toLowerCase().includes(normalizedQuery);
-  return titleMatch || descriptionMatch || authorOrTeamMatch;
-}
-
-function catalogMatchesQuery(catalog: Catalog, normalizedQuery: string): boolean {
-  if (!normalizedQuery) return false;
-  const titleMatch = catalog.title.toLowerCase().includes(normalizedQuery);
-  const authorMatch = catalog.authorName.toLowerCase().includes(normalizedQuery);
-  return titleMatch || authorMatch;
-}
-
-function newsMatchesQuery(item: NewsItem, normalizedQuery: string): boolean {
-  if (!normalizedQuery) return false;
-  return item.title.toLowerCase().includes(normalizedQuery);
-}
-
-function participantStableId(p: Participant): string {
-  return "artistName" in p ? `artist-${p.id}` : `team-${p.id}`;
-}
-
-function participantDisplayName(p: Participant): string {
-  return "artistName" in p ? p.artistName : p.name;
-}
-
-/** Лічильник збігів для учасників у режимі «усі» (як на /authors без фільтрів). */
-export function countParticipantMatches(normalizedQuery: string): number {
-  if (!normalizedQuery) return 0;
-  const all = [...artistsData, ...organizationsData, ...teamData] as Participant[];
-  return all.filter((p) => participantMatchesQuery(p, normalizedQuery)).length;
-}
-
-export function countProjectMatches(normalizedQuery: string): number {
-  if (!normalizedQuery) return 0;
-  return projectsData.filter((p) => projectMatchesQuery(p, normalizedQuery)).length;
-}
-
-export function countServiceMatches(normalizedQuery: string): number {
-  if (!normalizedQuery) return 0;
-  return servicesData.filter((s) => serviceMatchesQuery(s, normalizedQuery)).length;
-}
-
-export function countCatalogMatches(normalizedQuery: string): number {
-  if (!normalizedQuery) return 0;
-  return catalogsData.filter((c) => catalogMatchesQuery(c, normalizedQuery)).length;
-}
-
-export function countNewsMatches(normalizedQuery: string): number {
-  if (!normalizedQuery) return 0;
-  return newsData.filter((n) => newsMatchesQuery(n, normalizedQuery)).length;
-}
-
-/**
- * Підказки для глобального пошуку: конкретні збіги з посиланням на відповідну сторінку
- * з `?search=…` (текст пошуку — назва сутності, щоб на сторінці списку залишився релевантний набір).
- */
-export function getGlobalSearchSuggestions(trimmedQuery: string): GlobalSearchSuggestion[] {
-  const n = normalizeQuery(trimmedQuery);
-  if (!n) return [];
-
-  const out: GlobalSearchSuggestion[] = [];
-
-  const participants = [...artistsData, ...organizationsData, ...teamData] as Participant[];
-  for (const p of participants) {
-    if (!participantMatchesQuery(p, n)) continue;
-    const name = participantDisplayName(p);
-    out.push({
-      id: `participant-${participantStableId(p)}`,
-      primary: name,
-      categoryLabel: LABEL_PARTICIPANTS,
-      href: buildSearchUrl(PARTICIPANTS_PATH, name),
-    });
-  }
-
-  for (const project of projectsData) {
-    if (!projectMatchesQuery(project, n)) continue;
-    out.push({
-      id: `project-${project.id}`,
-      primary: project.title,
-      categoryLabel: LABEL_PROJECTS,
-      href: buildSearchUrl(PROJECTS_PATH, project.title),
-    });
-  }
-
-  for (const service of servicesData) {
-    if (!serviceMatchesQuery(service, n)) continue;
-    out.push({
-      id: `service-${service.id}`,
-      primary: service.title,
-      categoryLabel: LABEL_SERVICES,
-      href: buildSearchUrl(SERVICES_PATH, service.title),
-    });
-  }
-
-  for (const catalog of catalogsData) {
-    if (!catalogMatchesQuery(catalog, n)) continue;
-    out.push({
-      id: `catalog-${catalog.id}`,
-      primary: catalog.title,
-      categoryLabel: LABEL_CATALOGS,
-      href: buildSearchUrl(CATALOGS_PATH, catalog.title),
-    });
-  }
-
-  for (const item of newsData) {
-    if (!newsMatchesQuery(item, n)) continue;
-    out.push({
-      id: `news-${item.id}`,
-      primary: item.title,
-      categoryLabel: LABEL_NEWS,
-      href: buildSearchUrl(NEWS_PATH, item.title),
-    });
-  }
-
-  return out.slice(0, MAX_SUGGESTIONS);
-}
-
-/**
- * Підсумок пошуку по всіх розділах (логіка збігу узгоджена зі сторінками списків).
- */
-export function getGlobalSearchResults(trimmedQuery: string): GlobalSearchCategoryResult[] {
-  const q = normalizeQuery(trimmedQuery);
-
-  return [
-    {
-      id: "participants",
-      label: LABEL_PARTICIPANTS,
-      href: PARTICIPANTS_PATH,
-      count: countParticipantMatches(q),
-    },
-    {
-      id: "projects",
-      label: LABEL_PROJECTS,
-      href: PROJECTS_PATH,
-      count: countProjectMatches(q),
-    },
-    {
-      id: "services",
-      label: LABEL_SERVICES,
-      href: SERVICES_PATH,
-      count: countServiceMatches(q),
-    },
-    {
-      id: "catalogs",
-      label: LABEL_CATALOGS,
-      href: CATALOGS_PATH,
-      count: countCatalogMatches(q),
-    },
-    {
-      id: "news",
-      label: LABEL_NEWS,
-      href: NEWS_PATH,
-      count: countNewsMatches(q),
-    },
-  ];
-}
+/** Скільки підказок тягнути з бекенда на кожен розділ (участники — по стільки з кожного підтипу). */
+const SUGGESTIONS_PER_CATEGORY = 5;
 
 export function buildSearchUrl(pathname: string, query: string): string {
   const trimmed = query.trim();
@@ -247,9 +54,159 @@ export function buildSearchUrl(pathname: string, query: string): string {
   return `${pathname}?${params.toString()}`;
 }
 
-/** Перший розділ з ненульовим результатом (порядок як у getGlobalSearchResults). */
-export function getFirstCategoryWithResults(
-  trimmedQuery: string
-): GlobalSearchCategoryResult | undefined {
-  return getGlobalSearchResults(trimmedQuery).find((r) => r.count > 0);
+function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
+  return promise.catch(() => fallback);
+}
+
+// Новини не підтримують серверний пошук (лише per_page/page/category) — сторінка
+// /news-events так само тягне повний список і фільтрує заголовок на клієнті.
+// Кешуємо один раз на модуль, щоб не перезавантажувати сотні новин на кожен keystroke.
+let newsCachePromise: Promise<PublicNewsListItem[]> | null = null;
+function loadAllNews(): Promise<PublicNewsListItem[]> {
+  if (!newsCachePromise) {
+    newsCachePromise = newsAPI
+      .list({ per_page: 200, language: "uk" })
+      .then((result) => result.items)
+      .catch((error) => {
+        newsCachePromise = null;
+        throw error;
+      });
+  }
+  return newsCachePromise;
+}
+
+function matchNews(items: PublicNewsListItem[], normalizedQuery: string): PublicNewsListItem[] {
+  return items.filter((item) => item.title.toLowerCase().includes(normalizedQuery));
+}
+
+interface ParticipantHit {
+  key: string;
+  name: string;
+}
+
+/** Митці, організації й команди — окремі ендпоінти, але в пошуку об'єднані в один розділ "Учасники". */
+async function fetchParticipants(
+  search: string,
+  perPage: number
+): Promise<{ hits: ParticipantHit[]; total: number }> {
+  const [artists, organizations, teams] = await Promise.all([
+    safe(artistsAPI.browse({ search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 }, filters: { categories: [], parameters: [], sort_options: [] } }),
+    safe(organizationsAPI.browse({ search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 }, filters: { categories: [], parameters: [], sort_options: [] } }),
+    safe(teamsAPI.browse({ search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 } }),
+  ]);
+
+  const hits: ParticipantHit[] = [
+    ...artists.data.map((a) => ({ key: `artist-${a.id}`, name: a.name })),
+    ...organizations.data.map((o) => ({ key: `organization-${o.id}`, name: o.name })),
+    ...teams.data.map((t) => ({ key: `team-${t.id}`, name: t.name })),
+  ];
+
+  return {
+    hits,
+    total: artists.meta.total + organizations.meta.total + teams.meta.total,
+  };
+}
+
+/**
+ * Підказки для глобального пошуку: реальні збіги з бекенда з посиланням на відповідну
+ * сторінку з `?search=…` (текст пошуку — назва сутності, щоб на сторінці списку залишився
+ * релевантний набір).
+ */
+export async function getGlobalSearchSuggestions(rawQuery: string): Promise<GlobalSearchSuggestion[]> {
+  const trimmed = rawQuery.trim();
+  if (!trimmed) return [];
+  const normalized = trimmed.toLowerCase();
+
+  const [participants, projects, services, catalogs, news] = await Promise.all([
+    fetchParticipants(trimmed, SUGGESTIONS_PER_CATEGORY),
+    safe(projectsAPI.browse({ search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { sort_options: [], categories: [], statuses: [], parameters: [] } }),
+    safe(publicServicesAPI.browse({ search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
+    safe(publicCatalogsAPI.browse({ search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
+    safe(
+      loadAllNews().then((items) => matchNews(items, normalized).slice(0, SUGGESTIONS_PER_CATEGORY)),
+      []
+    ),
+  ]);
+
+  const out: GlobalSearchSuggestion[] = [];
+
+  participants.hits.slice(0, SUGGESTIONS_PER_CATEGORY).forEach((p) => {
+    out.push({
+      id: `participant-${p.key}`,
+      primary: p.name,
+      categoryLabel: LABEL_PARTICIPANTS,
+      href: buildSearchUrl(PARTICIPANTS_PATH, p.name),
+    });
+  });
+
+  projects.data.forEach((project) => {
+    out.push({
+      id: `project-${project.id}`,
+      primary: project.title,
+      categoryLabel: LABEL_PROJECTS,
+      href: buildSearchUrl(PROJECTS_PATH, project.title),
+    });
+  });
+
+  services.data.forEach((service) => {
+    out.push({
+      id: `service-${service.id}`,
+      primary: service.title,
+      categoryLabel: LABEL_SERVICES,
+      href: buildSearchUrl(SERVICES_PATH, service.title),
+    });
+  });
+
+  catalogs.data.forEach((catalog) => {
+    out.push({
+      id: `catalog-${catalog.id}`,
+      primary: catalog.title,
+      categoryLabel: LABEL_CATALOGS,
+      href: buildSearchUrl(CATALOGS_PATH, catalog.title),
+    });
+  });
+
+  news.forEach((item) => {
+    out.push({
+      id: `news-${item.id}`,
+      primary: item.title,
+      categoryLabel: LABEL_NEWS,
+      href: buildSearchUrl(NEWS_PATH, item.title),
+    });
+  });
+
+  return out;
+}
+
+/**
+ * Підсумок пошуку по всіх розділах — реальна кількість збігів з бекенда
+ * (per_page: 1, бо потрібен лише meta.total, а не самі елементи).
+ */
+export async function getGlobalSearchResults(rawQuery: string): Promise<GlobalSearchCategoryResult[]> {
+  const trimmed = rawQuery.trim();
+  const empty: GlobalSearchCategoryResult[] = [
+    { id: "participants", label: LABEL_PARTICIPANTS, href: PARTICIPANTS_PATH, count: 0 },
+    { id: "projects", label: LABEL_PROJECTS, href: PROJECTS_PATH, count: 0 },
+    { id: "services", label: LABEL_SERVICES, href: SERVICES_PATH, count: 0 },
+    { id: "catalogs", label: LABEL_CATALOGS, href: CATALOGS_PATH, count: 0 },
+    { id: "news", label: LABEL_NEWS, href: NEWS_PATH, count: 0 },
+  ];
+  if (!trimmed) return empty;
+  const normalized = trimmed.toLowerCase();
+
+  const [participants, projects, services, catalogs, newsCount] = await Promise.all([
+    fetchParticipants(trimmed, 1),
+    safe(projectsAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { sort_options: [], categories: [], statuses: [], parameters: [] } }),
+    safe(publicServicesAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
+    safe(publicCatalogsAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
+    safe(loadAllNews().then((items) => matchNews(items, normalized).length), 0),
+  ]);
+
+  return [
+    { id: "participants", label: LABEL_PARTICIPANTS, href: PARTICIPANTS_PATH, count: participants.total },
+    { id: "projects", label: LABEL_PROJECTS, href: PROJECTS_PATH, count: projects.meta.total },
+    { id: "services", label: LABEL_SERVICES, href: SERVICES_PATH, count: services.meta.total },
+    { id: "catalogs", label: LABEL_CATALOGS, href: CATALOGS_PATH, count: catalogs.meta.total },
+    { id: "news", label: LABEL_NEWS, href: NEWS_PATH, count: newsCount },
+  ];
 }
