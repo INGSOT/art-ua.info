@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -10,13 +10,53 @@ import FilterSection from "../../components/filters/FilterSection";
 import SelectedFiltersBar from "../../components/filters/SelectedFiltersBar";
 import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../components/filters/filterChipUtils";
 import { FilterSection as FilterSectionType } from "../../components/filters/filterConfig";
-import ListOfFAQ from "./ListOfFAQ";
-import { faqCategories, faqData } from "../../data/faqData";
+import ListOfFAQ, { FAQItem } from "./ListOfFAQ";
+import { faqAPI, PublicFaqCategory } from "../../lib/api/faq";
 
 export default function FAQPage() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+
+    const [categories, setCategories] = useState<PublicFaqCategory[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        faqAPI
+            .list()
+            .then((data) => {
+                if (isMounted) {
+                    setCategories(data);
+                }
+            })
+            .catch((error) => {
+                console.error("Failed to load FAQ:", error);
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const faqData = useMemo<FAQItem[]>(() => {
+        return categories.flatMap((category) =>
+            category.questions.map((question) => ({
+                id: `item-${question.id}`,
+                category: category.name,
+                question: question.question,
+                answer: question.answer.split("\n").filter(Boolean),
+            }))
+        );
+    }, [categories]);
+
+    const faqCategories = useMemo(() => categories.map((category) => category.name), [categories]);
 
     const selectedCategoryParam = searchParams.get("category");
     const selectedCategory = faqCategories.includes(selectedCategoryParam || "")
@@ -39,7 +79,7 @@ export default function FAQPage() {
                 ],
             },
         ];
-    }, []);
+    }, [faqCategories]);
 
     const initialSelectedFilters = useMemo<Record<string, boolean>>(() => {
         if (selectedCategory === "Усі") {
@@ -55,7 +95,7 @@ export default function FAQPage() {
         }
 
         return faqData.filter((item) => item.category === selectedCategory);
-    }, [selectedCategory]);
+    }, [faqData, selectedCategory]);
 
     const handleFilterChange = (filters: Record<string, boolean>) => {
         const selectedFilter = Object.entries(filters).find(([, isSelected]) => isSelected)?.[0] ?? "all";
@@ -114,7 +154,13 @@ export default function FAQPage() {
 
                     {/* Right Side - FAQ List */}
                     <div className="flex-1 w-full">
-                        <ListOfFAQ items={filteredFaq} />
+                        {isLoading ? (
+                            <div className="w-full bg-[#343434] border border-solid border-[#272727] p-6">
+                                <p className="text-white font-p1">Завантаження...</p>
+                            </div>
+                        ) : (
+                            <ListOfFAQ items={filteredFaq} />
+                        )}
                     </div>
                 </div>
             </section>

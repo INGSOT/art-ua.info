@@ -4,7 +4,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "../../components/ui/accordion";
-import { FAQItem } from "../../data/faqData";
+export interface FAQItem {
+  id: string;
+  category: string;
+  question: string;
+  answer: string[];
+}
 
 interface ListOfFAQProps {
   items: FAQItem[];
