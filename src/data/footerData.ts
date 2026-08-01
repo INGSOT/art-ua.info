@@ -121,12 +121,35 @@ export const footerContent = {
   copyrightYear: "2026",
 };
 
-// Link Mapping for Navigation
-export const linkMap: Record<string, string> = {
+// Link Mapping for Navigation, per footer column domain.
+// Кожен домен має власні шляхи, тож мапи не можна ділити між колонками:
+// ті самі підписи ("Проєкти", "Часті питання" тощо) ведуть на різні URL
+// залежно від сайту.
+export const siteLinkMap: Record<string, string> = {
   "Учасники": "/authors",
   "Каталоги": "/catalogs",
   "Проєкти": "/projects",
   "Послуги": "/services",
   "Новини та події": "/news-events",
   "Часті питання": "/faq",
+  "Умови використання": "/terms-of-use",
+};
+
+// art-ua.com ще не існує (див. коментар у siteDomains.ts), тож посилань
+// поки немає — підписи рендеряться як звичайний текст.
+export const artUaComLinkMap: Record<string, string> = {};
+
+export const saveArtLinkMap: Record<string, string> = {
+  "Проєкти": "/projects",
+  "Звіти": "/reports",
+  "Спецпроєкти": "/special-projects",
+  "Про нас": "/about-us",
+  "Часті питання": "/faq",
+  "Умови використання": "/terms-of-use",
+};
+
+export const linkMapsByDomain: Record<string, Record<string, string>> = {
+  [SITE_DOMAIN]: siteLinkMap,
+  [ART_UA_COM_DOMAIN]: artUaComLinkMap,
+  [SAVE_ART_DOMAIN]: saveArtLinkMap,
 };

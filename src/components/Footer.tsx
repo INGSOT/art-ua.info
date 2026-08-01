@@ -11,7 +11,7 @@ import {
   contactInfo,
   socialLinks,
   footerContent,
-  linkMap,
+  linkMapsByDomain,
 } from "../data/footerData";
 import { SITE_DOMAIN } from "../lib/siteDomains";
 
@@ -89,19 +89,24 @@ export default function Footer() {
             )}
 
             {column.links.map((link, linkIndex) => {
-              const href = linkMap[link];
-              
+              const isCurrentSite = column.title === SITE_DOMAIN;
+              const path = linkMapsByDomain[column.title]?.[link];
+
               return (
                 <Button
                   key={linkIndex}
                   variant="link"
                   className="h-auto p-0 font-button font-bold text-[#414141] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] hover:no-underline transition-colors hover:text-[#FECC39]"
-                  asChild={Boolean(href)}
+                  asChild={Boolean(path)}
                 >
-                  {href ? (
-                    <Link href={href}>{link}</Link>
-                  ) : (
+                  {!path ? (
                     link
+                  ) : isCurrentSite ? (
+                    <Link href={path}>{link}</Link>
+                  ) : (
+                    <a href={`https://${column.title}${path}`} target="_blank" rel="noopener noreferrer">
+                      {link}
+                    </a>
                   )}
                 </Button>
               );
