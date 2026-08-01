@@ -2,17 +2,19 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import { Card, CardContent } from "../../../../../components/ui/card";
 import { artistsAPI, type PublicArtistProject } from "../../../../../lib/api/artists";
 import { organizationsAPI } from "../../../../../lib/api/organizations";
 import { useAuthorProfile } from "../../AuthorProfileContext";
+import { localeToApiLanguage, type Locale } from "../../../../../i18n/routing";
 
 const FALLBACK_COVER = "/artists/artist-photo-5.png";
 
 export default function Projects() {
   const t = useTranslations("Authors.profile");
+  const locale = useLocale() as Locale;
   const projectFilterButtons = [
     { id: "all", text: t("filters.all") },
     { id: "newest", text: t("filters.newest") },
@@ -30,7 +32,7 @@ export default function Projects() {
       setLoading(true);
       try {
         const api = kind === "artist" ? artistsAPI : organizationsAPI;
-        const result = await api.projects(slug, { per_page: 50 });
+        const result = await api.projects(slug, localeToApiLanguage(locale), { per_page: 50 });
         if (!ignore) setMyProjects(result);
       } catch (error) {
         if (!ignore) {
@@ -45,7 +47,7 @@ export default function Projects() {
     return () => {
       ignore = true;
     };
-  }, [slug, kind, profileLoading]);
+  }, [slug, kind, profileLoading, locale]);
 
   if (notFound) {
     return null;

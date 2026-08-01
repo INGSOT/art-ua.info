@@ -1,11 +1,14 @@
 import api from "./auth";
+import type { ApiLanguage } from "../../i18n/routing";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://save-art.ddev.site";
 
 type LocalizedText = string | { uk: string; en?: string };
 
-function localize(value: LocalizedText | null | undefined): string {
-  return typeof value === "string" ? value : value?.uk ?? "";
+function localize(value: LocalizedText | null | undefined, language: ApiLanguage): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return language === "en" ? value.en ?? value.uk : value.uk;
 }
 
 function absoluteUrl(path: string | null | undefined): string | null {
@@ -37,7 +40,7 @@ export interface PublicArtist {
 
 interface RawArtist {
   id: number;
-  name: string;
+  name: LocalizedText;
   slug: string;
   avatar_url: string | null;
   profession: LocalizedText | null;
@@ -50,16 +53,16 @@ interface RawArtist {
   created_at: string;
 }
 
-function mapArtist(raw: RawArtist): PublicArtist {
+function mapArtist(raw: RawArtist, language: ApiLanguage): PublicArtist {
   return {
     id: raw.id,
     slug: raw.slug,
-    name: raw.name,
+    name: localize(raw.name, language),
     avatarUrl: absoluteUrl(raw.avatar_url),
-    profession: localize(raw.profession),
-    bio: localize(raw.bio),
-    city: localize(raw.city),
-    country: localize(raw.country),
+    profession: localize(raw.profession, language),
+    bio: localize(raw.bio, language),
+    city: localize(raw.city, language),
+    country: localize(raw.country, language),
     social: raw.social ?? null,
     projectsCount: raw.projects_count ?? 0,
     completedProjectsCount: raw.completed_projects_count ?? 0,
@@ -106,12 +109,12 @@ interface ArtistProjectsResponse {
   meta?: Record<string, unknown>;
 }
 
-export function mapArtistProject(raw: RawArtistProject): PublicArtistProject {
+export function mapArtistProject(raw: RawArtistProject, language: ApiLanguage): PublicArtistProject {
   return {
     id: raw.id,
     slug: raw.slug,
-    title: localize(raw.title),
-    shortDescription: localize(raw.short_description),
+    title: localize(raw.title, language),
+    shortDescription: localize(raw.short_description, language),
     coverUrl: absoluteUrl(raw.cover_url),
     artCategory: raw.art_category,
     artCategoryLabel: raw.art_category_label,
@@ -190,48 +193,55 @@ export function createAuthorProfileAPI(basePath: "artists" | "organizations") {
   return {
     // Простий список без пагінації/фільтрів — для автокомпліту тощо (сумісний з
     // попередньою поведінкою artistsAPI.list).
-    list: async (params?: {
-      search?: string;
-      per_page?: number;
-      page?: number;
-    }): Promise<PublicArtist[]> => {
+    list: async (
+      language: ApiLanguage,
+      params?: {
+        search?: string;
+        per_page?: number;
+        page?: number;
+      }
+    ): Promise<PublicArtist[]> => {
       const response = await api.get<ArtistsListResponse>(`/v1/art-ua-info/${basePath}`, {
-        params: { language: "uk", ...params },
+        params: { language, ...params },
       });
-      return response.data.data.map(mapArtist);
+      return response.data.data.map((raw) => mapArtist(raw, language));
     },
 
     // Список з пагінацією й фільтрами (categories/sort_options) — для /authors,
     // симетрично до projectsAPI.browse на /projects.
-    browse: async (params?: Record<string, string | number>): Promise<AuthorsBrowseResult> => {
+    browse: async (
+      language: ApiLanguage,
+      params?: Record<string, string | number>
+    ): Promise<AuthorsBrowseResult> => {
       const response = await api.get<ArtistsListResponse>(`/v1/art-ua-info/${basePath}`, {
-        params: { language: "uk", ...params },
+        params: { language, ...params },
       });
       return {
-        data: response.data.data.map(mapArtist),
+        data: response.data.data.map((raw) => mapArtist(raw, language)),
         meta: response.data.meta ?? { current_page: 1, last_page: 1, per_page: response.data.data.length, total: response.data.data.length },
         filters: response.data.filters ?? { categories: [], parameters: [], sort_options: [] },
       };
     },
 
-    get: async (slug: string): Promise<PublicArtist> => {
+    get: async (slug: string, language: ApiLanguage): Promise<PublicArtist> => {
       const response = await api.get<ArtistResponse>(`/v1/art-ua-info/${basePath}/${slug}`, {
-        params: { language: "uk" },
+        params: { language },
       });
-      return mapArtist(response.data.data);
+      return mapArtist(response.data.data, language);
     },
 
     projects: async (
       slug: string,
+      language: ApiLanguage,
       params?: { status?: string; per_page?: number; page?: number }
     ): Promise<PublicArtistProject[]> => {
       const response = await api.get<ArtistProjectsResponse>(
         `/v1/art-ua-info/${basePath}/${slug}/projects`,
         {
-          params: { language: "uk", ...params },
+          params: { language, ...params },
         }
       );
-      return response.data.data.map(mapArtistProject);
+      return response.data.data.map((raw) => mapArtistProject(raw, language));
     },
   };
 }

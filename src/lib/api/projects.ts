@@ -1,4 +1,5 @@
 import api from "./auth";
+import type { ApiLanguage } from "../../i18n/routing";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://save-art.ddev.site";
 
@@ -342,29 +343,36 @@ function mapProjectCardItem(raw: RawProjectCardItem): ProjectListCardItem {
 }
 
 export const projectsAPI = {
-  myList: async (params?: Record<string, string | number>): Promise<MyProjectListItem[]> => {
+  myList: async (
+    language: ApiLanguage,
+    params?: Record<string, string | number>
+  ): Promise<MyProjectListItem[]> => {
     const response = await api.get<MyProjectsListResponse>("/v1/art-ua-info/my/projects", {
-      params: { language: "uk", ...params },
+      params: { language, ...params },
     });
     return response.data.data.map(mapMyProjectListItem);
   },
 
   // Завершені art-ua-info-проєкти — GET /v1/art-ua-info/my/projects/completed.
   myCompletedList: async (
+    language: ApiLanguage,
     params?: Record<string, string | number>
   ): Promise<MyProjectListItem[]> => {
     const response = await api.get<MyProjectsListResponse>(
       "/v1/art-ua-info/my/projects/completed",
       {
-        params: { language: "uk", ...params },
+        params: { language, ...params },
       }
     );
     return response.data.data.map(mapMyProjectListItem);
   },
 
-  list: async (params?: Record<string, string | number>): Promise<PublicProjectListItem[]> => {
+  list: async (
+    language: ApiLanguage,
+    params?: Record<string, string | number>
+  ): Promise<PublicProjectListItem[]> => {
     const response = await api.get<ProjectsListResponse>("/v1/art-ua-info/projects", {
-      params: { language: "uk", ...params },
+      params: { language, ...params },
     });
     return response.data.data.map((project) => ({
       ...project,
@@ -374,13 +382,16 @@ export const projectsAPI = {
 
   // Список публічних проєктів із пагінацією, фільтрами (art_category/art_subcategory/status)
   // та довідником для UI (categories/statuses/sort_options) — для сторінки /projects.
-  browse: async (params?: Record<string, string | number>): Promise<ProjectsBrowseResult> => {
+  browse: async (
+    language: ApiLanguage,
+    params?: Record<string, string | number>
+  ): Promise<ProjectsBrowseResult> => {
     const response = await api.get<{
       data: RawProjectCardItem[];
       meta: ProjectsListMeta;
       filters: ProjectsListFilters;
     }>("/v1/art-ua-info/projects", {
-      params: { language: "uk", ...params },
+      params: { language, ...params },
     });
     return {
       data: response.data.data.map(mapProjectCardItem),
@@ -389,14 +400,14 @@ export const projectsAPI = {
     };
   },
 
-  show: async (slug: string): Promise<PublicProjectDetail> => {
+  show: async (slug: string, language: ApiLanguage): Promise<PublicProjectDetail> => {
     const response = await api.get<{ data: RawProjectDetail }>(
       `/v1/art-ua-info/projects/${slug}`,
       {
-        params: { language: "uk" },
+        params: { language },
       }
     );
-    return mapProjectDetail(response.data.data);
+    return mapProjectDetail(response.data.data, language);
   },
 
   donors: async (
@@ -689,12 +700,13 @@ interface RawProjectDetail {
   created_at: string;
 }
 
-function localize(value: LocalizedText | null | undefined): string {
+function localize(value: LocalizedText | null | undefined, language: ApiLanguage): string {
   if (!value) return "";
-  return typeof value === "string" ? value : value.uk ?? "";
+  if (typeof value === "string") return value;
+  return language === "en" ? value.en ?? value.uk : value.uk;
 }
 
-function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
+function mapProjectDetail(raw: RawProjectDetail, language: ApiLanguage): PublicProjectDetail {
   return {
     id: raw.id,
     slug: raw.slug,
@@ -702,8 +714,8 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
     source: raw.source,
     status: raw.status,
     statusLabel: raw.status_label,
-    title: localize(raw.title),
-    shortDescription: localize(raw.short_description),
+    title: localize(raw.title, language),
+    shortDescription: localize(raw.short_description, language),
     coverUrl: absoluteUrl(raw.cover_url),
     artCategory: raw.art_category,
     artCategoryLabel: raw.art_category_label,
@@ -711,7 +723,7 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
     artSubcategoryLabel: raw.art_subcategory_label,
     tags: Array.isArray(raw.tags)
       ? raw.tags
-      : localize(raw.tags)
+      : localize(raw.tags, language)
           .split(",")
           .map((tag) => tag.trim())
           .filter(Boolean),
@@ -728,21 +740,21 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
     completedAt: raw.completed_at,
     author: {
       id: raw.author?.id,
-      name: localize(raw.author?.name) || "",
+      name: localize(raw.author?.name, language) || "",
       slug: raw.author?.slug ?? null,
       avatarUrl: absoluteUrl(raw.author?.avatar_url),
-      profession: localize(raw.author?.profession),
+      profession: localize(raw.author?.profession, language),
       type: raw.author?.type ?? "personal",
     },
-    additionalInfo: localize(raw.additional_info),
+    additionalInfo: localize(raw.additional_info, language),
     contentBlocks: (raw.content_blocks ?? []).map((block) => ({
       type: block.type,
       headingLevel: block.heading_level,
-      headingText: localize(block.heading_text),
-      paragraphText: localize(block.paragraph_text),
+      headingText: localize(block.heading_text, language),
+      paragraphText: localize(block.paragraph_text, language),
       image: absoluteUrl(block.image),
-      imageAlt: localize(block.image_alt),
-      imageCaption: localize(block.image_caption),
+      imageAlt: localize(block.image_alt, language),
+      imageCaption: localize(block.image_caption, language),
       url: block.url,
     })),
     finalResult: (raw.final_result ?? []).map((item) => ({
@@ -755,8 +767,8 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
       order: stage.order,
       status: stage.status,
       statusLabel: stage.status_label,
-      title: localize(stage.title),
-      description: localize(stage.description),
+      title: localize(stage.title, language),
+      description: localize(stage.description, language),
       daysPlanned: stage.days_planned,
       budgetPlanned: stage.budget_planned,
       budgetActual: stage.budget_actual,
@@ -768,8 +780,8 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
     bonuses: (raw.bonuses ?? []).map((bonus) => ({
       id: bonus.id,
       order: bonus.order,
-      title: localize(bonus.title),
-      description: localize(bonus.description),
+      title: localize(bonus.title, language),
+      description: localize(bonus.description, language),
       minDonation: bonus.min_donation,
       maxDonation: bonus.max_donation,
       quantity: bonus.quantity,
@@ -780,10 +792,10 @@ function mapProjectDetail(raw: RawProjectDetail): PublicProjectDetail {
     })),
     parameters: (raw.parameters ?? []).map((param) => ({
       parameterId: param.parameter_id,
-      parameter: localize(param.parameter),
+      parameter: localize(param.parameter, language),
       type: param.type,
       valueId: param.value_id,
-      value: param.value !== null && param.value !== undefined ? localize(param.value) : null,
+      value: param.value !== null && param.value !== undefined ? localize(param.value, language) : null,
     })),
     canDonate: !!raw.can_donate,
     createdAt: raw.created_at,

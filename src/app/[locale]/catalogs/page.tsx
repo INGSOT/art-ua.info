@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
@@ -20,6 +20,7 @@ import {
     type PublicCatalog,
     type CatalogsListFilters,
 } from "../../../lib/api/publicCatalogs";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -36,6 +37,8 @@ const DEFAULT_FILTERS: CatalogsListFilters = { categories: [] };
 
 export default function CatalogsPage() {
     const t = useTranslations("Catalogs.list");
+    const locale = useLocale() as Locale;
+    const language = localeToApiLanguage(locale);
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const searchParams = useSearchParams();
@@ -72,7 +75,7 @@ export default function CatalogsPage() {
             setLoading(true);
             try {
                 const { sort_by, sort_dir } = sortParamsFor(sortSlug);
-                const result = await publicCatalogsAPI.browse({
+                const result = await publicCatalogsAPI.browse(language, {
                     page: currentPage,
                     per_page: ITEMS_PER_PAGE,
                     ...(selectedSubcategories.length ? { art_subcategory: selectedSubcategories.join(",") } : {}),
@@ -102,7 +105,7 @@ export default function CatalogsPage() {
             ignore = true;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentPage, subcategoryParam, sortSlug, searchQueryParam]);
+    }, [currentPage, subcategoryParam, sortSlug, searchQueryParam, language]);
 
     const pushParams = (mutate: (params: URLSearchParams) => void, resetPage = true) => {
         const params = new URLSearchParams(searchParams.toString());

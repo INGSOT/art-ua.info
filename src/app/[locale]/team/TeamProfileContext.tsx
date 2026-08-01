@@ -2,7 +2,9 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useParams } from "next/navigation";
+import { useLocale } from "next-intl";
 import { teamsAPI, type PublicTeam } from "../../../lib/api/teams";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 interface TeamProfileState {
   slug: string;
@@ -25,6 +27,8 @@ function isNotFoundError(error: unknown): boolean {
 export function TeamProfileProvider({ children }: { children: ReactNode }) {
   const params = useParams<{ slug?: string }>();
   const slug = params?.slug ?? "";
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
 
   const [state, setState] = useState<TeamProfileState>({
     slug,
@@ -40,7 +44,7 @@ export function TeamProfileProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, slug, loading: true, notFound: false }));
 
       try {
-        const team = await teamsAPI.get(slug);
+        const team = await teamsAPI.get(slug, language);
         if (!ignore) setState({ slug, loading: false, notFound: false, team });
       } catch (error) {
         if (!isNotFoundError(error)) {
@@ -53,7 +57,7 @@ export function TeamProfileProvider({ children }: { children: ReactNode }) {
     return () => {
       ignore = true;
     };
-  }, [slug]);
+  }, [slug, language]);
 
   const value = useMemo(() => state, [state]);
 

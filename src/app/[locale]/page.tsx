@@ -14,6 +14,8 @@ import { projectsAPI } from "../../lib/api/projects";
 import { publicCatalogsAPI, type PublicCatalog } from "../../lib/api/publicCatalogs";
 import { artistsAPI } from "../../lib/api/artists";
 import type { PublicArtist } from "../../lib/api/artists";
+import { getLocale } from "next-intl/server";
+import { localeToApiLanguage, type Locale } from "../../i18n/routing";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +34,11 @@ function shuffleProjects<T>(items: T[]): T[] {
 
 export default async function Home() {
   const seed = Date.now();
+  const locale = (await getLocale()) as Locale;
+  const language = localeToApiLanguage(locale);
   let projects: Awaited<ReturnType<typeof projectsAPI.list>> = [];
   try {
-    projects = await projectsAPI.list({ per_page: 20, sort_by: "popular" });
+    projects = await projectsAPI.list(language, { per_page: 20, sort_by: "popular" });
   } catch (error) {
     console.error("Failed to load featured projects:", error);
   }
@@ -49,7 +53,7 @@ export default async function Home() {
 
   let catalogs: PublicCatalog[] = [];
   try {
-    const result = await publicCatalogsAPI.browse({ per_page: 30, sort_by: "likes" });
+    const result = await publicCatalogsAPI.browse(language, { per_page: 30, sort_by: "likes" });
     catalogs = result.data;
   } catch (error) {
     console.error("Failed to load catalogs:", error);
@@ -57,7 +61,7 @@ export default async function Home() {
 
   let artists: PublicArtist[] = [];
   try {
-    artists = await artistsAPI.list({ per_page: 30 });
+    artists = await artistsAPI.list(language, { per_page: 30 });
   } catch (error) {
     console.error("Failed to load artists:", error);
   }

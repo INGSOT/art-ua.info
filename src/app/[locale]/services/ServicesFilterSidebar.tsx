@@ -2,8 +2,9 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { publicServicesAPI, type ServicesFilterCategory, type ServiceCurrency } from "../../../lib/api/publicServices";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 const MAX_PRICE = 1000000;
 
@@ -45,6 +46,8 @@ export default function ServicesFilterSidebar({
   onSelectLocation,
 }: ServicesFilterSidebarProps) {
   const t = useTranslations("Services.filters");
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
   const [minPrice, setMinPrice] = useState(initialMinPrice);
   const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
   const [minPriceInput, setMinPriceInput] = useState(String(initialMinPrice));
@@ -62,7 +65,7 @@ export default function ServicesFilterSidebar({
     let ignore = false;
     const timeout = setTimeout(async () => {
       try {
-        const results = await publicServicesAPI.locations(query);
+        const results = await publicServicesAPI.locations(language, query);
         if (!ignore) setLocationSuggestions(results);
       } catch {
         if (!ignore) setLocationSuggestions([]);
@@ -73,7 +76,7 @@ export default function ServicesFilterSidebar({
       ignore = true;
       clearTimeout(timeout);
     };
-  }, [locationInput]);
+  }, [locationInput, language]);
 
   const selectLocation = (city: string) => {
     setLocationSuggestions([]);

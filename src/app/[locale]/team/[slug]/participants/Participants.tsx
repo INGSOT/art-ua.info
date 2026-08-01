@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Participant from "../../../../../components/Participant";
 import { useTeamProfile } from "../../TeamProfileContext";
 import { artistsAPI, type PublicArtist, type PublicArtistProject } from "../../../../../lib/api/artists";
 import { organizationsAPI } from "../../../../../lib/api/organizations";
 import type { TeamMemberSummary } from "../../../../../lib/api/teams";
 import type { PhotoData } from "../../../../../data/artistsData";
+import { localeToApiLanguage, type ApiLanguage, type Locale } from "../../../../../i18n/routing";
 
 const FALLBACK_AVATAR = "/artists/artist-photo-5.png";
 
@@ -31,16 +32,17 @@ function toPhotos(projects: PublicArtistProject[]): PhotoData[] {
 async function loadMemberCard(
   member: TeamMemberSummary,
   artistTypeLabel: string,
-  organizationTypeLabel: string
+  organizationTypeLabel: string,
+  language: ApiLanguage
 ): Promise<MemberCard> {
   let profile: PublicArtist | null = null;
   let kind: "artist" | "organization" = "artist";
 
   try {
-    profile = await artistsAPI.get(member.slug);
+    profile = await artistsAPI.get(member.slug, language);
   } catch {
     try {
-      profile = await organizationsAPI.get(member.slug);
+      profile = await organizationsAPI.get(member.slug, language);
       kind = "organization";
     } catch {
       profile = null;
@@ -51,7 +53,7 @@ async function loadMemberCard(
   if (profile) {
     try {
       const api = kind === "artist" ? artistsAPI : organizationsAPI;
-      projects = await api.projects(member.slug, { per_page: 5 });
+      projects = await api.projects(member.slug, language, { per_page: 5 });
     } catch (error) {
       console.error(`Failed to load projects for member "${member.slug}":`, error);
     }
@@ -71,6 +73,8 @@ async function loadMemberCard(
 
 export default function Participants() {
   const t = useTranslations("Team.participants");
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
   const { loading: teamLoading, notFound, team } = useTeamProfile();
   const [members, setMembers] = useState<MemberCard[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
@@ -82,7 +86,9 @@ export default function Participants() {
     (async () => {
       setLoadingMembers(true);
       const cards = await Promise.all(
-        team.members.map((member) => loadMemberCard(member, t("artistType"), t("organizationType")))
+        team.members.map((member) =>
+          loadMemberCard(member, t("artistType"), t("organizationType"), language)
+        )
       );
       if (!ignore) setMembers(cards);
       if (!ignore) setLoadingMembers(false);
@@ -91,7 +97,7 @@ export default function Participants() {
     return () => {
       ignore = true;
     };
-  }, [team, teamLoading, t]);
+  }, [team, teamLoading, t, language]);
 
   if (teamLoading || loadingMembers) {
     return (

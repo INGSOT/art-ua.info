@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
@@ -20,6 +20,7 @@ import {
     type ProjectListCardItem,
     type ProjectsListFilters,
 } from "../../../lib/api/projects";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -37,6 +38,8 @@ function getDefaultFilters(t: (key: string) => string): ProjectsListFilters {
 
 export default function ProjectsPage() {
     const t = useTranslations("Projects.list");
+    const locale = useLocale() as Locale;
+    const language = localeToApiLanguage(locale);
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
     const searchParams = useSearchParams();
@@ -71,7 +74,7 @@ export default function ProjectsPage() {
         const fetchProjects = async () => {
             setLoading(true);
             try {
-                const result = await projectsAPI.browse({
+                const result = await projectsAPI.browse(language, {
                     page: currentPage,
                     per_page: ITEMS_PER_PAGE,
                     ...(artCategoryParam ? { art_category: artCategoryParam } : {}),
@@ -113,6 +116,7 @@ export default function ProjectsPage() {
         parameterValueParam,
         sortBy,
         searchQueryParam,
+        language,
     ]);
 
     const pushParams = (mutate: (params: URLSearchParams) => void, resetPage = true) => {

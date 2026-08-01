@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
@@ -20,6 +20,7 @@ import { type PhotoData } from "../../../data/artistsData";
 import { artistsAPI, type AuthorsListFilters, type PublicArtist, type PublicArtistProject } from "../../../lib/api/artists";
 import { organizationsAPI } from "../../../lib/api/organizations";
 import { teamsAPI, type PublicTeam } from "../../../lib/api/teams";
+import { localeToApiLanguage, type ApiLanguage, type Locale } from "../../../i18n/routing";
 
 const ITEMS_PER_PAGE = 10;
 // "Усі" поєднує 3 незалежно пагіновані джерела — точну наскрізну пагінацію не
@@ -53,7 +54,8 @@ function toPhotos(projects: PublicArtistProject[]): PhotoData[] {
 async function buildAuthorCards(
     items: PublicArtist[],
     kind: "artist" | "organization",
-    fallbackTypeLabel: string
+    fallbackTypeLabel: string,
+    language: ApiLanguage
 ): Promise<AuthorCardData[]> {
     const api = kind === "artist" ? artistsAPI : organizationsAPI;
 
@@ -61,7 +63,7 @@ async function buildAuthorCards(
         items.map(async (item) => {
             let projects: PublicArtistProject[] = [];
             try {
-                projects = await api.projects(item.slug, { per_page: 5 });
+                projects = await api.projects(item.slug, language, { per_page: 5 });
             } catch (error) {
                 console.error(`Failed to load projects for "${item.slug}":`, error);
             }
@@ -80,12 +82,16 @@ async function buildAuthorCards(
     );
 }
 
-async function buildTeamCards(teams: PublicTeam[], typeLabel: string): Promise<AuthorCardData[]> {
+async function buildTeamCards(
+    teams: PublicTeam[],
+    typeLabel: string,
+    language: ApiLanguage
+): Promise<AuthorCardData[]> {
     return Promise.all(
         teams.map(async (team) => {
             let projects: PublicArtistProject[] = [];
             try {
-                projects = await teamsAPI.projects(team.slug, { per_page: 5 });
+                projects = await teamsAPI.projects(team.slug, language, { per_page: 5 });
             } catch (error) {
                 console.error(`Failed to load projects for team "${team.slug}":`, error);
             }
@@ -155,6 +161,8 @@ function mergeCategoryFilters(a: AuthorsListFilters, b: AuthorsListFilters): Aut
 
 export default function AuthorsPage() {
     const t = useTranslations("Authors.list");
+    const locale = useLocale() as Locale;
+    const language = localeToApiLanguage(locale);
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -201,7 +209,7 @@ export default function AuthorsPage() {
 
                 if (participant === "artist" || participant === "organization") {
                     const api = participant === "artist" ? artistsAPI : organizationsAPI;
-                    const result = await api.browse({
+                    const result = await api.browse(language, {
                         ...(search ? { search } : {}),
                         ...(artCategoryParam ? { art_category: artCategoryParam } : {}),
                         ...(selectedSubcategories.length ? { art_subcategory: selectedSubcategories.join(",") } : {}),
@@ -216,20 +224,21 @@ export default function AuthorsPage() {
                     const cards = await buildAuthorCards(
                         result.data,
                         participant,
-                        participant === "artist" ? t("typeArtist") : t("typeOrganization")
+                        participant === "artist" ? t("typeArtist") : t("typeOrganization"),
+                        language
                     );
                     if (ignore) return;
                     setItems(cards);
                     setMeta(result.meta);
                     setFiltersData(result.filters);
                 } else if (participant === "team") {
-                    const result = await teamsAPI.browse({
+                    const result = await teamsAPI.browse(language, {
                         ...(search ? { search } : {}),
                         page: currentPage,
                         per_page: ITEMS_PER_PAGE,
                     });
                     if (ignore) return;
-                    const cards = await buildTeamCards(result.data, t("typeTeam"));
+                    const cards = await buildTeamCards(result.data, t("typeTeam"), language);
                     if (ignore) return;
                     setItems(cards);
                     setMeta(result.meta);
@@ -246,15 +255,15 @@ export default function AuthorsPage() {
                         per_page: ALL_TAB_PER_TYPE,
                     };
                     const [artistsResult, organizationsResult, teamsResult] = await Promise.all([
-                        artistsAPI.browse(authorParams),
-                        organizationsAPI.browse(authorParams),
-                        teamsAPI.browse({ ...(search ? { search } : {}), per_page: ALL_TAB_PER_TYPE }),
+                        artistsAPI.browse(language, authorParams),
+                        organizationsAPI.browse(language, authorParams),
+                        teamsAPI.browse(language, { ...(search ? { search } : {}), per_page: ALL_TAB_PER_TYPE }),
                     ]);
                     if (ignore) return;
                     const [artistCards, organizationCards, teamCards] = await Promise.all([
-                        buildAuthorCards(artistsResult.data, "artist", t("typeArtist")),
-                        buildAuthorCards(organizationsResult.data, "organization", t("typeOrganization")),
-                        buildTeamCards(teamsResult.data, t("typeTeam")),
+                        buildAuthorCards(artistsResult.data, "artist", t("typeArtist"), language),
+                        buildAuthorCards(organizationsResult.data, "organization", t("typeOrganization"), language),
+                        buildTeamCards(teamsResult.data, t("typeTeam"), language),
                     ]);
                     if (ignore) return;
                     setItems([...artistCards, ...organizationCards, ...teamCards]);
@@ -278,7 +287,7 @@ export default function AuthorsPage() {
             ignore = true;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [participant, artCategoryParam, subcategoryParam, parameterValueParam, sortBy, searchQueryParam, currentPage]);
+    }, [participant, artCategoryParam, subcategoryParam, parameterValueParam, sortBy, searchQueryParam, currentPage, language]);
 
     const pushParams = (mutate: (params: URLSearchParams) => void, resetPage = true) => {
         const params = new URLSearchParams(searchParams.toString());

@@ -1,4 +1,5 @@
 import api from "./auth";
+import type { ApiLanguage } from "../../i18n/routing";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://save-art.ddev.site";
 
@@ -100,9 +101,12 @@ function mapCatalog(raw: RawPublicCatalog): PublicCatalog {
 
 export const publicCatalogsAPI = {
   /** Список каталогів із пагінацією, фільтрами (art_subcategory/search/sort) та довідником категорій. */
-  browse: async (params?: Record<string, string | number>): Promise<CatalogsBrowseResult> => {
+  browse: async (
+    language: ApiLanguage,
+    params?: Record<string, string | number>
+  ): Promise<CatalogsBrowseResult> => {
     const response = await api.get<RawCatalogsListResponse>("/v1/art-ua-info/catalogs", {
-      params: { language: "uk", ...params },
+      params: { language, ...params },
     });
     return {
       data: response.data.data.map(mapCatalog),
@@ -112,9 +116,9 @@ export const publicCatalogsAPI = {
   },
 
   /** Один каталог за id — для сторінки перегляду PDF. */
-  show: async (id: number | string): Promise<PublicCatalog> => {
+  show: async (id: number | string, language: ApiLanguage): Promise<PublicCatalog> => {
     const response = await api.get<RawCatalogResponse>(`/v1/art-ua-info/catalogs/${id}`, {
-      params: { language: "uk" },
+      params: { language },
     });
     return mapCatalog(response.data.data);
   },

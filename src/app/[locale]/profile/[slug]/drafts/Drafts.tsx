@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import { Card, CardContent } from "../../../../../components/ui/card";
 import EmptyState from "../../../../../components/ui/empty-state";
 import { projectsAPI, type MyProjectListItem } from "../../../../../lib/api/projects";
 import { useProfileView } from "../../ProfileViewContext";
 import { withProfileId } from "../../../../../lib/authorQuery";
+import { localeToApiLanguage, type Locale } from "../../../../../i18n/routing";
 
 // Усі статуси art-ua-info-проєктів, крім завершених/проданих (ті показуються
 // на вкладці "Проєкти" — Projects.tsx через GET /v1/my/projects/completed).
@@ -16,6 +17,7 @@ const DRAFT_STATUSES = "new,draft,moderation,rejected";
 
 export default function Drafts() {
   const t = useTranslations("Profile.drafts");
+  const locale = useLocale() as Locale;
   const { slug } = useProfileView();
   const [drafts, setDrafts] = useState<MyProjectListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ export default function Drafts() {
     let cancelled = false;
     setLoading(true);
     projectsAPI
-      .myList({ source: "art_ua_info", status: DRAFT_STATUSES })
+      .myList(localeToApiLanguage(locale), { source: "art_ua_info", status: DRAFT_STATUSES })
       .then((projects) => {
         if (!cancelled) setDrafts(projects);
       })
@@ -34,7 +36,7 @@ export default function Drafts() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locale]);
 
   const hasDrafts = drafts.length > 0;
 

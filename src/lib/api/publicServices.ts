@@ -1,4 +1,5 @@
 import api from "./auth";
+import type { ApiLanguage } from "../../i18n/routing";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://save-art.ddev.site";
 
@@ -44,20 +45,24 @@ interface RawPublicService {
   performer: { id: number; name: string; slug: string; avatar_url: string | null } | null;
 }
 
-function localized(value: { uk?: string; en?: string } | string | null | undefined): string {
+function localized(
+  value: { uk?: string; en?: string } | string | null | undefined,
+  language: ApiLanguage
+): string {
   if (!value) return "";
-  return typeof value === "string" ? value : (value.uk ?? value.en ?? "");
+  if (typeof value === "string") return value;
+  return language === "en" ? value.en ?? value.uk ?? "" : value.uk ?? value.en ?? "";
 }
 
-function mapService(raw: RawPublicService): PublicService {
+function mapService(raw: RawPublicService, language: ApiLanguage): PublicService {
   return {
     id: raw.id,
     slug: raw.slug,
-    title: localized(raw.title),
-    description: localized(raw.description),
+    title: localized(raw.title, language),
+    description: localized(raw.description, language),
     image: absoluteUrl(raw.image_url),
     artCategorySlug: raw.art_category?.slug ?? null,
-    location: localized(raw.location),
+    location: localized(raw.location, language),
     price: raw.price,
     priceFrom: raw.price_from,
     currency: raw.currency,
@@ -109,28 +114,31 @@ interface RawServiceResponse {
 
 export const publicServicesAPI = {
   /** Список послуг із пагінацією, фільтрами (категорія/ціна/валюта/локація/пошук) та довідником категорій. */
-  browse: async (params?: Record<string, string | number>): Promise<ServicesBrowseResult> => {
+  browse: async (
+    language: ApiLanguage,
+    params?: Record<string, string | number>
+  ): Promise<ServicesBrowseResult> => {
     const response = await api.get<RawServicesListResponse>("/v1/services", {
-      params: { language: "uk", ...params },
+      params: { language, ...params },
     });
     return {
-      data: response.data.data.map(mapService),
+      data: response.data.data.map((raw) => mapService(raw, language)),
       meta: response.data.meta,
       filters: response.data.filters,
     };
   },
 
-  show: async (slug: string): Promise<PublicService> => {
+  show: async (slug: string, language: ApiLanguage): Promise<PublicService> => {
     const response = await api.get<RawServiceResponse>(`/v1/services/${slug}`, {
-      params: { language: "uk" },
+      params: { language },
     });
-    return mapService(response.data.data);
+    return mapService(response.data.data, language);
   },
 
   /** Підказки міст (серед виконавців, що мають хоча б одну послугу) для автодоповнення пошуку за локацією. */
-  locations: async (search: string): Promise<string[]> => {
+  locations: async (language: ApiLanguage, search: string): Promise<string[]> => {
     const response = await api.get<{ data: string[] }>("/v1/services/locations", {
-      params: { language: "uk", search },
+      params: { language, search },
     });
     return response.data.data;
   },

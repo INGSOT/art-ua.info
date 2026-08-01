@@ -90,12 +90,13 @@ interface ParticipantHit {
 /** Митці, організації й команди — окремі ендпоінти, але в пошуку об'єднані в один розділ "Учасники". */
 async function fetchParticipants(
   search: string,
-  perPage: number
+  perPage: number,
+  language: ApiLanguage
 ): Promise<{ hits: ParticipantHit[]; total: number }> {
   const [artists, organizations, teams] = await Promise.all([
-    safe(artistsAPI.browse({ search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 }, filters: { categories: [], parameters: [], sort_options: [] } }),
-    safe(organizationsAPI.browse({ search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 }, filters: { categories: [], parameters: [], sort_options: [] } }),
-    safe(teamsAPI.browse({ search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 } }),
+    safe(artistsAPI.browse(language, { search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 }, filters: { categories: [], parameters: [], sort_options: [] } }),
+    safe(organizationsAPI.browse(language, { search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 }, filters: { categories: [], parameters: [], sort_options: [] } }),
+    safe(teamsAPI.browse(language, { search, per_page: perPage }), { data: [], meta: { current_page: 1, last_page: 1, per_page: perPage, total: 0 } }),
   ]);
 
   const hits: ParticipantHit[] = [
@@ -124,10 +125,10 @@ export async function getGlobalSearchSuggestions(
   const normalized = trimmed.toLowerCase();
 
   const [participants, projects, services, catalogs, news] = await Promise.all([
-    fetchParticipants(trimmed, SUGGESTIONS_PER_CATEGORY),
-    safe(projectsAPI.browse({ search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { sort_options: [], categories: [], statuses: [], parameters: [] } }),
-    safe(publicServicesAPI.browse({ search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
-    safe(publicCatalogsAPI.browse({ search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
+    fetchParticipants(trimmed, SUGGESTIONS_PER_CATEGORY, language),
+    safe(projectsAPI.browse(language, { search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { sort_options: [], categories: [], statuses: [], parameters: [] } }),
+    safe(publicServicesAPI.browse(language, { search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
+    safe(publicCatalogsAPI.browse(language, { search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
     safe(
       loadAllNews(language).then((items) => matchNews(items, normalized).slice(0, SUGGESTIONS_PER_CATEGORY)),
       []
@@ -204,10 +205,10 @@ export async function getGlobalSearchResults(
   const normalized = trimmed.toLowerCase();
 
   const [participants, projects, services, catalogs, newsCount] = await Promise.all([
-    fetchParticipants(trimmed, 1),
-    safe(projectsAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { sort_options: [], categories: [], statuses: [], parameters: [] } }),
-    safe(publicServicesAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
-    safe(publicCatalogsAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
+    fetchParticipants(trimmed, 1, language),
+    safe(projectsAPI.browse(language, { search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { sort_options: [], categories: [], statuses: [], parameters: [] } }),
+    safe(publicServicesAPI.browse(language, { search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
+    safe(publicCatalogsAPI.browse(language, { search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
     safe(loadAllNews(language).then((items) => matchNews(items, normalized).length), 0),
   ]);
 

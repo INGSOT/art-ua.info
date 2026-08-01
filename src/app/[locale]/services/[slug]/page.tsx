@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import Header from "../../../../components/Header";
 import Footer from "../../../../components/Footer";
@@ -11,6 +11,7 @@ import Message from "../../../../components/Message";
 import { publicServicesAPI, type PublicService, type ServiceCurrency } from "../../../../lib/api/publicServices";
 import { withAuthorId, withTeamId } from "../../../../lib/authorQuery";
 import { getApiErrorMessage } from "../../../../lib/apiError";
+import { localeToApiLanguage, type Locale } from "../../../../i18n/routing";
 
 type ServiceDetailTranslations = ReturnType<typeof useTranslations>;
 
@@ -31,6 +32,8 @@ const CURRENCY_ICON: Record<ServiceCurrency, string> = {
 
 export default function ServicePage() {
   const t = useTranslations("Services.detail");
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
   const params = useParams<{ slug?: string }>();
   const slug = typeof params?.slug === "string" ? params.slug : undefined;
 
@@ -46,7 +49,7 @@ export default function ServicePage() {
       setLoading(true);
       setNotFound(false);
       try {
-        const data = await publicServicesAPI.show(slug);
+        const data = await publicServicesAPI.show(slug, language);
         if (!ignore) setService(data);
       } catch {
         if (!ignore) setNotFound(true);
@@ -60,7 +63,7 @@ export default function ServicePage() {
     return () => {
       ignore = true;
     };
-  }, [slug]);
+  }, [slug, language]);
 
   if (loading) {
     return (

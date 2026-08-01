@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "../components/ui/button";
 import { joinCommunityWrapperData } from "../data/joinCommunityWrapperData";
 import { useAuth } from "../context/AuthContext";
@@ -14,10 +14,11 @@ import ResetPassModal from "./ResetPassModal";
 export default function JoinCommunityWrapper() {
   const { user } = useAuth();
   const locale = useLocale() as Locale;
+  const t = useTranslations("Main.joinCommunityWrapper");
   const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
   const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
   const [content, setContent] = useState({
-    title: joinCommunityWrapperData.title,
+    title: t("title"),
     backgroundImage: joinCommunityWrapperData.backgroundImage,
   });
 
@@ -29,7 +30,7 @@ export default function JoinCommunityWrapper() {
       .then(({ second }) => {
         if (!isMounted) return;
         setContent({
-          title: second.title || joinCommunityWrapperData.title,
+          title: second.title || t("title"),
           backgroundImage: second.image || joinCommunityWrapperData.backgroundImage,
         });
       })
@@ -59,7 +60,7 @@ export default function JoinCommunityWrapper() {
             >
             <div className="flex-col items-start gap-2.5 flex-1 w-full grow flex">
               <p className="self-stretch font-p1 font-[number:var(--p1-font-weight)] text-white text-[length:var(--p1-font-size)] tracking-[var(--p1-letter-spacing)] leading-[var(--p1-line-height)] [font-style:var(--p1-font-style)]">
-                {joinCommunityWrapperData.tagline}
+                {t("tagline")}
               </p>
 
               <h5 className="self-stretch text-white text-[24px] md:text-[30px] font-bold font-[700] leading-[var(--h5-line-height)] tracking-[var(--h5-letter-spacing)] max-w-[600px]">
@@ -72,7 +73,7 @@ export default function JoinCommunityWrapper() {
                 onClick={() => setActiveAuthModal("login")}
                 className="w-[300px] h-[60px] bg-[#FECC39] hover:bg-white hover:text-black text-black font-wix font-button font-bold font-[700] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none"
               >
-                {joinCommunityWrapperData.buttonText}
+                {t("buttonText")}
               </Button>
             )}
           </div>

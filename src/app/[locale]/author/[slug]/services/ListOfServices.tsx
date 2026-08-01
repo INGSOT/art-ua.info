@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import ServiceCard from "../../../../../components/ServiceCard";
 import { publicServicesAPI, type PublicService } from "../../../../../lib/api/publicServices";
 import { useAuthorProfile } from "../../AuthorProfileContext";
+import { localeToApiLanguage, type Locale } from "../../../../../i18n/routing";
 
 const FALLBACK_IMAGE = "/masks.svg";
 
@@ -15,6 +16,8 @@ function formatOverlayLabel(service: PublicService, negotiablePrice: string, pri
 
 export default function ListOfServices() {
     const t = useTranslations("Authors");
+    const locale = useLocale() as Locale;
+    const language = localeToApiLanguage(locale);
     const { slug, loading: profileLoading, notFound } = useAuthorProfile();
     const [myServices, setMyServices] = useState<PublicService[]>([]);
     const [loading, setLoading] = useState(true);
@@ -26,7 +29,7 @@ export default function ListOfServices() {
         (async () => {
             setLoading(true);
             try {
-                const result = await publicServicesAPI.browse({ performer_slug: slug, per_page: 50 });
+                const result = await publicServicesAPI.browse(language, { performer_slug: slug, per_page: 50 });
                 if (!ignore) setMyServices(result.data);
             } catch (error) {
                 if (!ignore) {
@@ -41,7 +44,7 @@ export default function ListOfServices() {
         return () => {
             ignore = true;
         };
-    }, [slug, profileLoading, notFound]);
+    }, [slug, profileLoading, notFound, language]);
 
     if (notFound) {
         return null;

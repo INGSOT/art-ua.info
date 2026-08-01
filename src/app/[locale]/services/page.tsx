@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
@@ -20,6 +20,7 @@ import {
 } from '../../../lib/api/publicServices';
 import PaginationSection from '../../../components/PaginationSection';
 import JoinCommunityWrapper from '../../../components/JoinCommunityWrapper';
+import { localeToApiLanguage, type Locale } from '../../../i18n/routing';
 
 const ITEMS_PER_PAGE = 6;
 const MAX_PRICE = 1000000;
@@ -28,6 +29,8 @@ const ALLOWED_CURRENCIES: ServiceCurrency[] = ['UAH', 'USD', 'EUR'];
 
 export default function ServicesPage() {
     const t = useTranslations('Services.list');
+    const locale = useLocale() as Locale;
+    const language = localeToApiLanguage(locale);
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -72,7 +75,7 @@ export default function ServicesPage() {
         const fetchServices = async () => {
             setLoading(true);
             try {
-                const result = await publicServicesAPI.browse({
+                const result = await publicServicesAPI.browse(language, {
                     page: currentPage,
                     per_page: ITEMS_PER_PAGE,
                     ...(selectedSubcategories.length ? { art_subcategory: selectedSubcategories.join(',') } : {}),
@@ -104,7 +107,7 @@ export default function ServicesPage() {
             ignore = true;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentPage, subcategoryParam, selectedCurrency, priceMinParam, priceMaxParam, selectedLocation, searchQueryParam]);
+    }, [currentPage, subcategoryParam, selectedCurrency, priceMinParam, priceMaxParam, selectedLocation, searchQueryParam, language]);
 
     const pushParams = (mutate: (params: URLSearchParams) => void, resetPage = true) => {
         const params = new URLSearchParams(searchParams.toString());

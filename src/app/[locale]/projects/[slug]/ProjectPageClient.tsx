@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { isAxiosError } from "axios";
 import type { Project } from "../../../../data/projectsData";
 import { useAuth } from "../../../../context/AuthContext";
 import { useToast } from "../../../../context/ToastContext";
 import { projectsAPI, type LikeResponse } from "../../../../lib/api/projects";
 import ProjectResultShowcase from "../../../../components/project/ProjectResultShowcase";
+import { localeToApiLanguage, type Locale } from "../../../../i18n/routing";
 
 interface ProjectPageClientProps {
   project: Project;
@@ -16,6 +17,7 @@ interface ProjectPageClientProps {
 
 export default function ProjectPageClient({ project, initialIsLiked = false }: ProjectPageClientProps) {
   const t = useTranslations("Projects.detail");
+  const locale = useLocale() as Locale;
   const [likes, setLikes] = useState(project.projectDetails.initialLikes);
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [likeLoading, setLikeLoading] = useState(false);
@@ -30,7 +32,7 @@ export default function ProjectPageClient({ project, initialIsLiked = false }: P
 
     let cancelled = false;
     projectsAPI
-      .show(project.slug)
+      .show(project.slug, localeToApiLanguage(locale))
       .then((detail) => {
         if (cancelled) return;
         setIsLiked(detail.isLiked);
@@ -43,7 +45,7 @@ export default function ProjectPageClient({ project, initialIsLiked = false }: P
     return () => {
       cancelled = true;
     };
-  }, [authLoading, user, project.slug]);
+  }, [authLoading, user, project.slug, locale]);
 
   const { projectDetails, projectDescriptionData } = project;
 

@@ -49,6 +49,11 @@
       "title2": "and become part of the art community",
       "joinText": "Join\nnow"
     },
+    "joinCommunityWrapper": {
+      "tagline": "Join us",
+      "title": "Become part of the art community today",
+      "buttonText": "Log in"
+    },
     "faq": {
       "title": "Frequently asked questions",
       "buttonText": "All questions"

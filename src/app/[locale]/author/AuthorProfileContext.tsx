@@ -2,8 +2,10 @@
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useParams } from "next/navigation";
+import { useLocale } from "next-intl";
 import { artistsAPI, type PublicArtist } from "../../../lib/api/artists";
 import { organizationsAPI } from "../../../lib/api/organizations";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 export type AuthorKind = "artist" | "organization";
 
@@ -25,6 +27,8 @@ function isNotFoundError(error: unknown): boolean {
 export function AuthorProfileProvider({ children }: { children: ReactNode }) {
   const params = useParams<{ slug?: string }>();
   const slug = params?.slug ?? "";
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
 
   const [state, setState] = useState<AuthorProfileState>({
     slug,
@@ -41,7 +45,7 @@ export function AuthorProfileProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, slug, loading: true, notFound: false }));
 
       try {
-        const profile = await artistsAPI.get(slug);
+        const profile = await artistsAPI.get(slug, language);
         if (!ignore) setState({ slug, loading: false, notFound: false, kind: "artist", profile });
         return;
       } catch (error) {
@@ -51,7 +55,7 @@ export function AuthorProfileProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const profile = await organizationsAPI.get(slug);
+        const profile = await organizationsAPI.get(slug, language);
         if (!ignore) setState({ slug, loading: false, notFound: false, kind: "organization", profile });
       } catch (error) {
         if (!isNotFoundError(error)) {
@@ -64,7 +68,7 @@ export function AuthorProfileProvider({ children }: { children: ReactNode }) {
     return () => {
       ignore = true;
     };
-  }, [slug]);
+  }, [slug, language]);
 
   const value = useMemo(() => state, [state]);
 

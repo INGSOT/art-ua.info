@@ -5,13 +5,16 @@ import {
   type PublicArtistProject,
   type RawArtistProject,
 } from "./authorProfiles";
+import type { ApiLanguage } from "../../i18n/routing";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://save-art.ddev.site";
 
 type LocalizedText = string | { uk: string; en?: string };
 
-function localize(value: LocalizedText | null | undefined): string {
-  return typeof value === "string" ? value : value?.uk ?? "";
+function localize(value: LocalizedText | null | undefined, language: ApiLanguage): string {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return language === "en" ? value.en ?? value.uk : value.uk;
 }
 
 function absoluteUrl(path: string | null | undefined): string | null {
@@ -79,7 +82,7 @@ export interface PublicTeam {
 
 interface RawTeamMember {
   id: number;
-  name: string;
+  name: LocalizedText;
   slug: string;
   avatar_url: string | null;
 }
@@ -87,7 +90,7 @@ interface RawTeamMember {
 interface RawTeam {
   id: number;
   slug: string;
-  name: string;
+  name: LocalizedText;
   avatar_url: string | null;
   website: string | null;
   country: LocalizedText | null;
@@ -121,52 +124,58 @@ interface TeamProjectsResponse {
   meta?: Record<string, unknown>;
 }
 
-function mapTeam(raw: RawTeam): PublicTeam {
+function mapTeam(raw: RawTeam, language: ApiLanguage): PublicTeam {
   return {
     id: raw.id,
     slug: raw.slug,
-    name: raw.name,
+    name: localize(raw.name, language),
     avatarUrl: absoluteUrl(raw.avatar_url),
     website: raw.website,
-    country: localize(raw.country),
-    city: localize(raw.city),
-    description: localize(raw.description),
-    specialization: localize(raw.specialization),
+    country: localize(raw.country, language),
+    city: localize(raw.city, language),
+    description: localize(raw.description, language),
+    specialization: localize(raw.specialization, language),
     socialLinks: mapSocialLinks(raw.social_links),
     membersCount: raw.members_count ?? 0,
     memberAvatars: (raw.member_avatars ?? []).map((avatar) => absoluteUrl(avatar) ?? avatar),
     members: (raw.members ?? []).map((member) => ({
       id: member.id,
       slug: member.slug,
-      name: member.name,
+      name: localize(member.name, language),
       avatarUrl: absoluteUrl(member.avatar_url),
     })),
   };
 }
 
 export const teamsAPI = {
-  list: async (params?: {
-    search?: string;
-    per_page?: number;
-    page?: number;
-  }): Promise<PublicTeam[]> => {
+  list: async (
+    language: ApiLanguage,
+    params?: {
+      search?: string;
+      per_page?: number;
+      page?: number;
+    }
+  ): Promise<PublicTeam[]> => {
     const response = await api.get<TeamsListResponse>("/v1/art-ua-info/teams", {
-      params: { language: "uk", ...params },
+      params: { language, ...params },
     });
-    return response.data.data.map(mapTeam);
+    return response.data.data.map((raw) => mapTeam(raw, language));
   },
 
   // З пагінацією (meta) — для /authors, симетрично до artistsAPI.browse.
-  browse: async (params?: {
-    search?: string;
-    per_page?: number;
-    page?: number;
-  }): Promise<TeamsBrowseResult> => {
+  browse: async (
+    language: ApiLanguage,
+    params?: {
+      search?: string;
+      per_page?: number;
+      page?: number;
+    }
+  ): Promise<TeamsBrowseResult> => {
     const response = await api.get<TeamsListResponse>("/v1/art-ua-info/teams", {
-      params: { language: "uk", ...params },
+      params: { language, ...params },
     });
     return {
-      data: response.data.data.map(mapTeam),
+      data: response.data.data.map((raw) => mapTeam(raw, language)),
       meta: response.data.meta ?? {
         current_page: 1,
         last_page: 1,
@@ -176,23 +185,24 @@ export const teamsAPI = {
     };
   },
 
-  get: async (slug: string): Promise<PublicTeam> => {
+  get: async (slug: string, language: ApiLanguage): Promise<PublicTeam> => {
     const response = await api.get<TeamResponse>(`/v1/art-ua-info/teams/${slug}`, {
-      params: { language: "uk" },
+      params: { language },
     });
-    return mapTeam(response.data.data);
+    return mapTeam(response.data.data, language);
   },
 
   projects: async (
     slug: string,
+    language: ApiLanguage,
     params?: { per_page?: number; page?: number }
   ): Promise<PublicArtistProject[]> => {
     const response = await api.get<TeamProjectsResponse>(
       `/v1/art-ua-info/teams/${slug}/projects`,
       {
-        params: { language: "uk", ...params },
+        params: { language, ...params },
       }
     );
-    return response.data.data.map(mapArtistProject);
+    return response.data.data.map((raw) => mapArtistProject(raw, language));
   },
 };

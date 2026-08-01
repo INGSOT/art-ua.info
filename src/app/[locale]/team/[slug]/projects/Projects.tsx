@@ -3,16 +3,19 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import { Card, CardContent } from "../../../../../components/ui/card";
 import { teamsAPI } from "../../../../../lib/api/teams";
 import type { PublicArtistProject } from "../../../../../lib/api/authorProfiles";
+import { localeToApiLanguage, type Locale } from "../../../../../i18n/routing";
 
 const FALLBACK_COVER = "/artists/artist-photo-5.png";
 
 export default function Projects() {
   const t = useTranslations("Team.projects");
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
   const teamProjectFilterButtons = [
     { id: "all", text: t("filters.all") },
     { id: "new", text: t("filters.new") },
@@ -30,7 +33,7 @@ export default function Projects() {
     (async () => {
       setLoading(true);
       try {
-        const result = await teamsAPI.projects(slug, { per_page: 50 });
+        const result = await teamsAPI.projects(slug, language, { per_page: 50 });
         if (!ignore) setProjects(result);
       } catch (error) {
         if (!ignore) {
@@ -45,7 +48,7 @@ export default function Projects() {
     return () => {
       ignore = true;
     };
-  }, [slug]);
+  }, [slug, language]);
 
   if (loading) {
     return (

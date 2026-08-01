@@ -5,10 +5,12 @@ import { projectsAPI, type PublicProjectDetail } from "../../../../lib/api/proje
 import type { Project, SalesStatus } from "../../../../data/projectsData";
 import ProjectPageClient from "./ProjectPageClient";
 import { saveArtProfileLabel, siteProfileLabel } from "../../../../lib/siteDomains";
+import { localeToApiLanguage, type Locale } from "../../../../i18n/routing";
 
 interface ProjectPageProps {
   params: Promise<{
     slug: string;
+    locale: Locale;
   }>;
 }
 
@@ -127,12 +129,12 @@ function mapToProject(raw: PublicProjectDetail, t: ProjectDetailTranslations): P
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const t = await getTranslations("Projects.detail");
 
   let raw: PublicProjectDetail | null = null;
   try {
-    raw = await projectsAPI.show(slug);
+    raw = await projectsAPI.show(slug, localeToApiLanguage(locale));
   } catch (error) {
     console.error(`Failed to load project "${slug}":`, error);
   }

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { isAxiosError } from "axios";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useAuth } from "../../../../context/AuthContext";
 import { useToast } from "../../../../context/ToastContext";
 import { publicCatalogsAPI, type CatalogLikeResponse } from "../../../../lib/api/publicCatalogs";
+import { localeToApiLanguage, type Locale } from "../../../../i18n/routing";
 
 interface CatalogLikeButtonProps {
   catalogId: number;
@@ -26,6 +27,8 @@ export default function CatalogLikeButton({
   const { user, loading: authLoading } = useAuth();
   const { showToast } = useToast();
   const t = useTranslations("Catalogs.like");
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
 
   // Сторінка рендериться на сервері без токена користувача, тож is_liked із
   // SSR-фетчу завжди false. Після визначення авторизації на клієнті
@@ -35,7 +38,7 @@ export default function CatalogLikeButton({
 
     let cancelled = false;
     publicCatalogsAPI
-      .show(catalogId)
+      .show(catalogId, language)
       .then((catalog) => {
         if (cancelled) return;
         setIsLiked(catalog.isLiked);
@@ -48,7 +51,7 @@ export default function CatalogLikeButton({
     return () => {
       cancelled = true;
     };
-  }, [authLoading, user, catalogId]);
+  }, [authLoading, user, catalogId, language]);
 
   const handleLikeClick = async () => {
     if (likeLoading) return;

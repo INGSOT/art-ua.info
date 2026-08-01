@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import { Card, CardContent } from "../../../../../components/ui/card";
 import EmptyState from "../../../../../components/ui/empty-state";
 import { projectsAPI, type MyProjectListItem } from "../../../../../lib/api/projects";
 import { useProfileView } from "../../ProfileViewContext";
 import { withProfileId } from "../../../../../lib/authorQuery";
+import { localeToApiLanguage, type Locale } from "../../../../../i18n/routing";
 
 export default function Projects() {
   const t = useTranslations("Profile.projects");
+  const locale = useLocale() as Locale;
   const projectFilterButtons = [
     { id: "all", text: t("filters.all") },
     { id: "newest", text: t("filters.newest") },
@@ -25,7 +27,7 @@ export default function Projects() {
     let cancelled = false;
     setLoading(true);
     projectsAPI
-      .myCompletedList()
+      .myCompletedList(localeToApiLanguage(locale))
       .then((projects) => {
         if (!cancelled) setMyProjects(projects);
       })
@@ -35,7 +37,7 @@ export default function Projects() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locale]);
 
   const hasProjects = myProjects.length > 0;
 

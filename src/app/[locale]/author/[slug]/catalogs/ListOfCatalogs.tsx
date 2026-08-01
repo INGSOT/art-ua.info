@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Catalog from "./Catalog";
 import { publicCatalogsAPI, type PublicCatalog } from "../../../../../lib/api/publicCatalogs";
 import { useAuthorProfile } from "../../AuthorProfileContext";
+import { localeToApiLanguage, type Locale } from "../../../../../i18n/routing";
 
 export default function ListOfCatalogs() {
   const t = useTranslations("Authors.profile");
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
   const { slug, loading: profileLoading, notFound } = useAuthorProfile();
   const [myCatalogs, setMyCatalogs] = useState<PublicCatalog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,7 +22,7 @@ export default function ListOfCatalogs() {
     (async () => {
       setLoading(true);
       try {
-        const result = await publicCatalogsAPI.browse({ author_slug: slug, per_page: 50 });
+        const result = await publicCatalogsAPI.browse(language, { author_slug: slug, per_page: 50 });
         if (!ignore) setMyCatalogs(result.data);
       } catch (error) {
         if (!ignore) {
@@ -34,7 +37,7 @@ export default function ListOfCatalogs() {
     return () => {
       ignore = true;
     };
-  }, [slug, profileLoading, notFound]);
+  }, [slug, profileLoading, notFound, language]);
 
   if (notFound) {
     return null;
