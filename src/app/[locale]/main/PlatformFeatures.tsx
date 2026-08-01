@@ -1,8 +1,10 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { homeAPI } from "../../../lib/api/home";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 export default async function PlatformFeatures() {
   const t = await getTranslations("Main.platformFeatures");
+  const locale = (await getLocale()) as Locale;
   let features: { title: string; description: string }[] = [
     { title: t("inspiration.title"), description: t("inspiration.description") },
     { title: t("recognition.title"), description: t("recognition.description") },
@@ -10,7 +12,7 @@ export default async function PlatformFeatures() {
   ];
 
   try {
-    const loaded = await homeAPI.getPlatformFeatures();
+    const loaded = await homeAPI.getPlatformFeatures(localeToApiLanguage(locale));
     if (loaded.length) {
       features = loaded;
     }

@@ -1,16 +1,18 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { supportArtistsData } from "../../../data/mainData";
 import { homeAPI } from "../../../lib/api/home";
 import { SAVE_ART_URL } from "../../../lib/siteDomains";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 export default async function SupportArtists() {
   const t = await getTranslations("Main.supportArtists");
+  const locale = (await getLocale()) as Locale;
   let title: string = t("title");
   let linkText: string = supportArtistsData.link;
   let backgroundImage: string = supportArtistsData.backgroundImage;
 
   try {
-    const { first } = await homeAPI.getAdBlocks();
+    const { first } = await homeAPI.getAdBlocks(localeToApiLanguage(locale));
     if (first.title) title = first.title;
     if (first.buttonText) linkText = first.buttonText;
     if (first.image) backgroundImage = first.image;

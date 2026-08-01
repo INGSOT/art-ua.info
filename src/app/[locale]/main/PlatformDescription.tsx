@@ -1,8 +1,10 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { homeAPI } from "../../../lib/api/home";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 export default async function PlatformDescription() {
   const t = await getTranslations("Main.platformDescription");
+  const locale = (await getLocale()) as Locale;
   let data = {
     tagline: t("tagline"),
     title: t("title"),
@@ -11,7 +13,7 @@ export default async function PlatformDescription() {
   };
 
   try {
-    const description = await homeAPI.getPlatformDescription();
+    const description = await homeAPI.getPlatformDescription(localeToApiLanguage(locale));
     data = {
       tagline: description.tagline || data.tagline,
       title: description.title || data.title,

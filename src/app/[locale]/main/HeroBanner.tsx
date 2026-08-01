@@ -1,15 +1,17 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Header from "../../../components/Header";
 import { heroBannerData } from "../../../data/mainData";
 import { homeAPI } from "../../../lib/api/home";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 export default async function HeroBanner() {
   const t = await getTranslations("Main.hero");
+  const locale = (await getLocale()) as Locale;
   let heroTitle: string = t("text");
   let posterImage: string | null = null;
 
   try {
-    const hero = await homeAPI.getHero();
+    const hero = await homeAPI.getHero(localeToApiLanguage(locale));
     if (hero.title) {
       heroTitle = hero.title;
     }

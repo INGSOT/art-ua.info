@@ -1,10 +1,11 @@
 'use client';
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from 'react';
 import { Link } from "@/src/i18n/navigation";
 import { useRouter } from 'next/navigation';
 import SearchSection from './SearchSection';
+import { localeToApiLanguage, type Locale } from "@/src/i18n/routing";
 import {
   buildSearchUrl,
   getGlobalSearchResults,
@@ -57,6 +58,8 @@ function SuggestionsList({
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const t = useTranslations("Modals.search");
+  const locale = useLocale() as Locale;
+  const language = localeToApiLanguage(locale);
   const router = useRouter();
   const [value, setValue] = useState('');
   const [submittedQuery, setSubmittedQuery] = useState('');
@@ -77,7 +80,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
     const requestId = ++suggestionsRequestId.current;
     const timeout = setTimeout(() => {
-      getGlobalSearchSuggestions(trimmed)
+      getGlobalSearchSuggestions(trimmed, language)
         .then((items) => {
           if (suggestionsRequestId.current === requestId) setSuggestions(items);
         })
@@ -87,7 +90,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [value]);
+  }, [value, language]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -123,7 +126,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       return;
     }
 
-    const results = await getGlobalSearchResults(trimmed);
+    const results = await getGlobalSearchResults(trimmed, language);
     const withHits = results.filter((r) => r.count > 0);
 
     if (withHits.length === 1) {

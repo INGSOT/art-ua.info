@@ -1,4 +1,5 @@
 import api from "./auth";
+import type { ApiLanguage } from "../../i18n/routing";
 
 type LocalizedText = string | { uk: string; en?: string };
 
@@ -77,76 +78,77 @@ interface HomeResponse {
   };
 }
 
-function localize(value: LocalizedText | null | undefined): string {
+function localize(value: LocalizedText | null | undefined, language: ApiLanguage): string {
   if (!value) return "";
-  return typeof value === "string" ? value : value.uk;
+  if (typeof value === "string") return value;
+  return language === "en" ? value.en ?? value.uk : value.uk;
 }
 
-function mapAdBlock(raw: RawHomeAdBlock): HomeAdBlock {
+function mapAdBlock(raw: RawHomeAdBlock, language: ApiLanguage): HomeAdBlock {
   return {
-    title: localize(raw.title),
-    buttonText: localize(raw.button_text),
+    title: localize(raw.title, language),
+    buttonText: localize(raw.button_text, language),
     image: raw.image,
   };
 }
 
 export const homeAPI = {
-  getPartners: async (): Promise<{ title: string; items: HomePartner[] }> => {
+  getPartners: async (language: ApiLanguage): Promise<{ title: string; items: HomePartner[] }> => {
     const response = await api.get<HomeResponse>("/v1/art-ua-info/home", {
-      params: { language: "uk" },
+      params: { language },
     });
     const { title, items } = response.data.data.partners;
     return {
-      title: localize(title),
+      title: localize(title, language),
       items: items.map((partner) => ({
         logo: partner.logo,
-        name: localize(partner.name),
-        description: localize(partner.description),
+        name: localize(partner.name, language),
+        description: localize(partner.description, language),
         url: partner.url,
       })),
     };
   },
 
-  getHero: async (): Promise<HomeHero> => {
+  getHero: async (language: ApiLanguage): Promise<HomeHero> => {
     const response = await api.get<HomeResponse>("/v1/art-ua-info/home", {
-      params: { language: "uk" },
+      params: { language },
     });
     const hero = response.data.data.hero;
     return {
-      title: localize(hero.title),
+      title: localize(hero.title, language),
       imagePoster: hero.image_poster,
       imagePosterMobile: hero.image_poster_mobile,
     };
   },
 
-  getPlatformDescription: async (): Promise<HomePlatformDescription> => {
+  getPlatformDescription: async (language: ApiLanguage): Promise<HomePlatformDescription> => {
     const response = await api.get<HomeResponse>("/v1/art-ua-info/home", {
-      params: { language: "uk" },
+      params: { language },
     });
     const description = response.data.data.platform_description;
     return {
-      tagline: localize(description.tagline),
-      title: localize(description.title),
-      subtitle: localize(description.subtitle),
+      tagline: localize(description.tagline, language),
+      title: localize(description.title, language),
+      subtitle: localize(description.subtitle, language),
       paragraphs: description.paragraphs,
     };
   },
 
-  getPlatformFeatures: async (): Promise<HomePlatformFeature[]> => {
+  getPlatformFeatures: async (language: ApiLanguage): Promise<HomePlatformFeature[]> => {
     const response = await api.get<HomeResponse>("/v1/art-ua-info/home", {
-      params: { language: "uk" },
+      params: { language },
     });
     return response.data.data.platform_features;
   },
 
-  getAdBlocks: async (): Promise<{ first: HomeAdBlock; second: HomeAdBlock }> => {
+  getAdBlocks: async (language: ApiLanguage): Promise<{ first: HomeAdBlock; second: HomeAdBlock }> => {
     const response = await api.get<HomeResponse>("/v1/art-ua-info/home", {
-      params: { language: "uk" },
+      params: { language },
     });
     const { first, second } = response.data.data.ad_blocks;
     return {
-      first: mapAdBlock(first),
-      second: mapAdBlock(second),
+      first: mapAdBlock(first, language),
+      second: mapAdBlock(second, language),
     };
   },
 };

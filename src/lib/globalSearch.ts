@@ -5,6 +5,7 @@ import { projectsAPI } from "./api/projects";
 import { publicServicesAPI } from "./api/publicServices";
 import { publicCatalogsAPI } from "./api/publicCatalogs";
 import { newsAPI, type PublicNewsListItem } from "./api/news";
+import type { ApiLanguage } from "../i18n/routing";
 
 export type GlobalSearchCategoryId =
   | "participants"
@@ -60,19 +61,21 @@ function safe<T>(promise: Promise<T>, fallback: T): Promise<T> {
 
 // Новини не підтримують серверний пошук (лише per_page/page/category) — сторінка
 // /news-events так само тягне повний список і фільтрує заголовок на клієнті.
-// Кешуємо один раз на модуль, щоб не перезавантажувати сотні новин на кожен keystroke.
-let newsCachePromise: Promise<PublicNewsListItem[]> | null = null;
-function loadAllNews(): Promise<PublicNewsListItem[]> {
-  if (!newsCachePromise) {
-    newsCachePromise = newsAPI
-      .list({ per_page: 200, language: "uk" })
+// Кешуємо один раз на мову, щоб не перезавантажувати сотні новин на кожен keystroke.
+const newsCachePromises = new Map<ApiLanguage, Promise<PublicNewsListItem[]>>();
+function loadAllNews(language: ApiLanguage): Promise<PublicNewsListItem[]> {
+  let promise = newsCachePromises.get(language);
+  if (!promise) {
+    promise = newsAPI
+      .list({ per_page: 200, language })
       .then((result) => result.items)
       .catch((error) => {
-        newsCachePromise = null;
+        newsCachePromises.delete(language);
         throw error;
       });
+    newsCachePromises.set(language, promise);
   }
-  return newsCachePromise;
+  return promise;
 }
 
 function matchNews(items: PublicNewsListItem[], normalizedQuery: string): PublicNewsListItem[] {
@@ -112,7 +115,10 @@ async function fetchParticipants(
  * сторінку з `?search=…` (текст пошуку — назва сутності, щоб на сторінці списку залишився
  * релевантний набір).
  */
-export async function getGlobalSearchSuggestions(rawQuery: string): Promise<GlobalSearchSuggestion[]> {
+export async function getGlobalSearchSuggestions(
+  rawQuery: string,
+  language: ApiLanguage
+): Promise<GlobalSearchSuggestion[]> {
   const trimmed = rawQuery.trim();
   if (!trimmed) return [];
   const normalized = trimmed.toLowerCase();
@@ -123,7 +129,7 @@ export async function getGlobalSearchSuggestions(rawQuery: string): Promise<Glob
     safe(publicServicesAPI.browse({ search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
     safe(publicCatalogsAPI.browse({ search: trimmed, per_page: SUGGESTIONS_PER_CATEGORY }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
     safe(
-      loadAllNews().then((items) => matchNews(items, normalized).slice(0, SUGGESTIONS_PER_CATEGORY)),
+      loadAllNews(language).then((items) => matchNews(items, normalized).slice(0, SUGGESTIONS_PER_CATEGORY)),
       []
     ),
   ]);
@@ -182,7 +188,10 @@ export async function getGlobalSearchSuggestions(rawQuery: string): Promise<Glob
  * Підсумок пошуку по всіх розділах — реальна кількість збігів з бекенда
  * (per_page: 1, бо потрібен лише meta.total, а не самі елементи).
  */
-export async function getGlobalSearchResults(rawQuery: string): Promise<GlobalSearchCategoryResult[]> {
+export async function getGlobalSearchResults(
+  rawQuery: string,
+  language: ApiLanguage
+): Promise<GlobalSearchCategoryResult[]> {
   const trimmed = rawQuery.trim();
   const empty: GlobalSearchCategoryResult[] = [
     { id: "participants", label: LABEL_PARTICIPANTS, href: PARTICIPANTS_PATH, count: 0 },
@@ -199,7 +208,7 @@ export async function getGlobalSearchResults(rawQuery: string): Promise<GlobalSe
     safe(projectsAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { sort_options: [], categories: [], statuses: [], parameters: [] } }),
     safe(publicServicesAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
     safe(publicCatalogsAPI.browse({ search: trimmed, per_page: 1 }), { data: [], meta: { current_page: 1, last_page: 1, per_page: 0, total: 0 }, filters: { categories: [] } }),
-    safe(loadAllNews().then((items) => matchNews(items, normalized).length), 0),
+    safe(loadAllNews(language).then((items) => matchNews(items, normalized).length), 0),
   ]);
 
   return [

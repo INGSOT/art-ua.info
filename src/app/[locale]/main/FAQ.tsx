@@ -6,14 +6,16 @@ import {
 } from "../../../components/ui/accordion";
 import { Button } from "../../../components/ui/button";
 import { Link } from "@/src/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { faqAPI } from "../../../lib/api/faq";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 export default async function FAQ() {
   const t = await getTranslations("Main.faq");
+  const locale = (await getLocale()) as Locale;
   let categories: Awaited<ReturnType<typeof faqAPI.list>> = [];
   try {
-    categories = await faqAPI.list();
+    categories = await faqAPI.list(localeToApiLanguage(locale));
   } catch (error) {
     console.error("Failed to load FAQ:", error);
   }

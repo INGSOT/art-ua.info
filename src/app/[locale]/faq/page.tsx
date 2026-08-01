@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
@@ -14,11 +14,13 @@ import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from 
 import { FilterSection as FilterSectionType } from "../../../components/filters/filterConfig";
 import ListOfFAQ, { FAQItem } from "./ListOfFAQ";
 import { faqAPI, PublicFaqCategory } from "../../../lib/api/faq";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 const ALL_CATEGORIES = "all";
 
 export default function FAQPage() {
     const t = useTranslations("Faq.page");
+    const locale = useLocale() as Locale;
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -30,7 +32,7 @@ export default function FAQPage() {
         let isMounted = true;
 
         faqAPI
-            .list()
+            .list(localeToApiLanguage(locale))
             .then((data) => {
                 if (isMounted) {
                     setCategories(data);
@@ -48,7 +50,7 @@ export default function FAQPage() {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [locale]);
 
     const faqData = useMemo<FAQItem[]>(() => {
         return categories.flatMap((category) =>

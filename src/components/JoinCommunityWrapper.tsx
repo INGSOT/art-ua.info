@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import { Button } from "../components/ui/button";
 import { joinCommunityWrapperData } from "../data/joinCommunityWrapperData";
 import { useAuth } from "../context/AuthContext";
 import { homeAPI } from "../lib/api/home";
+import { localeToApiLanguage, type Locale } from "../i18n/routing";
 import LoginModal from "./LoginModal";
 import RegistrationModal from "./RegistrationModal";
 import ResetPassModal from "./ResetPassModal";
 
 export default function JoinCommunityWrapper() {
   const { user } = useAuth();
+  const locale = useLocale() as Locale;
   const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
   const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
   const [content, setContent] = useState({
@@ -22,7 +25,7 @@ export default function JoinCommunityWrapper() {
     let isMounted = true;
 
     homeAPI
-      .getAdBlocks()
+      .getAdBlocks(localeToApiLanguage(locale))
       .then(({ second }) => {
         if (!isMounted) return;
         setContent({
@@ -37,7 +40,7 @@ export default function JoinCommunityWrapper() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [locale]);
 
   const closeAuthModal = () => {
     setDisableAuthAnimation(false);

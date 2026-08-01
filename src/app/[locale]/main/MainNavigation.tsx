@@ -1,13 +1,15 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/src/i18n/navigation";
 import { catalogsAPI, type ArtCategory } from "../../../lib/api/catalogs";
 import { navigationItems } from "../../../data/mainData";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 export default async function MainNavigation() {
   const t = await getTranslations("Main.navigation");
+  const locale = (await getLocale()) as Locale;
   let categories: ArtCategory[] = [];
   try {
-    categories = await catalogsAPI.categories();
+    categories = await catalogsAPI.categories({ language: localeToApiLanguage(locale) });
   } catch (error) {
     console.error("Failed to load categories:", error);
   }

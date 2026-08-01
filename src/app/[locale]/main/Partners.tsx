@@ -1,13 +1,15 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Card, CardContent } from "../../../components/ui/card";
 import { ScrollArea, ScrollBar } from "../../../components/ui/scroll-area";
 import { homeAPI } from "../../../lib/api/home";
+import { localeToApiLanguage, type Locale } from "../../../i18n/routing";
 
 export default async function Partners() {
   const t = await getTranslations("Main.partners");
+  const locale = (await getLocale()) as Locale;
   let partners: Awaited<ReturnType<typeof homeAPI.getPartners>> = { title: t("title"), items: [] };
   try {
-    partners = await homeAPI.getPartners();
+    partners = await homeAPI.getPartners(localeToApiLanguage(locale));
   } catch (error) {
     console.error("Failed to load partners:", error);
   }

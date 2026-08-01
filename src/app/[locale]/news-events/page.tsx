@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
@@ -12,6 +12,7 @@ import ListOfNews, { type NewsListCardItem } from "./ListOfNews";
 import PaginationSection from "../../../components/PaginationSection";
 import Image from "next/image";
 import { newsAPI, type PublicNewsListItem } from "../../../lib/api/news";
+import { localeToApiLanguage, type Locale } from "@/src/i18n/routing";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -33,6 +34,7 @@ const mapToCardItem = (item: PublicNewsListItem): NewsListCardItem => ({
 
 export default function NewsEventsPage() {
     const t = useTranslations("News.list");
+    const locale = useLocale() as Locale;
     const [currentPage, setCurrentPage] = useState(1);
     const [isSortOpen, setIsSortOpen] = useState(false);
     const [allNews, setAllNews] = useState<PublicNewsListItem[]>([]);
@@ -57,7 +59,7 @@ export default function NewsEventsPage() {
 
         setIsLoading(true);
         newsAPI
-            .list({ per_page: 200, language: "uk" })
+            .list({ per_page: 200, language: localeToApiLanguage(locale) })
             .then((result) => {
                 if (isMounted) {
                     setAllNews(result.items);
@@ -77,7 +79,7 @@ export default function NewsEventsPage() {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [locale]);
 
     const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
     const filteredNews = normalizedSearchQuery

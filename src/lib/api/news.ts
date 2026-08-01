@@ -121,14 +121,14 @@ function mapDetail(raw: RawNewsDetail): PublicNewsDetail {
 }
 
 export const newsAPI = {
-  list: async (params?: {
+  list: async (params: {
     per_page?: number;
     page?: number;
     category?: NewsCategory;
-    language?: "uk" | "en";
+    language: "uk" | "en";
   }): Promise<NewsListResult> => {
     const response = await api.get<NewsListResponse>("/v1/art-ua-info/news", {
-      params: { language: "uk", ...params },
+      params,
     });
     return {
       items: response.data.data.map(mapListItem),
@@ -136,7 +136,7 @@ export const newsAPI = {
     };
   },
 
-  get: async (slug: string, language: "uk" | "en" = "uk"): Promise<PublicNewsDetail> => {
+  get: async (slug: string, language: "uk" | "en"): Promise<PublicNewsDetail> => {
     const response = await api.get<NewsDetailResponse>(`/v1/art-ua-info/news/${slug}`, {
       params: { language },
     });

@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { newsAPI, type PublicNewsListItem } from "../lib/api/news";
+import { localeToApiLanguage, type Locale } from "@/src/i18n/routing";
 
 const LATEST_COUNT = 5;
 const SCROLL_STEP = 500;
 
 export default function LatestNews() {
   const t = useTranslations("News.latest");
+  const locale = useLocale() as Locale;
   const [latestNews, setLatestNews] = useState<PublicNewsListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredArrow, setHoveredArrow] = useState<"prev" | "next" | null>(null);
@@ -21,7 +23,7 @@ export default function LatestNews() {
     let isMounted = true;
 
     newsAPI
-      .list({ per_page: LATEST_COUNT, language: "uk" })
+      .list({ per_page: LATEST_COUNT, language: localeToApiLanguage(locale) })
       .then((result) => {
         if (isMounted) {
           setLatestNews(result.items);
@@ -41,7 +43,7 @@ export default function LatestNews() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [locale]);
 
   const scrollByStep = (direction: 1 | -1) => {
     trackRef.current?.scrollBy({

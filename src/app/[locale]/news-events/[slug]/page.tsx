@@ -2,20 +2,21 @@ import { notFound } from "next/navigation";
 import Header from "../../../../components/Header";
 import JoinCommunityWrapper from "../../../../components/JoinCommunityWrapper";
 import { newsAPI } from "../../../../lib/api/news";
+import { localeToApiLanguage, type Locale } from "@/src/i18n/routing";
 import ArticleText from "./ArticleText";
 import Photo from "./Photo";
 import SocialLinksBar from "./SocialLinksBar";
 
 interface ArticlePageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: Locale }>;
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
 
   let article;
   try {
-    article = await newsAPI.get(slug, "uk");
+    article = await newsAPI.get(slug, localeToApiLanguage(locale));
   } catch {
     article = null;
   }

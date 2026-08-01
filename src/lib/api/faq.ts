@@ -1,4 +1,5 @@
 import api from "./auth";
+import type { ApiLanguage } from "../../i18n/routing";
 
 export interface PublicFaqQuestion {
   id: number;
@@ -20,9 +21,9 @@ interface FaqResponse {
 }
 
 export const faqAPI = {
-  list: async (): Promise<PublicFaqCategory[]> => {
+  list: async (language: ApiLanguage): Promise<PublicFaqCategory[]> => {
     const response = await api.get<FaqResponse>("/v1/art-ua-info/faq", {
-      params: { language: "uk" },
+      params: { language },
     });
     return response.data.data.categories;
   },
