@@ -1,0 +1,24 @@
+<?php
+
+// Copy to deploy.local.php and fill in real values.
+// deploy.local.php is gitignored — never commit credentials.
+
+// ─── Remote server (same host/user as backend) ────────────────────────────────
+const DEP_HOST = '95.67.62.235';
+const DEP_PORT = 22;
+const DEP_USER = 'developer';
+
+// Пользователь с sudo-правами — нужен для управления systemd-юнитом
+// (developer не в sudoers; admin — в sudoers).
+const DEP_USER_ROOT = 'admin';
+const DEP_PASSWORD_ROOT = 'your-admin-password';
+
+// SSH key path. Empty string = use password via sshpass instead.
+const DEP_SSH_KEY = '~/.ssh/id_rsa';
+const DEP_PASSWORD = '';
+
+// ─── Paths / service ────────────────────────────────────────────────────────────
+const DEP_PROJECT_PATH = '/home/developer/web/art-ua-unfo.dev2025.ingsot.com/public_html/art-ua.info';
+const DEP_SITE_DOMAIN = 'art-ua-unfo.dev2025.ingsot.com';
+const DEP_SERVICE_NAME = 'art-ua-info';
+const DEP_APP_PORT = 3002;
