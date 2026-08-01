@@ -11,6 +11,9 @@ import FAQ from "./main/FAQ";
 import Partners from "./main/Partners";
 import JoinCommunityWrapper from "../components/JoinCommunityWrapper";
 import { projectsAPI } from "../lib/api/projects";
+import { publicCatalogsAPI, type PublicCatalog } from "../lib/api/publicCatalogs";
+import { artistsAPI } from "../lib/api/artists";
+import type { PublicArtist } from "../lib/api/artists";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +44,23 @@ export default async function Home() {
     title: project.title,
     image: project.cover_url ?? FALLBACK_PROJECT_IMAGE,
     likes: project.likes_count,
+    tags: project.tags,
   }));
+
+  let catalogs: PublicCatalog[] = [];
+  try {
+    const result = await publicCatalogsAPI.browse({ per_page: 30, sort_by: "likes" });
+    catalogs = result.data;
+  } catch (error) {
+    console.error("Failed to load catalogs:", error);
+  }
+
+  let artists: PublicArtist[] = [];
+  try {
+    artists = await artistsAPI.list({ per_page: 30 });
+  } catch (error) {
+    console.error("Failed to load artists:", error);
+  }
 
   return (
     <>
@@ -50,9 +69,9 @@ export default async function Home() {
     <PlatformDescription />
     <PlatformFeatures />
     <FeaturedWorks artworks={featuredProjectSlides} />
-    <ImageCatalog seed={seed} />
+    <ImageCatalog seed={seed} catalogs={catalogs} />
     <SupportArtists />
-    <JoinCommunity />
+    <JoinCommunity artists={artists} />
     <LatestNews />
     <FAQ />
     <Partners />

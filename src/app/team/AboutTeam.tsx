@@ -1,15 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { Button } from "../../components/ui/button";
 import { useTeamProfile } from "./TeamProfileContext";
-import { SITE_URL, siteProfileLabel } from "../../lib/siteDomains";
 
 const FALLBACK_AVATAR = "/artists/artist-photo-5.png";
 
 export default function AboutTeam() {
-  const [hoveredButton, setHoveredButton] = useState(false);
   const { loading, notFound, team } = useTeamProfile();
 
   if (loading) {
@@ -31,9 +27,6 @@ export default function AboutTeam() {
       </section>
     );
   }
-
-  const profileUrl = `${SITE_URL}/${team.slug}`;
-  const buttonLabel = siteProfileLabel(team.slug);
 
   return (
     <section className="w-full bg-[#414141] py-16 px-4">
@@ -57,37 +50,6 @@ export default function AboutTeam() {
         {team.specialization && (
           <p className="text-white text-center mb-8">{team.specialization}</p>
         )}
-
-        <Button
-          asChild
-          className={`h-[60px] flex items-stretch transition-all duration-300 rounded-none p-0 w-full md:w-auto ${
-            hoveredButton ? "bg-[#FECC39] hover:bg-[#FECC39]" : "bg-[#343434] hover:bg-[#343434]"
-          }`}
-          onMouseEnter={() => setHoveredButton(true)}
-          onMouseLeave={() => setHoveredButton(false)}
-        >
-          <a href={profileUrl} target="_blank" rel="noopener noreferrer" className="flex items-stretch w-full">
-            <span
-              className={`flex items-center justify-center flex-1 px-6 font-bold transition-colors duration-300 whitespace-nowrap ${
-                hoveredButton ? "text-[#343434]" : "text-[#FECC39]"
-              }`}
-            >
-              {buttonLabel}
-            </span>
-            <div
-              className={`flex items-center justify-center w-[60px] flex-shrink-0 transition-colors duration-300 ${
-                hoveredButton ? "border-l border-[#343434]" : "border-l border-[#FECC39]"
-              }`}
-            >
-              <Image
-                src={hoveredButton ? "/grey_triangle_right.svg" : "/yellow_triangle_right.svg"}
-                alt=""
-                width={24}
-                height={24}
-              />
-            </div>
-          </a>
-        </Button>
       </div>
     </section>
   );

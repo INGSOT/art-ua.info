@@ -12,7 +12,14 @@ export interface FeaturedWorkSlide {
   title: string;
   image: string;
   likes: number;
+  tags: string[];
 }
+
+const MAX_VISIBLE_TAGS = 5;
+// Нижче цієї кількості робіт дублювання для безкінечної прокрутки виглядає як
+// "зациклений" повтор 1-2 карток, а не плавна стрічка — тому просто показуємо
+// реальну кількість без анімації.
+const MIN_ITEMS_FOR_LOOP = 4;
 
 interface FeaturedWorksProps {
   artworks: FeaturedWorkSlide[];
@@ -54,28 +61,35 @@ function TagBadge({ label }: TagBadgeProps) {
 
 export default function FeaturedWorks({ artworks }: FeaturedWorksProps) {
 const scrollRef = useRef<HTMLDivElement>(null);
+const shouldLoop = artworks.length >= MIN_ITEMS_FOR_LOOP;
 
-// Дублируем массив для бесконечной прокрутки
-const duplicatedArtworks = [...artworks, ...artworks, ...artworks];
+// Дублюємо масив для безкінечної прокрутки лише коли робіт достатньо,
+// інакше цикл із 1-3 карток виглядає як зациклений глюк.
+const displayArtworks = shouldLoop ? [...artworks, ...artworks, ...artworks] : artworks;
+
+const uniqueTags = Array.from(new Set(artworks.flatMap((artwork) => artwork.tags))).slice(
+  0,
+  MAX_VISIBLE_TAGS
+);
 
 useEffect(() => {
   const scrollContainer = scrollRef.current;
-  if (!scrollContainer || artworks.length === 0) return;
+  if (!scrollContainer || !shouldLoop) return;
 
   let scrollPosition = 0;
   const scrollSpeed = 1; // пикселей за кадр
-  const itemWidth = 400.5; // 400px ширина + 0.5px gap
+  const itemWidth = 402; // 400px ширина + 2px gap (gap-0.5 = 0.125rem)
   const totalWidth = artworks.length * itemWidth;
 
   const scroll = () => {
     scrollPosition += scrollSpeed;
-    
+
     // Когда прокрутили один полный набор, возвращаемся к началу второго набора
     if (scrollPosition >= totalWidth) {
       scrollPosition = 0;
       scrollContainer.scrollLeft = 0;
     }
-    
+
     scrollContainer.scrollLeft = scrollPosition;
     requestAnimationFrame(scroll);
   };
@@ -83,7 +97,7 @@ useEffect(() => {
   const animationId = requestAnimationFrame(scroll);
 
   return () => cancelAnimationFrame(animationId);
-}, [artworks.length]);
+}, [artworks.length, shouldLoop]);
 
     return (
     <section className="flex flex-col items-center gap-[30px] px-0 py-10 md:py-20 w-full" style={{ backgroundColor: "#414141" }}>
@@ -100,18 +114,22 @@ useEffect(() => {
         </h4>
       </div>
 
-      <div className="flex w-full max-w-[1440px] items-start gap-2 px-4 flex-wrap">
-        {featuredWorksData.tags.map((tag, index) => (
-          <TagBadge key={index} label={tag.label} />
-        ))}
-      </div>
+      {uniqueTags.length > 0 && (
+        <div className="flex w-full max-w-[1440px] items-start gap-2 px-4 flex-wrap">
+          {uniqueTags.map((tag) => (
+            <TagBadge key={tag} label={tag} />
+          ))}
+        </div>
+      )}
 
-      <div 
+      <div
         ref={scrollRef}
-        className="flex w-full max-w-[1440px] items-start gap-0.5 p-0.5 bg-id-7 overflow-x-hidden border-2 border-solid border-[#272727] [&::-webkit-scrollbar]:hidden"
+        className={`flex w-full max-w-[1440px] items-start gap-0.5 p-0.5 bg-[#272727] border-2 border-solid border-[#272727] [&::-webkit-scrollbar]:hidden ${
+          shouldLoop ? "overflow-x-hidden" : "overflow-x-auto"
+        }`}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {duplicatedArtworks.map((artwork, index) => (
+        {displayArtworks.map((artwork, index) => (
           <div
             key={`${artwork.slug}-${index}`}
             className="flex flex-col min-w-[400px] h-[300px] items-start justify-center gap-2.5 relative"
@@ -143,7 +161,7 @@ useEffect(() => {
 
       <Button
         asChild
-        className="w-[300px] h-[60px] p-3 text-id-6 font-button text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] transition-colors rounded-none"
+        className="w-[300px] h-[60px] p-3 text-black font-button text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] transition-colors rounded-none"
         style={{
           backgroundColor: "#FECC39",
           fontWeight: 700,

@@ -15,7 +15,7 @@ export interface LanguageOption {
 
 export const navigationItems: NavigationItem[] = [
   { label: "Учасники", href: "/authors" },
-  { label: "Мистецтво", href: "/projects" },
+  { label: "Роботи", href: "/projects" },
   { label: "Послуги", href: "/services" },
   { label: "Каталоги", href: "/catalogs" },
   { label: "Новини та події", href: "/news-events" },

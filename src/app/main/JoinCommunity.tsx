@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { artistsData } from "../../data/artistsData";
 import { joinCommunityData } from "../../data/mainData";
+import type { PublicArtist } from "../../lib/api/artists";
+
+const FALLBACK_ARTIST_PHOTO = "/artists/artist-photo-5.png";
 
 type Participant = {
   id: number;
@@ -31,15 +33,19 @@ function pickRandomParticipants(
   return shuffleArray(source).slice(0, Math.min(count, source.length));
 }
 
-export default function JoinCommunity() {
+interface JoinCommunityProps {
+  artists: PublicArtist[];
+}
+
+export default function JoinCommunity({ artists }: JoinCommunityProps) {
   const participantsPool = useMemo<Participant[]>(
     () =>
-      artistsData.map((a) => ({
+      artists.map((a) => ({
         id: a.id,
-        photo: a.artistPhoto,
-        name: a.artistName,
+        photo: a.avatarUrl ?? FALLBACK_ARTIST_PHOTO,
+        name: a.name,
       })),
-    []
+    [artists]
   );
 
   const PARTICIPANTS_COUNT = 4;

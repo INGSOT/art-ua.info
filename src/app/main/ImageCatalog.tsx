@@ -5,8 +5,7 @@ import { Card, CardContent } from "../../components/ui/card";
 import { Avatar, AvatarImage } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
 import { ScrollArea, ScrollBar } from "../../components/ui/scroll-area";
-import type { Catalog } from "../../data/catalogsData";
-import { catalogsData } from "../../data/catalogsData";
+import type { PublicCatalog } from "../../lib/api/publicCatalogs";
 
 function createSeededRng(seed: number) {
   // Mulberry32 PRNG (fast deterministic RNG)
@@ -33,11 +32,12 @@ function pickRandomItemsSeeded<T>(items: T[], count: number, seed: number): T[] 
 
 interface ImageCatalogProps {
   seed: number;
+  catalogs: PublicCatalog[];
 }
 
-export default function ImageCatalog({ seed }: ImageCatalogProps) {
+export default function ImageCatalog({ seed, catalogs }: ImageCatalogProps) {
   const router = useRouter();
-  const randomCatalogs: Catalog[] = pickRandomItemsSeeded(catalogsData, 10, seed);
+  const randomCatalogs: PublicCatalog[] = pickRandomItemsSeeded(catalogs, 10, seed);
 
     return (
     <section className="flex flex-col items-center gap-[30px] px-0 py-20 w-full bg-[#414141] border-t border-solid border-[#343434]">
@@ -109,7 +109,7 @@ export default function ImageCatalog({ seed }: ImageCatalogProps) {
 
       <Button
         onClick={() => router.push("/catalogs")}
-        className="w-[300px] h-[60px] bg-[#FECC39] hover:bg-white hover:text-id-6 text-id-6 font-button font-bold font-[700] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none"
+        className="w-[300px] h-[60px] bg-[#FECC39] hover:bg-white hover:text-black text-black font-button font-bold font-[700] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none"
       >
         Усі каталоги
       </Button>

@@ -49,13 +49,6 @@ export const featuredWorksData = {
   tagline: "Роботи",
   title: "Найкращі роботи наших митців",
   buttonText: "Усі роботи",
-  tags: [
-    { label: "Скульптури" },
-    { label: "Картини" },
-    { label: "Тег" },
-    { label: "Тег" },
-    { label: "Показуємо до 5 тегів" },
-  ],
 };
 
 // Support Artists Data

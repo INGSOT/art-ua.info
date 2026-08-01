@@ -33,6 +33,7 @@ export interface PublicProjectListItem {
   title: string;
   cover_url: string | null;
   likes_count: number;
+  tags: string[];
 }
 
 interface RawProjectListItem extends Omit<PublicProjectListItem, "cover_url"> {

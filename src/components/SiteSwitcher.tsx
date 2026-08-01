@@ -1,6 +1,7 @@
 'use client';
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import Link from "next/link";
 import { SITE_DOMAIN, SAVE_ART_DOMAIN, SAVE_ART_URL, ART_UA_COM_DOMAIN, ART_UA_COM_URL } from "../lib/siteDomains";
 
 const siteLinks = [
@@ -11,7 +12,9 @@ const siteLinks = [
 export default function SiteSwitcher() {
   return (
     <div className="inline-flex items-center gap-2 flex-[0_0_auto]">
-      <img className="w-11 h-11 shrink-0" alt="Logos" src="/logos.svg" />
+      <Link href="/" className="shrink-0">
+        <img className="w-11 h-11 shrink-0" alt="Logos" src="/logos.svg" />
+      </Link>
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>

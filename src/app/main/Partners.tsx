@@ -47,10 +47,6 @@ export default async function Partners() {
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-
-      <div className="flex w-full max-w-[1440px] items-start p-px bg-id-7 rounded-[5px] overflow-hidden">
-        <div className="w-[690px] h-2 bg-id-5 rounded" />
-      </div>
     </section>
     );
 }

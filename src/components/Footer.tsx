@@ -46,7 +46,7 @@ export default function Footer() {
                 key={index}
                 className="flex flex-col w-[200px] gap-3 items-center"
               >
-                <div className="w-[60px] h-[60px] flex justify-center items-center gap-2.5 bg-id-5 rounded-[30px] overflow-hidden">
+                <div className="w-[60px] h-[60px] flex justify-center items-center gap-2.5 bg-[#FECC39] rounded-[30px] overflow-hidden">
                   <img
                     className="w-[60px] h-[60px] object-cover"
                     alt="Image"
