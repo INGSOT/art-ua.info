@@ -12,7 +12,7 @@ corepack_enable: false
 omit_containers: [db]
 web_extra_daemons:
     - name: next
-      command: "npm run dev -- -H 0.0.0.0 -p 3000"
+      command: "npm run dev -- -H 0.0.0.0 -p 3000 --webpack"
       directory: /var/www/html
 web_extra_exposed_ports:
     - name: next
