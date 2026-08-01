@@ -1,0 +1,66 @@
+{
+  "Authors": {
+    "list": {
+      "sortPopularity": "By popularity",
+      "sortName": "By name",
+      "typeArtist": "Artist",
+      "typeOrganization": "Organization",
+      "typeTeam": "Creative team",
+      "participantAll": "All",
+      "participantArtist": "Artists",
+      "participantOrganization": "Organizations",
+      "participantTeam": "Teams",
+      "searchResultTitle": "Search results",
+      "clearSearchAlt": "Clear search",
+      "noResultsTitle": "Nothing found. Try a different name, surname, or title.",
+      "allCategories": "All fields",
+      "loading": "Loading...",
+      "emptyTitle": "No authors found",
+      "emptyAlt": "No authors found",
+      "catalogButton": "View catalog"
+    },
+    "sorting": {
+      "toggleAlt": "Toggle"
+    },
+    "sidebar": {
+      "participantsTitle": "Platform participants",
+      "parametersTitle": "Parameters"
+    },
+    "menu": {
+      "projects": "Projects",
+      "catalogs": "Catalogs",
+      "services": "Services",
+      "info": "Information"
+    },
+    "profile": {
+      "loading": "Loading...",
+      "notFound": "Author not found",
+      "filters": {
+        "all": "All categories",
+        "newest": "Newest"
+      },
+      "empty": {
+        "title": "There's nothing here yet",
+        "subtitle": "Add your first work.",
+        "button": "Create"
+      }
+    },
+    "catalogs": {
+      "open": "Open"
+    },
+    "services": {
+      "negotiablePrice": "Negotiable price",
+      "priceFromPrefix": "From "
+    },
+    "order": {
+      "title": "Order",
+      "selectOption": "Select an option",
+      "fillAllFields": "Fill in all form fields",
+      "nameNoDigits": "Name must not contain digits",
+      "emailMustContainAt": "Email must contain the @ symbol",
+      "phoneDigitsOnly": "Phone must contain digits only",
+      "requestSent": "Request sent",
+      "requestError": "Error sending the request"
+    }
+  }
+}

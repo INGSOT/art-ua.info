@@ -1,0 +1,18 @@
+{
+  "Faq": {
+    "page": {
+      "tagline": "How the platform works",
+      "title": "Frequently asked questions",
+      "categoriesFilterTitle": "Categories",
+      "allCategories": "All",
+      "loading": "Loading..."
+    },
+    "list": {
+      "noQuestions": "There are no questions in the selected category yet.",
+      "questionIconAlt": "Question icon",
+      "toggleIconAlt": "Toggle icon",
+      "toggleIconHoverAlt": "Toggle icon hover",
+      "toggleIconOpenAlt": "Toggle icon open"
+    }
+  }
+}

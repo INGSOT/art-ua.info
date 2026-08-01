@@ -1,0 +1,56 @@
+{
+  "Projects": {
+    "list": {
+      "searchResultsLabel": "Результат пошуку",
+      "clearSearchAlt": "Очистити пошук",
+      "noResults": "Нічого не знайдено. Спробуйте іншу назву проєкту або автора.",
+      "allCategories": "Усі",
+      "loading": "Завантаження...",
+      "empty": "Проектів не знайдено",
+      "sortByDate": "За датою",
+      "sortByName": "За назвою"
+    },
+    "filters": {
+      "statusTitle": "Статус проєкту",
+      "parametersTitle": "Параметри"
+    },
+    "detail": {
+      "shareLinkAlt": "Посилання",
+      "characteristicDefault": "Характеристика",
+      "direction": "Напрям",
+      "genreMarkers": "Жанрові маркери",
+      "conceptAuthor": "Автор концепції",
+      "status": "Статус",
+      "characteristicsTitle": "Характеристики проєкту:",
+      "tableHeaderName": "Назва",
+      "tableHeaderDescription": "Опис",
+      "notesTitle": "Нотатки до проєкту «{title}»",
+      "projectOnSaveArt": "Проєкт на {label}",
+      "projectOnArtUa": "Проєкт на {label}",
+      "loginToLike": "Щоб поставити лайк, потрібно увійти в систему",
+      "errorTitle": "Помилка",
+      "likeSyncFailed": "Не вдалося оновити лайк",
+      "likeUpdateFailed": "Не вдалося оновити лайк, спробуйте пізніше"
+    },
+    "showcase": {
+      "editProject": "Редагувати проект",
+      "editAlt": "Редагувати",
+      "linkCopied": "Посилання на проєкт скопійовано",
+      "linkCopyFailed": "Не вдалося скопіювати посилання",
+      "shareIn": "Поділитися в {network}",
+      "copyProjectLink": "Скопіювати посилання на проєкт",
+      "prevSlide": "Попередній",
+      "nextSlide": "Наступний"
+    }
+  },
+  "Filters": {
+    "filtersCount": "Фільтри ({count})",
+    "dialogLabel": "Фільтри",
+    "close": "Закрити",
+    "foundCount": "Знайдено: {count}",
+    "cancel": "Скасувати",
+    "apply": "Застосувати",
+    "clearAll": "Скинути все",
+    "removeFilter": "Видалити фільтр {label}"
+  }
+}

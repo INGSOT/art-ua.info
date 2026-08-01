@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/src/i18n/navigation";
 import { AuthUser } from "../lib/api/auth";
 import { socialIcons } from "../data/headerData";
 import { getImageUrl } from "../lib/url";
@@ -15,15 +16,17 @@ interface ProfileMenuModalProps {
   onLogout: () => void;
 }
 
-const menuItems = (slug: string) => [
-  { label: "Проєкти", href: `/profile/${slug}/projects` },
-  { label: "Каталоги", href: `/profile/${slug}/catalogs` },
-  { label: "Послуги", href: `/profile/${slug}/services` },
-  { label: "Команда", href: `/profile/${slug}/team` },
-  { label: "Інформація", href: `/profile/${slug}/info` },
-];
-
 export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: ProfileMenuModalProps) {
+  const t = useTranslations("Modals.profileMenu");
+  const tShared = useTranslations("Modals.shared");
+  const menuItems = [
+    { label: t("projects"), href: `/profile/${user.slug}/projects` },
+    { label: t("catalogs"), href: `/profile/${user.slug}/catalogs` },
+    { label: t("services"), href: `/profile/${user.slug}/services` },
+    { label: t("team"), href: `/profile/${user.slug}/team` },
+    { label: t("info"), href: `/profile/${user.slug}/info` },
+  ];
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -48,9 +51,9 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
               type="button"
               onClick={onClose}
               className="w-10 h-10 flex items-center justify-center hover:bg-black/5 transition-colors"
-              aria-label="Закрити"
+              aria-label={tShared("close")}
             >
-              <img src="/yellow_cross.svg" alt="Закрити" className="w-6 h-6" />
+              <img src="/yellow_cross.svg" alt="" className="w-6 h-6" />
             </button>
           </div>
 
@@ -70,7 +73,7 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
           </div>
 
           <nav className="mt-8 flex flex-col gap-5">
-            {menuItems(user.slug).map((item) => (
+            {menuItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -101,7 +104,7 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
             }}
             className="mt-6 text-left font-bold text-[#343434] text-[16px] font-[family-name:var(--font-unbounded)] hover:text-[#FECC39] transition-colors"
           >
-            Вийти
+            {t("logout")}
           </button>
 
           <div className="mt-auto pt-8">

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { applicationsAPI } from "../lib/api/applications";
 import { getApiErrorMessage, getApiFieldErrors } from "../lib/apiError";
@@ -16,6 +17,8 @@ export default function ApplicationModal({
   onClose,
   disableAnimation = false,
 }: ApplicationModalProps) {
+  const t = useTranslations("Modals.application");
+  const tShared = useTranslations("Modals.shared");
   const { showToast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -52,7 +55,7 @@ export default function ApplicationModal({
     setIsSubmitting(true);
     try {
       await applicationsAPI.submit({ name, email, phone, about, resume: file });
-      showToast("Заявку успішно надіслано!", "green");
+      showToast(t("success"), "green");
       setName("");
       setEmail("");
       setPhone("");
@@ -71,7 +74,7 @@ export default function ApplicationModal({
           )
         );
       } else {
-        showToast(getApiErrorMessage(err, "Не вдалося надіслати заявку"), "red");
+        showToast(getApiErrorMessage(err, t("error")), "red");
       }
     } finally {
       setIsSubmitting(false);
@@ -90,15 +93,15 @@ export default function ApplicationModal({
         <div className="p-6 md:p-[30px] flex-1">
           <div className="flex items-center justify-between">
             <div className="font-bold text-white text-[16px] font-[family-name:var(--font-unbounded)]">
-              Заявка
+              {t("title")}
             </div>
             <button
               type="button"
               onClick={onClose}
               className="w-10 h-10 flex items-center justify-center hover:bg-[#343434] transition-colors"
-              aria-label="Закрити"
+              aria-label={tShared("close")}
             >
-              <img src="/yellow_cross.svg" alt="Закрити" className="w-6 h-6" />
+              <img src="/yellow_cross.svg" alt="" className="w-6 h-6" />
             </button>
           </div>
 
@@ -110,7 +113,7 @@ export default function ApplicationModal({
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Вкажіть повне ім'я"
+                placeholder={t("namePlaceholder")}
                 className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
               />
               {errors.name && (
@@ -121,7 +124,7 @@ export default function ApplicationModal({
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="sample@mail.com"
+                placeholder={t("emailPlaceholder")}
                 className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
               />
               {errors.email && (
@@ -132,7 +135,7 @@ export default function ApplicationModal({
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Вкажіть номер"
+                placeholder={t("phonePlaceholder")}
                 className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
               />
               {errors.phone && (
@@ -143,7 +146,7 @@ export default function ApplicationModal({
                 rows={4}
                 value={about}
                 onChange={(e) => setAbout(e.target.value)}
-                placeholder="Розкажіть про себе"
+                placeholder={t("aboutPlaceholder")}
                 className="font-wix w-full bg-[#343434] px-6 py-4 text-white placeholder-[#A0A0A0] resize-none"
               />
               {errors.about && (
@@ -152,7 +155,7 @@ export default function ApplicationModal({
 
               <label className="flex items-center justify-between w-full h-[60px] bg-[#343434] px-6 text-white cursor-pointer">
                 <span className="font-wix text-sm truncate">
-                  {file ? file.name : "Завантажте резюме (не обов'язково)"}
+                  {file ? file.name : t("resumePlaceholder")}
                 </span>
                 <input
                   type="file"
@@ -167,9 +170,9 @@ export default function ApplicationModal({
                       e.preventDefault();
                       setFile(null);
                     }}
-                    aria-label="Видалити файл"
+                    aria-label={t("removeFile")}
                   >
-                    <img src="/yellow_cross.svg" alt="Видалити" className="w-4 h-4" />
+                    <img src="/yellow_cross.svg" alt={t("removeFileAlt")} className="w-4 h-4" />
                   </button>
                 )}
               </label>
@@ -183,7 +186,7 @@ export default function ApplicationModal({
               disabled={isSubmitting}
               className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[16px] hover:bg-white transition-colors disabled:opacity-60"
             >
-              {isSubmitting ? "Надсилаємо..." : "Відправити"}
+              {isSubmitting ? t("sending") : t("submit")}
             </button>
           </form>
         </div>

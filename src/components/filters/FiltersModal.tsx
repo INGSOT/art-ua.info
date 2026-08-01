@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import FilterSection from './FilterSection';
 import { FilterSection as FilterSectionType } from './filterConfig';
 
@@ -22,6 +23,7 @@ export default function FiltersModal({
     onApply,
     onCancel,
 }: FiltersModalProps) {
+    const t = useTranslations('Filters');
     const [draftFilters, setDraftFilters] = useState(initialSelectedFilters);
 
     useEffect(() => {
@@ -64,19 +66,19 @@ export default function FiltersModal({
             className="fixed inset-0 z-[100] lg:hidden flex flex-col bg-[#414141]"
             role="dialog"
             aria-modal="true"
-            aria-label="Фільтри"
+            aria-label={t('dialogLabel')}
         >
             <div className="flex items-center justify-between px-4 pt-5 pb-3 flex-shrink-0">
                 <button
                     type="button"
                     onClick={onClose}
                     className="w-10 h-10 flex items-center justify-center"
-                    aria-label="Закрити"
+                    aria-label={t('close')}
                 >
                     <Image src="/yellow_cross.svg" alt="" width={28} height={28} className="w-7 h-7" />
                 </button>
                 <p className="text-white font-bold text-base md:text-lg">
-                    Знайдено: {foundCount}
+                    {t('foundCount', { count: foundCount })}
                 </p>
             </div>
 
@@ -95,14 +97,14 @@ export default function FiltersModal({
                     onClick={handleCancel}
                     className="flex-1 h-[44px] md:h-[48px] bg-white text-[#343434] font-bold text-sm md:text-base hover:bg-[#f0f0f0] transition-colors"
                 >
-                    Скасувати
+                    {t('cancel')}
                 </button>
                 <button
                     type="button"
                     onClick={handleApply}
                     className="flex-1 h-[44px] md:h-[48px] bg-[#343434] text-[#FECC39] font-bold text-sm md:text-base hover:bg-[#3a3a3a] transition-colors"
                 >
-                    Застосувати
+                    {t('apply')}
                 </button>
             </div>
         </div>

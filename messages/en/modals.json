@@ -1,0 +1,114 @@
+{
+  "Modals": {
+    "shared": {
+      "close": "Close",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "platformDescription": "- a platform for artists and everyone who wants to join the creation, development and preservation of contemporary Ukrainian art",
+      "loginTab": "Community login",
+      "registerTab": "Registration",
+      "googleContinue": "Continue with Google",
+      "wait": "Please wait...",
+      "agreementImageAlt": "Terms of use",
+      "memberAlt": "Member {index}"
+    },
+    "login": {
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "forgotPassword": "I forgot my password",
+      "submit": "Log in",
+      "loggedIn": "You have joined the community",
+      "loginError": "Failed to log in"
+    },
+    "registration": {
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "Email",
+      "passwordPlaceholder": "Password",
+      "repeatPasswordPlaceholder": "Repeat password",
+      "agreementText": "I accept the platform's terms of use",
+      "agreementRequired": "You must accept the platform's terms of use",
+      "passwordMismatch": "Passwords do not match",
+      "submit": "Register",
+      "success": "Registration successful! Welcome to the community.",
+      "emailTaken": "A user with this email already exists. Try logging in or resetting your password.",
+      "error": "Failed to register"
+    },
+    "resetPassword": {
+      "title": "Password recovery",
+      "backToLogin": "Back to login",
+      "emailPlaceholder": "Email",
+      "sentMessage": "Check your email — we've sent you a link to reset your password.",
+      "promptMessage": "Enter your email and we'll send you a link to set a new password.",
+      "sending": "Sending...",
+      "submit": "Send link",
+      "error": "Failed to send the email"
+    },
+    "resetPasswordConfirm": {
+      "title": "Set a new password",
+      "invalidLink": "The link is invalid or has expired. Please request a password reset again.",
+      "successMessage": "Password successfully changed.",
+      "home": "Go to homepage",
+      "passwordPlaceholder": "New password",
+      "repeatPasswordPlaceholder": "Repeat new password",
+      "passwordMismatch": "Passwords do not match",
+      "saving": "Saving...",
+      "submit": "Save password",
+      "error": "Failed to change the password"
+    },
+    "search": {
+      "title": "Search",
+      "close": "Close",
+      "suggestionsAriaLabel": "Search suggestions",
+      "placeholder": "Search members, projects, services, catalogs, news…",
+      "nothingFound": "No results found for “{query}”. Try different keywords.",
+      "chooseSection": "Choose a section with results:",
+      "resultsHint": "Results on the relevant page will appear after following the link."
+    },
+    "searchSection": {
+      "placeholderDefault": "Search",
+      "placeholderAuthors": "Search authors",
+      "placeholderCatalogs": "Search catalogs",
+      "placeholderProjects": "Search projects",
+      "placeholderNews": "Search news and events",
+      "placeholderServices": "Search services"
+    },
+    "application": {
+      "title": "Application",
+      "namePlaceholder": "Enter your full name",
+      "emailPlaceholder": "sample@mail.com",
+      "phonePlaceholder": "Enter your phone number",
+      "aboutPlaceholder": "Tell us about yourself",
+      "resumePlaceholder": "Upload resume (optional)",
+      "removeFile": "Remove file",
+      "removeFileAlt": "Remove",
+      "sending": "Sending...",
+      "submit": "Submit",
+      "success": "Application submitted successfully!",
+      "error": "Failed to submit the application"
+    },
+    "profileMenu": {
+      "projects": "Projects",
+      "catalogs": "Catalogs",
+      "services": "Services",
+      "team": "Team",
+      "info": "Info",
+      "logout": "Log out"
+    },
+    "toast": {
+      "error": "Error",
+      "success": "Success"
+    },
+    "message": {
+      "error": "Error",
+      "success": "Success",
+      "closeAria": "Close message"
+    },
+    "pagination": {
+      "of": "{current} of {total}"
+    },
+    "emptyState": {
+      "megaphoneAlt": "Megaphone",
+      "plusAlt": "Plus"
+    }
+  }
+}

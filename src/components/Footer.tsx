@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "../i18n/navigation";
 import { Button } from "../components/ui/button";
 import ApplicationModal from "./ApplicationModal";
 import {
@@ -10,34 +11,34 @@ import {
   navigationData,
   contactInfo,
   socialLinks,
-  footerContent,
-  linkMapsByDomain,
+  footerCopyrightYear,
 } from "../data/footerData";
 import { SITE_DOMAIN } from "../lib/siteDomains";
 
 export default function Footer() {
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false);
+  const t = useTranslations("Footer");
 
   return (
     <footer className="flex flex-col w-full items-start gap-6 md:gap-[30px] p-4 md:p-10 lg:p-20 relative bg-[#FFFCF5]">
       <section className="flex flex-col items-start w-full">
         <header className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 md:p-[30px] bg-[#414141] w-full">
           <h5 className="font-h5 font-bold text-[#FECC39] text-[20px] md:text-[24px] lg:text-[30px] tracking-[var(--h5-letter-spacing)] leading-[var(--h5-line-height)] [font-style:var(--h5-font-style)] font-[600] text-center md:text-left">
-            {footerContent.header.siteName}
+            {SITE_DOMAIN}
           </h5>
 
           <h5 className="font-bold text-[#FFFCF5] text-[20px] md:text-[24px] lg:text-[30px] leading-[var(--h5-line-height)] font-h5 text-center tracking-[var(--h5-letter-spacing)] [font-style:var(--h5-font-style)] font-[600]">
-            {footerContent.header.slogan}
+            {t("slogan")}
           </h5>
         </header>
 
         <div className="flex flex-col items-center gap-5 p-4 md:p-[30px] w-full bg-[#FECC39]">
           <h2 className="self-stretch font-bold text-black text-[length:var(--h6-font-size)] leading-[var(--h6-line-height)] font-h6 text-center tracking-[var(--h6-letter-spacing)] [font-style:var(--h6-font-style)]">
-            {footerContent.expertiseSection.title}
+            {t("expertise.title")}
           </h2>
 
           <p className="self-stretch font-p1 font-[number:var(--p1-font-weight)] text-black text-[length:var(--p1-font-size)] text-center tracking-[var(--p1-letter-spacing)] leading-[var(--p1-line-height)] [font-style:var(--p1-font-style)]">
-            {footerContent.expertiseSection.description}
+            {t("expertise.description")}
           </p>
 
           <div className="flex flex-wrap items-start justify-center gap-4 md:gap-[30px]">
@@ -55,7 +56,7 @@ export default function Footer() {
                 </div>
 
                 <h2 className="self-stretch font-bold text-black text-[length:var(--h6-font-size)] leading-[var(--h6-line-height)] font-h6 text-center tracking-[var(--h6-letter-spacing)] [font-style:var(--h6-font-style)]">
-                  {item.text}
+                  {t(`expertise.items.${item.key}`)}
                 </h2>
               </div>
             ))}
@@ -64,7 +65,7 @@ export default function Footer() {
             onClick={() => setIsApplicationModalOpen(true)}
             className="w-[300px] h-[60px] bg-[#343434] hover:bg-[#FECC39] text-[#FECC39] hover:text-[#343434] font-button font-bold text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none transition-colors"
           >
-            {footerContent.expertiseSection.buttonLabel}
+            {t("expertise.buttonLabel")}
           </Button>
         </div>
       </section>
@@ -75,7 +76,7 @@ export default function Footer() {
             key={columnIndex}
             className="flex flex-col items-start gap-[30px] p-[30px] flex-1 bg-[#FFFCF5] self-stretch"
           >
-            {column.title === SITE_DOMAIN ? (
+            {column.isCurrentSite ? (
               <Link
                 href="/"
                 className="block font-h6 font-bold text-[#414141] text-[20px] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)] [font-style:var(--h6-font-style)] transition-colors hover:text-[#FECC39]"
@@ -89,23 +90,22 @@ export default function Footer() {
             )}
 
             {column.links.map((link, linkIndex) => {
-              const isCurrentSite = column.title === SITE_DOMAIN;
-              const path = linkMapsByDomain[column.title]?.[link];
+              const label = t(`nav.${link.key}`);
 
               return (
                 <Button
                   key={linkIndex}
                   variant="link"
                   className="h-auto p-0 font-button font-bold text-[#414141] text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] hover:no-underline transition-colors hover:text-[#FECC39]"
-                  asChild={Boolean(path)}
+                  asChild={Boolean(link.href)}
                 >
-                  {!path ? (
-                    link
-                  ) : isCurrentSite ? (
-                    <Link href={path}>{link}</Link>
+                  {!link.href ? (
+                    label
+                  ) : column.isCurrentSite ? (
+                    <Link href={link.href}>{label}</Link>
                   ) : (
-                    <a href={`https://${column.title}${path}`} target="_blank" rel="noopener noreferrer">
-                      {link}
+                    <a href={`https://${column.title}${link.href}`} target="_blank" rel="noopener noreferrer">
+                      {label}
                     </a>
                   )}
                 </Button>
@@ -117,7 +117,7 @@ export default function Footer() {
 
       <section className="flex flex-col items-start gap-3 p-4 md:p-[30px] w-full bg-white">
         <h2 className="font-button font-bold text-black text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)]">
-          {footerContent.organizationName}
+          {t("organizationName")}
         </h2>
 
         <div className="flex items-start gap-4 md:gap-[30px] flex-wrap">
@@ -126,7 +126,7 @@ export default function Footer() {
               key={index}
               className="font-wix font-p2 font-[number:var(--p2-font-weight)] text-black text-[length:var(--p2-font-size)] tracking-[var(--p2-letter-spacing)] leading-[var(--p2-line-height)] [font-style:var(--p2-font-style)]"
             >
-              {info.text}
+              {info.key === "address" ? t("contact.address") : info.text}
             </div>
           ))}
 
@@ -157,7 +157,7 @@ export default function Footer() {
           <img className="relative w-6 h-6" alt="Copy" src="/copy.svg" />
 
           <div className="relative w-fit mt-[-1.00px] font-wix font-p1 font-[number:var(--p1-font-weight)] text-black text-[length:var(--p1-font-size)] text-center tracking-[var(--p1-letter-spacing)] leading-[var(--p1-line-height)] whitespace-nowrap [font-style:var(--p1-font-style)]">
-            {footerContent.copyrightYear}
+            {footerCopyrightYear}
           </div>
         </div>
       </div>

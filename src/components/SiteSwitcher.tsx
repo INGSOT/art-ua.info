@@ -1,7 +1,7 @@
 'use client';
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import Link from "next/link";
+import { Link } from "@/src/i18n/navigation";
 import { SITE_DOMAIN, SAVE_ART_DOMAIN, SAVE_ART_URL, ART_UA_COM_DOMAIN, ART_UA_COM_URL } from "../lib/siteDomains";
 
 const siteLinks = [

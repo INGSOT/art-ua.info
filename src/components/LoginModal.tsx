@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -21,6 +22,7 @@ export default function LoginModal({
   onSwitchToResetPassword,
   disableAnimation = false,
 }: LoginModalProps) {
+  const t = useTranslations("Modals");
   const { login } = useAuth();
   const { showToast } = useToast();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -35,10 +37,10 @@ export default function LoginModal({
     setError("");
     try {
       await login(loginValue, passwordValue);
-      showToast("Ви увійшли до спільноти", "green");
+      showToast(t("login.loggedIn"), "green");
       onClose();
     } catch (err) {
-      setError(getApiErrorMessage(err, "Не вдалося увійти"));
+      setError(getApiErrorMessage(err, t("login.loginError")));
     } finally {
       setIsSubmitting(false);
     }
@@ -75,15 +77,14 @@ export default function LoginModal({
               type="button"
               onClick={onClose}
               className="w-10 h-10 flex items-center justify-center hover:bg-[#343434] transition-colors"
-              aria-label="Закрити"
+              aria-label={t("shared.close")}
             >
-              <img src="/yellow_cross.svg" alt="Закрити" className="w-6 h-6" />
+              <img src="/yellow_cross.svg" alt={t("shared.close")} className="w-6 h-6" />
             </button>
           </div>
 
           <div className="mt-8 font-bold text-white text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
-            {SAVE_ART_DOMAIN} - платформа для митців та бажаючих долучитись до
-            створення, розвитку і збереження новітнього українського мистецтва
+            {SAVE_ART_DOMAIN} {t("shared.platformDescription")}
           </div>
 
           <div className="mt-8 w-full border-t border-[#343434]" />
@@ -93,14 +94,14 @@ export default function LoginModal({
               type="button"
               className="font-bold text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)] transition-colors text-[#FECC39]"
             >
-              Вхід до спільноти
+              {t("shared.loginTab")}
             </button>
             <button
               type="button"
               onClick={onSwitchToRegister}
               className="font-bold text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)] transition-colors text-white hover:text-[#FECC39]"
             >
-              Реєстрація
+              {t("shared.registerTab")}
             </button>
           </div>
 
@@ -132,7 +133,7 @@ export default function LoginModal({
                 required
                 value={loginValue}
                 onChange={(e) => setLoginValue(e.target.value)}
-                placeholder="Електронна пошта"
+                placeholder={t("login.emailPlaceholder")}
                 className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
               />
 
@@ -142,14 +143,14 @@ export default function LoginModal({
                   required
                   value={passwordValue}
                   onChange={(e) => setPasswordValue(e.target.value)}
-                  placeholder="Пароль"
+                  placeholder={t("login.passwordPlaceholder")}
                   className="font-wix w-full h-full bg-[#343434] px-6 pr-16 text-white placeholder-[#A0A0A0]"
                 />
                 <button
                   type="button"
                   onClick={() => setIsPasswordVisible((prev) => !prev)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
-                  aria-label={isPasswordVisible ? "Сховати пароль" : "Показати пароль"}
+                  aria-label={isPasswordVisible ? t("shared.hidePassword") : t("shared.showPassword")}
                 >
                   <img
                     src={isPasswordVisible ? "/visible.svg" : "/hidden.svg"}
@@ -165,7 +166,7 @@ export default function LoginModal({
               onClick={onSwitchToResetPassword}
               className="mt-3 w-full text-right font-wix text-sm text-white hover:text-[#FECC39] transition-colors"
             >
-              Я не пам&apos;ятаю пароль
+              {t("login.forgotPassword")}
             </button>
 
             {error && (
@@ -177,7 +178,7 @@ export default function LoginModal({
               disabled={isSubmitting}
               className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[14px] hover:bg-white transition-colors disabled:opacity-60"
             >
-              {isSubmitting ? "Зачекайте..." : "Увійти"}
+              {isSubmitting ? t("shared.wait") : t("login.submit")}
             </button>
           </form>
 
@@ -191,7 +192,7 @@ export default function LoginModal({
               >
                 <img src="/google.svg" alt="Google" className="w-7 h-7" />
                 <span className="font-bold text-[14px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
-                  Продовжити з Google
+                  {t("shared.googleContinue")}
                 </span>
               </button>
             </>

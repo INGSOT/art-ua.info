@@ -1,10 +1,11 @@
 'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { Link, usePathname } from "../i18n/navigation";
+import { routing } from "../i18n/routing";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { navigationItems, socialIcons, languageOptions } from "../data/headerData";
+import { navigationItems, socialIcons } from "../data/headerData";
 import SearchModal from "./SearchModal";
 import LoginModal from "./LoginModal";
 import RegistrationModal from "./RegistrationModal";
@@ -24,10 +25,12 @@ export default function Header({ isHomePage = false }: HeaderProps) {
     const { user, logout } = useAuth();
     const { showToast } = useToast();
     const pathname = usePathname();
+    const locale = useLocale();
+    const t = useTranslations("Header");
 
     const handleLogout = async () => {
       await logout();
-      showToast("Ви вийшли з акаунту", "green");
+      showToast(t("logout"), "green");
     };
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
@@ -97,12 +100,12 @@ export default function Header({ isHomePage = false }: HeaderProps) {
                           isActive ? "text-[#FECC39]" : "text-white"
                         }`}
                       >
-                        {item.label}
+                        {t(`nav.${item.key}`)}
                       </div>
                     </Link>
                   ) : (
                     <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 group-hover:text-[#FECC39]">
-                      {item.label}
+                      {t(`nav.${item.key}`)}
                     </div>
                   )}
                 </Button>
@@ -125,17 +128,20 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         </div>
 
         <div className="hidden md:inline-flex items-center gap-2">
-          {languageOptions.map((lang, index) => (
+          {routing.locales.map((code) => (
             <Button
-              key={index}
+              key={code}
               variant="ghost"
               className={`inline-flex items-start p-0 h-auto hover:bg-transparent ${
-                !lang.active ? "opacity-30" : ""
+                code !== locale ? "opacity-30" : ""
               }`}
+              asChild
             >
-              <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap">
-                {lang.code}
-              </div>
+              <Link href={pathname} locale={code}>
+                <div className="w-fit font-bold text-white text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap">
+                  {code.toUpperCase()}
+                </div>
+              </Link>
             </Button>
           ))}
         </div>

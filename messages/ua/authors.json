@@ -1,0 +1,66 @@
+{
+  "Authors": {
+    "list": {
+      "sortPopularity": "За популярністю",
+      "sortName": "За ім'ям",
+      "typeArtist": "Митець",
+      "typeOrganization": "Організація",
+      "typeTeam": "Творча команда",
+      "participantAll": "Усі",
+      "participantArtist": "Митці",
+      "participantOrganization": "Організації",
+      "participantTeam": "Команди",
+      "searchResultTitle": "Результат пошуку",
+      "clearSearchAlt": "Очистити пошук",
+      "noResultsTitle": "Нічого не знайдено. Спробуйте інше ім'я, прізвище або назву.",
+      "allCategories": "Усі галузі",
+      "loading": "Завантаження...",
+      "emptyTitle": "Авторів не знайдено",
+      "emptyAlt": "Авторів не знайдено",
+      "catalogButton": "До каталогу робіт"
+    },
+    "sorting": {
+      "toggleAlt": "Перемкнути"
+    },
+    "sidebar": {
+      "participantsTitle": "Учасники платформи",
+      "parametersTitle": "Параметри"
+    },
+    "menu": {
+      "projects": "Проєкти",
+      "catalogs": "Каталоги",
+      "services": "Послуги",
+      "info": "Інформація"
+    },
+    "profile": {
+      "loading": "Завантаження...",
+      "notFound": "Автора не знайдено",
+      "filters": {
+        "all": "Усі категорії",
+        "newest": "Новіші"
+      },
+      "empty": {
+        "title": "Тут ще нічого немає",
+        "subtitle": "Додайте свою першу роботу.",
+        "button": "Створити"
+      }
+    },
+    "catalogs": {
+      "open": "Відкрити"
+    },
+    "services": {
+      "negotiablePrice": "Договірна ціна",
+      "priceFromPrefix": "Від "
+    },
+    "order": {
+      "title": "Замовлення",
+      "selectOption": "Оберіть опцію",
+      "fillAllFields": "Заповніть всі поля форми",
+      "nameNoDigits": "Ім'я не має містити цифр",
+      "emailMustContainAt": "Електронна пошта повинна містити символ @",
+      "phoneDigitsOnly": "Телефон повинен містити тільки цифри",
+      "requestSent": "Запит надіслано",
+      "requestError": "Помилка при надіслані запиту"
+    }
+  }
+}

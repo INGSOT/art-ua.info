@@ -1,0 +1,182 @@
+{
+  "CreateProject": {
+    "title": "New project",
+    "titleEdit": "Edit project",
+    "next": "Next",
+    "menu": {
+      "owner": "Project owner",
+      "name": "Name",
+      "media": "Media",
+      "description": "Description",
+      "characteristics": "Characteristics",
+      "additional": "Additional",
+      "publication": "Publication"
+    },
+    "publication": {
+      "previewCaption": "This is how your project will look",
+      "characteristicsTitle": "Project characteristics:",
+      "tableHeaderName": "Name",
+      "tableHeaderDescription": "Description",
+      "placeholderTitle": "\"Project name\"",
+      "placeholderGenre": "Genre not selected",
+      "placeholderDescription": "Project description text",
+      "statusDraft": "Draft",
+      "deleteButton": "Delete",
+      "saveDraftButton": "Save draft",
+      "publishButton": "Publish",
+      "deleteModal": {
+        "title": "You are deleting a draft",
+        "close": "Close",
+        "confirmText": "Are you sure you want to delete this draft?",
+        "confirmSubtext": "This action will permanently delete the project without the possibility of recovery.",
+        "confirmButton": "Yes, delete",
+        "cancelButton": "No, keep it"
+      },
+      "messages": {
+        "updateSuccess": "Project updated",
+        "createSuccess": "Project sent for moderation",
+        "publishError": "Error while sending the project",
+        "draftUnpublished": "The project has been unpublished and saved as a draft",
+        "draftSaved": "Draft saved",
+        "draftError": "Failed to save the draft",
+        "formCleared": "Form cleared",
+        "deleteSuccess": "Project deleted",
+        "deleteError": "Failed to delete the project",
+        "editLoadError": "Failed to load the project for editing."
+      }
+    },
+    "owner": {
+      "question": "Specify the project owner",
+      "error": "Select the project owner"
+    },
+    "name": {
+      "label": "Project name",
+      "placeholderUa": "Specify the project name",
+      "placeholderEn": "Specify the project name",
+      "artFieldLabel": "Art field",
+      "artFieldButton": "Select an art field",
+      "artFieldModalTitle": "Select an art field",
+      "errorUa": "Enter the project name in Ukrainian.",
+      "errorEn": "Enter the project name in English.",
+      "errorArtField": "Select an art field."
+    },
+    "media": {
+      "coverLabel": "Cover",
+      "addCoverText": "Add a cover",
+      "addCoverOptional": "(Optional)",
+      "workLabel": "Work",
+      "workUploadText": "Add work",
+      "workError": "Add work.",
+      "tagsLabel": "Add tags to make it easier to find",
+      "tagsPlaceholderUa": "Add tags",
+      "tagsPlaceholderEn": "Add tags",
+      "tagsHint": "This field is not required.",
+      "editGallery": "Edit gallery",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "description": {
+      "label": "Short project description",
+      "placeholderUa": "Tell us about the project (up to 500 characters)",
+      "placeholderEn": "Tell us about the project (up to 500 characters)",
+      "remainingUa": "{count} characters remaining",
+      "remainingEn": "{count} characters remaining",
+      "errorUa": "Enter the project description in Ukrainian.",
+      "errorEn": "Enter the project description in English."
+    },
+    "specifications": {
+      "hint": "Specify the characteristics of your work. If you are painting a picture — what size will it be? Making a film — who will write the script?",
+      "selectArtFieldFirst": "First select an art field on the \"Name\" tab",
+      "loading": "Loading…",
+      "empty": "There are no characteristics for this category",
+      "selectValue": "Select a value",
+      "errorValue": "Select a value.",
+      "errorUa": "Fill in the characteristic in Ukrainian.",
+      "errorEn": "Fill in the characteristic in English."
+    },
+    "additional": {
+      "intro": "Tell more about your project. Add photos of the work process, drafts, etc.",
+      "optional": "This section is not required.",
+      "addBlockButton": "Add block",
+      "moveUp": "Up",
+      "moveDown": "Down",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "sold": {
+      "description": "Indicate if your project has already been sold through {domain} or any other platform.",
+      "label": "Project sold"
+    },
+    "contentBlockType": {
+      "modalTitle": "Add block",
+      "heading": "Heading",
+      "paragraph": "Text",
+      "image": "Image",
+      "link": "Link"
+    },
+    "headingBlockModal": {
+      "title": "Heading",
+      "labelUa": "Heading in Ukrainian",
+      "labelEn": "Heading in English",
+      "placeholderUa": "Enter heading",
+      "placeholderEn": "Enter heading",
+      "addButton": "Add"
+    },
+    "paragraphBlockModal": {
+      "title": "Text",
+      "labelUa": "Text in Ukrainian",
+      "labelEn": "Text in English",
+      "placeholderUa": "Enter text",
+      "placeholderEn": "Enter text",
+      "addButton": "Add"
+    },
+    "linkBlockModal": {
+      "title": "Link",
+      "label": "Link",
+      "placeholder": "https://...",
+      "addButton": "Add"
+    },
+    "addLinkModal": {
+      "title": "Add link",
+      "label": "Paste the link",
+      "placeholder": "https://...",
+      "addButton": "Add"
+    },
+    "addWorkModal": {
+      "title": "Add work",
+      "imageButton": "Image",
+      "galleryButton": "Image gallery",
+      "linkButton": "Link (YouTube, Vimeo, Issuu)"
+    },
+    "addCoverModal": {
+      "title": "Add a project cover",
+      "uploadText": "Add an image.\nA 4x3 aspect ratio looks best.",
+      "addButton": "Add",
+      "backAlt": "Back",
+      "closeAlt": "Close",
+      "removeAlt": "Remove",
+      "uploadAlt": "Upload"
+    },
+    "addImageModal": {
+      "title": "Add image"
+    },
+    "imageGalleryModal": {
+      "title": "Add an image gallery",
+      "subtitle": "Images with a 4x3 aspect ratio look best",
+      "mixedHint": " You can mix photos with YouTube or Vimeo videos.",
+      "uploadButton": "Upload images",
+      "hint": "Up to 10 items (photos or video links). Images: .jpg, .jpeg, .png and .webp up to 15 MB each.",
+      "addButton": "Add",
+      "backAlt": "Back",
+      "closeAlt": "Close",
+      "uploadAlt": "Upload",
+      "imageAlt": "Image {index}",
+      "moveLeftAlt": "Left",
+      "moveRightAlt": "Right",
+      "removeAlt": "Remove"
+    },
+    "selectArtFormModal": {
+      "title": "Select an art field"
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "News": {
+    "list": {
+      "tagline": "News and events",
+      "title": "Current news and events in the community",
+      "sortNewer": "Newest",
+      "sortOlder": "Oldest",
+      "searchResult": "Search result",
+      "clearSearch": "Clear search",
+      "noSearchResults": "Nothing found. Try a different news title."
+    },
+    "card": {
+      "viewAlt": "View"
+    },
+    "social": {
+      "linkAlt": "Link",
+      "shareIn": "Share on {network}",
+      "copyLink": "Copy the link to this news item",
+      "linkCopied": "Link to the news item copied",
+      "copyFailed": "Failed to copy the link"
+    },
+    "latest": {
+      "tagline": "News and events",
+      "title": "Current news and events in the community",
+      "prev": "Previous",
+      "next": "Next",
+      "viewAlt": "View",
+      "moreNews": "More news"
+    }
+  }
+}

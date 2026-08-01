@@ -1,0 +1,182 @@
+{
+  "CreateProject": {
+    "title": "Новий проект",
+    "titleEdit": "Редагування проєкту",
+    "next": "Далі",
+    "menu": {
+      "owner": "Власник проєкту",
+      "name": "Назва",
+      "media": "Медіа",
+      "description": "Опис",
+      "characteristics": "Характеристики",
+      "additional": "Додатково",
+      "publication": "Публікація"
+    },
+    "publication": {
+      "previewCaption": "Так буде виглядати ваш проект",
+      "characteristicsTitle": "Характеристики проекту:",
+      "tableHeaderName": "Назва",
+      "tableHeaderDescription": "Опис",
+      "placeholderTitle": "«Назва проєкту»",
+      "placeholderGenre": "Жанр не обрано",
+      "placeholderDescription": "Текст опису проекту",
+      "statusDraft": "Чернетка",
+      "deleteButton": "Видалити",
+      "saveDraftButton": "Зберегти чернетку",
+      "publishButton": "Опублікувати",
+      "deleteModal": {
+        "title": "Ви видаляєте чернетку",
+        "close": "Закрити",
+        "confirmText": "Ви впевнені, що хочете видалити цю чернетку?",
+        "confirmSubtext": "Ця операція видалить проєкт назавжди без можливості його відновлення.",
+        "confirmButton": "Так, видалити",
+        "cancelButton": "Ні, залишити"
+      },
+      "messages": {
+        "updateSuccess": "Проект оновлено",
+        "createSuccess": "Проект відправлено на модерацію",
+        "publishError": "Помилка при надісланні проекту",
+        "draftUnpublished": "Проєкт знято з публікації та збережено як чернетку",
+        "draftSaved": "Чернетку збережено",
+        "draftError": "Не вдалося зберегти чернетку",
+        "formCleared": "Форму очищено",
+        "deleteSuccess": "Проєкт видалено",
+        "deleteError": "Не вдалося видалити проєкт",
+        "editLoadError": "Не вдалося завантажити проєкт для редагування."
+      }
+    },
+    "owner": {
+      "question": "Вкажіть власника проєкту",
+      "error": "Оберіть власника проєкту"
+    },
+    "name": {
+      "label": "Назва проекту",
+      "placeholderUa": "Вкажіть назву проекту",
+      "placeholderEn": "Specify the project name",
+      "artFieldLabel": "Галузь мистецтва",
+      "artFieldButton": "Оберіть галузь мистецтва",
+      "artFieldModalTitle": "Оберіть галузь мистецтва",
+      "errorUa": "Введіть назву проєкту українською.",
+      "errorEn": "Введіть назву проєкту англійською.",
+      "errorArtField": "Оберіть галузь мистецтва."
+    },
+    "media": {
+      "coverLabel": "Обкладинка",
+      "addCoverText": "Додайте обкладинку",
+      "addCoverOptional": "(Необов'язково)",
+      "workLabel": "Робота",
+      "workUploadText": "Додайте роботу",
+      "workError": "Додайте роботу.",
+      "tagsLabel": "Додайте теги для зручності пошуку",
+      "tagsPlaceholderUa": "Додайте теги",
+      "tagsPlaceholderEn": "Add tags",
+      "tagsHint": "Поле не є обов'язковим.",
+      "editGallery": "Редагувати галерею",
+      "previous": "Попередній",
+      "next": "Наступний"
+    },
+    "description": {
+      "label": "Короткий опис проєкту",
+      "placeholderUa": "Розкажіть про проєкт (до 500 символів)",
+      "placeholderEn": "Tell us about the project (up to 500 characters)",
+      "remainingUa": "Залишилось {count} символів",
+      "remainingEn": "{count} characters remaining",
+      "errorUa": "Введіть опис проєкту українською.",
+      "errorEn": "Введіть опис проєкту англійською."
+    },
+    "specifications": {
+      "hint": "Вкажіть характеристики вашої роботи. Якщо ви малюєте картину — якого розміру вона буде? Знімаєте фільм — хто напише сценарій?",
+      "selectArtFieldFirst": "Спочатку оберіть галузь мистецтва на вкладці «Назва»",
+      "loading": "Завантаження…",
+      "empty": "Для цієї категорії немає характеристик",
+      "selectValue": "Оберіть значення",
+      "errorValue": "Оберіть значення.",
+      "errorUa": "Заповніть характеристику українською.",
+      "errorEn": "Заповніть характеристику англійською."
+    },
+    "additional": {
+      "intro": "Розкажіть більше про свій проєкт. Додавайте фотографії робочого процесу, чернетки, тощо.",
+      "optional": "Розділ не є обов'язковим.",
+      "addBlockButton": "Додати блок",
+      "moveUp": "Вгору",
+      "moveDown": "Вниз",
+      "edit": "Редагувати",
+      "delete": "Видалити"
+    },
+    "sold": {
+      "description": "Вкажіть, якщо ваш проєкт вже був проданий через {domain} чи будь-яку іншу платформу.",
+      "label": "Проект проданий"
+    },
+    "contentBlockType": {
+      "modalTitle": "Додати блок",
+      "heading": "Заголовок",
+      "paragraph": "Текст",
+      "image": "Зображення",
+      "link": "Посилання"
+    },
+    "headingBlockModal": {
+      "title": "Заголовок",
+      "labelUa": "Заголовок українською",
+      "labelEn": "Заголовок англійською",
+      "placeholderUa": "Введіть заголовок",
+      "placeholderEn": "Enter heading",
+      "addButton": "Додати"
+    },
+    "paragraphBlockModal": {
+      "title": "Текст",
+      "labelUa": "Текст українською",
+      "labelEn": "Текст англійською",
+      "placeholderUa": "Введіть текст",
+      "placeholderEn": "Enter text",
+      "addButton": "Додати"
+    },
+    "linkBlockModal": {
+      "title": "Посилання",
+      "label": "Посилання",
+      "placeholder": "https://...",
+      "addButton": "Додати"
+    },
+    "addLinkModal": {
+      "title": "Додати посилання",
+      "label": "Вставте посилання",
+      "placeholder": "https://...",
+      "addButton": "Додати"
+    },
+    "addWorkModal": {
+      "title": "Додати роботу",
+      "imageButton": "Зображення",
+      "galleryButton": "Галерею зображень",
+      "linkButton": "Посилання (YouTube, Vimeo, Issuu)"
+    },
+    "addCoverModal": {
+      "title": "Додайте обкладинку проєкту",
+      "uploadText": "Додайте зображення.\nДобре будуть виглядати зі співвідношенням 4х3.",
+      "addButton": "Додати",
+      "backAlt": "Назад",
+      "closeAlt": "Закрити",
+      "removeAlt": "Видалити",
+      "uploadAlt": "Завантажити"
+    },
+    "addImageModal": {
+      "title": "Додати зображення"
+    },
+    "imageGalleryModal": {
+      "title": "Додайте галерею зображень",
+      "subtitle": "Добре будуть виглядати зображення зі співвідношенням 4x3",
+      "mixedHint": " Можна чергувати світлини з роликами YouTube або Vimeo.",
+      "uploadButton": "Завантажте зображення",
+      "hint": "До 10 елементів (фото або відео за посиланням). Зображення: .jpg, .jpeg, .png та .webp до 15 мб кожна.",
+      "addButton": "Додати",
+      "backAlt": "Назад",
+      "closeAlt": "Закрити",
+      "uploadAlt": "Завантажити",
+      "imageAlt": "Зображення {index}",
+      "moveLeftAlt": "Ліворуч",
+      "moveRightAlt": "Праворуч",
+      "removeAlt": "Видалити"
+    },
+    "selectArtFormModal": {
+      "title": "Оберіть галузь мистецтва"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { FilterChip } from './filterChipUtils';
 
 interface SelectedFiltersBarProps {
@@ -10,6 +11,7 @@ interface SelectedFiltersBarProps {
 }
 
 export default function SelectedFiltersBar({ chips, onRemove, onClearAll }: SelectedFiltersBarProps) {
+    const t = useTranslations('Filters');
     if (chips.length === 0) {
         return null;
     }
@@ -21,7 +23,7 @@ export default function SelectedFiltersBar({ chips, onRemove, onClearAll }: Sele
                 onClick={onClearAll}
                 className="flex-shrink-0 font-wix text-[#FECC39] font-normal text-xs leading-4 underline hover:opacity-80 transition-opacity"
             >
-                Скинути все
+                {t('clearAll')}
             </button>
 
             {chips.map((chip) => (
@@ -36,7 +38,7 @@ export default function SelectedFiltersBar({ chips, onRemove, onClearAll }: Sele
                         type="button"
                         onClick={() => onRemove(chip.id)}
                         className="flex items-center justify-center hover:opacity-80 transition-opacity"
-                        aria-label={`Видалити фільтр ${chip.label}`}
+                        aria-label={t('removeFilter', { label: chip.label })}
                     >
                         <Image
                             src="/yellow_cross.svg"

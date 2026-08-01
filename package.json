@@ -14,6 +14,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.562.0",
     "next": "^16.2.12",
+    "next-intl": "^4.13.4",
     "nextjs-toploader": "^3.9.17",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",

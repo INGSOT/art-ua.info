@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface PaginationSectionProps {
   currentPage: number;
@@ -13,6 +14,7 @@ export default function PaginationSection({
   totalPages,
   onPageChange,
 }: PaginationSectionProps) {
+  const t = useTranslations("Modals.pagination");
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5;
@@ -71,7 +73,7 @@ export default function PaginationSection({
       <div className="flex justify-between items-center max-w-full">
         {/* Left side - Page counter */}
         <div className="font-wix text-white text-base">
-          {currentPage} з {totalPages}
+          {t("of", { current: currentPage, total: totalPages })}
         </div>
 
         {/* Right side - Page numbers with arrows */}

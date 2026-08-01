@@ -1,7 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/src/i18n/navigation";
 import { authAPI } from "../lib/api/auth";
 import { getApiErrorMessage } from "../lib/apiError";
 
@@ -11,6 +12,7 @@ interface ResetPasswordConfirmModalProps {
 }
 
 export default function ResetPasswordConfirmModal({ token, email }: ResetPasswordConfirmModalProps) {
+  const t = useTranslations("Modals");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isRepeatPasswordVisible, setIsRepeatPasswordVisible] = useState(false);
   const [passwordValue, setPasswordValue] = useState("");
@@ -25,7 +27,7 @@ export default function ResetPasswordConfirmModal({ token, email }: ResetPasswor
     e.preventDefault();
 
     if (passwordValue !== repeatPasswordValue) {
-      setError("Паролі не співпадають");
+      setError(t("resetPasswordConfirm.passwordMismatch"));
       return;
     }
 
@@ -37,7 +39,7 @@ export default function ResetPasswordConfirmModal({ token, email }: ResetPasswor
       await authAPI.resetPassword(token, email, passwordValue, repeatPasswordValue);
       setIsSuccess(true);
     } catch (err) {
-      setError(getApiErrorMessage(err, "Не вдалося змінити пароль"));
+      setError(getApiErrorMessage(err, t("resetPasswordConfirm.error")));
     } finally {
       setIsSubmitting(false);
     }
@@ -47,7 +49,7 @@ export default function ResetPasswordConfirmModal({ token, email }: ResetPasswor
     <div className="flex items-center justify-center min-h-screen bg-[#272727] px-4">
       <div className="w-full max-w-[480px] bg-[#414141] p-6 md:p-[30px]">
         <div className="font-bold text-white text-[16px] font-[family-name:var(--font-unbounded)]">
-          Встановлення нового паролю
+          {t("resetPasswordConfirm.title")}
         </div>
 
         <div className="mt-8 w-full border-t border-[#343434]" />
@@ -55,16 +57,16 @@ export default function ResetPasswordConfirmModal({ token, email }: ResetPasswor
         <div className="mt-8">
           {isLinkInvalid ? (
             <p className="font-wix text-white">
-              Посилання недійсне або застаріле. Запросіть відновлення паролю ще раз.
+              {t("resetPasswordConfirm.invalidLink")}
             </p>
           ) : isSuccess ? (
             <>
-              <p className="font-wix text-white">Пароль успішно змінено.</p>
+              <p className="font-wix text-white">{t("resetPasswordConfirm.successMessage")}</p>
               <Link
                 href="/"
                 className="mt-8 inline-block w-full h-[60px] leading-[60px] text-center bg-[#FECC39] text-[#343434] font-bold text-[14px] hover:bg-white transition-colors"
               >
-                На головну
+                {t("resetPasswordConfirm.home")}
               </Link>
             </>
           ) : (
@@ -76,14 +78,14 @@ export default function ResetPasswordConfirmModal({ token, email }: ResetPasswor
                     required
                     value={passwordValue}
                     onChange={(e) => setPasswordValue(e.target.value)}
-                    placeholder="Новий пароль"
+                    placeholder={t("resetPasswordConfirm.passwordPlaceholder")}
                     className="font-wix w-full h-full bg-[#343434] px-6 pr-16 text-white placeholder-[#A0A0A0]"
                   />
                   <button
                     type="button"
                     onClick={() => setIsPasswordVisible((prev) => !prev)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
-                    aria-label={isPasswordVisible ? "Сховати пароль" : "Показати пароль"}
+                    aria-label={isPasswordVisible ? t("shared.hidePassword") : t("shared.showPassword")}
                   >
                     <img
                       src={isPasswordVisible ? "/visible.svg" : "/hidden.svg"}
@@ -99,14 +101,14 @@ export default function ResetPasswordConfirmModal({ token, email }: ResetPasswor
                     required
                     value={repeatPasswordValue}
                     onChange={(e) => setRepeatPasswordValue(e.target.value)}
-                    placeholder="Повторіть новий пароль"
+                    placeholder={t("resetPasswordConfirm.repeatPasswordPlaceholder")}
                     className="font-wix w-full h-full bg-[#343434] px-6 pr-16 text-white placeholder-[#A0A0A0]"
                   />
                   <button
                     type="button"
                     onClick={() => setIsRepeatPasswordVisible((prev) => !prev)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
-                    aria-label={isRepeatPasswordVisible ? "Сховати пароль" : "Показати пароль"}
+                    aria-label={isRepeatPasswordVisible ? t("shared.hidePassword") : t("shared.showPassword")}
                   >
                     <img
                       src={isRepeatPasswordVisible ? "/visible.svg" : "/hidden.svg"}
@@ -126,7 +128,7 @@ export default function ResetPasswordConfirmModal({ token, email }: ResetPasswor
                 disabled={isSubmitting}
                 className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[14px] hover:bg-white transition-colors disabled:opacity-60"
               >
-                {isSubmitting ? "Зберігаємо..." : "Зберегти пароль"}
+                {isSubmitting ? t("resetPasswordConfirm.saving") : t("resetPasswordConfirm.submit")}
               </button>
             </form>
           )}

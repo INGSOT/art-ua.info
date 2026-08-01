@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import WorkVideoEmbed from "../../app/profile/[slug]/create-project/WorkVideoEmbed";
+import { useTranslations } from "next-intl";
+import { Link } from "@/src/i18n/navigation";
+import WorkVideoEmbed from "../../app/[locale]/profile/[slug]/create-project/WorkVideoEmbed";
 import { getVideoInfo } from "../../utils/videoUtils";
 import { useToast } from "../../context/ToastContext";
 
@@ -174,6 +175,7 @@ export default function ProjectResultShowcase({
   descriptionParagraphs,
   contentBlocks,
 }: ProjectResultShowcaseProps) {
+  const t = useTranslations("Projects.showcase");
   const [activeSlide, setActiveSlide] = useState(0);
   const safeIndex = Math.min(activeSlide, Math.max(slides.length - 1, 0));
   const { showToast } = useToast();
@@ -190,9 +192,9 @@ export default function ProjectResultShowcase({
 
     try {
       await navigator.clipboard.writeText(pageUrl);
-      showToast("Посилання на проєкт скопійовано", "green");
+      showToast(t("linkCopied"), "green");
     } catch {
-      showToast("Не вдалося скопіювати посилання", "red");
+      showToast(t("linkCopyFailed"), "red");
     }
   };
 
@@ -283,7 +285,7 @@ export default function ProjectResultShowcase({
                 type="button"
                 onClick={() => setActiveSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1))}
               >
-                <Image src="/white-arrow-left-slider.svg" alt="Попередній" width={24} height={24} />
+                <Image src="/white-arrow-left-slider.svg" alt={t("prevSlide")} width={24} height={24} />
               </button>
               <div className="flex items-center gap-3">
                 {slides.map((_, index) => (
@@ -301,7 +303,7 @@ export default function ProjectResultShowcase({
                 type="button"
                 onClick={() => setActiveSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1))}
               >
-                <Image src="/white-arrow-right-slider.svg" alt="Наступний" width={24} height={24} />
+                <Image src="/white-arrow-right-slider.svg" alt={t("nextSlide")} width={24} height={24} />
               </button>
             </div>
           </div>
@@ -315,10 +317,10 @@ export default function ProjectResultShowcase({
             className="w-[300px] max-w-full flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors"
           >
             <span className="flex items-center justify-center flex-1 px-6 font-bold text-[#343434] whitespace-nowrap">
-              Редагувати проект
+              {t("editProject")}
             </span>
             <div className="flex items-center justify-center w-[60px] flex-shrink-0 border-l border-[#343434]">
-              <Image src="/edit.svg" alt="Редагувати" width={20} height={20} />
+              <Image src="/edit.svg" alt={t("editAlt")} width={20} height={20} />
             </div>
           </Link>
         )}
@@ -385,7 +387,7 @@ export default function ProjectResultShowcase({
                   onClick={() => handleShareClick(social.alt)}
                   onMouseEnter={() => setHoveredSocialIndex(index)}
                   onMouseLeave={() => setHoveredSocialIndex(null)}
-                  aria-label={buildShareUrl(social.alt, "", "") ? `Поділитися в ${social.alt}` : "Скопіювати посилання на проєкт"}
+                  aria-label={buildShareUrl(social.alt, "", "") ? t("shareIn", { network: social.alt }) : t("copyProjectLink")}
                   className="w-11 h-11 flex items-center justify-center hover:bg-[#FECC39] transition-colors"
                 >
                   <Image

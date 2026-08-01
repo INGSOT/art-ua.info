@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { authAPI } from "../lib/api/auth";
 import { getApiErrorMessage } from "../lib/apiError";
@@ -17,6 +18,7 @@ export default function ResetPassModal({
   onSwitchToLogin,
   disableAnimation = false,
 }: ResetPassModalProps) {
+  const t = useTranslations("Modals");
   const [emailValue, setEmailValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -43,7 +45,7 @@ export default function ResetPassModal({
       await authAPI.forgotPassword(emailValue.trim());
       setIsSent(true);
     } catch (err) {
-      setError(getApiErrorMessage(err, "Не вдалося надіслати лист"));
+      setError(getApiErrorMessage(err, t("resetPassword.error")));
     } finally {
       setIsSubmitting(false);
     }
@@ -65,16 +67,16 @@ export default function ResetPassModal({
                 type="button"
                 onClick={onSwitchToLogin}
                 className="w-10 h-10 flex items-center justify-center hover:bg-[#343434] transition-colors"
-                aria-label="Повернутись до входу"
+                aria-label={t("resetPassword.backToLogin")}
               >
                 <img
                   src="/yellow_triangle_left.svg"
-                  alt="Повернутись до входу"
+                  alt={t("resetPassword.backToLogin")}
                   className="w-6 h-6"
                 />
               </button>
               <div className="font-bold text-white text-[16px] font-[family-name:var(--font-unbounded)]">
-                Відновлення паролю
+                {t("resetPassword.title")}
               </div>
             </div>
 
@@ -82,16 +84,16 @@ export default function ResetPassModal({
               type="button"
               onClick={onClose}
               className="w-10 h-10 flex items-center justify-center hover:bg-[#343434] transition-colors"
-              aria-label="Закрити"
+              aria-label={t("shared.close")}
             >
-              <img src="/yellow_cross.svg" alt="Закрити" className="w-6 h-6" />
+              <img src="/yellow_cross.svg" alt={t("shared.close")} className="w-6 h-6" />
             </button>
           </div>
 
           <div className="mt-8 font-bold text-white text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
             {isSent
-              ? "Перевірте вашу пошту — ми надіслали посилання для відновлення паролю."
-              : "Вкажіть email, і ми надішлемо посилання для встановлення нового паролю."}
+              ? t("resetPassword.sentMessage")
+              : t("resetPassword.promptMessage")}
           </div>
 
           <div className="mt-8 w-full border-t border-[#343434]" />
@@ -104,7 +106,7 @@ export default function ResetPassModal({
                   required
                   value={emailValue}
                   onChange={(e) => setEmailValue(e.target.value)}
-                  placeholder="Електронна пошта"
+                  placeholder={t("resetPassword.emailPlaceholder")}
                   className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
                 />
               </div>
@@ -118,7 +120,7 @@ export default function ResetPassModal({
                 disabled={isSubmitting}
                 className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[14px] hover:bg-white transition-colors disabled:opacity-60"
               >
-                {isSubmitting ? "Надсилаємо..." : "Надіслати посилання"}
+                {isSubmitting ? t("resetPassword.sending") : t("resetPassword.submit")}
               </button>
             </form>
           )}

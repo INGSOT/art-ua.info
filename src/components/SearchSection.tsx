@@ -1,15 +1,8 @@
 'use client';
 
+import { useTranslations } from "next-intl";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-
-const PLACEHOLDER_BY_PATH: Record<string, string> = {
-    '/authors': 'Пошук авторів',
-    '/catalogs': 'Пошук каталогів',
-    '/projects': 'Пошук проєктів',
-    '/news-events': 'Пошук новин та подій',
-    '/services': 'Пошук послуг',
-};
 
 interface SearchSectionProps {
     value?: string;
@@ -26,8 +19,16 @@ export default function SearchSection({
     placeholder: placeholderProp,
     maxWidthPx,
 }: SearchSectionProps) {
+    const t = useTranslations("Modals.searchSection");
     const pathname = usePathname();
-    const placeholder = placeholderProp ?? PLACEHOLDER_BY_PATH[pathname] ?? 'Пошук';
+    const placeholderByPath: Record<string, string> = {
+        '/authors': t('placeholderAuthors'),
+        '/catalogs': t('placeholderCatalogs'),
+        '/projects': t('placeholderProjects'),
+        '/news-events': t('placeholderNews'),
+        '/services': t('placeholderServices'),
+    };
+    const placeholder = placeholderProp ?? placeholderByPath[pathname] ?? t('placeholderDefault');
 
     return (
         <section className="w-full bg-[#414141] flex justify-center items-center py-4 md:py-8 px-4 md:px-0">

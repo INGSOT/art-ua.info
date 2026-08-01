@@ -1,0 +1,53 @@
+{
+  "Services": {
+    "list": {
+      "searchResultsLabel": "Search results",
+      "clearSearchAlt": "Clear search",
+      "noResults": "Nothing found. Try a different service or author name.",
+      "loading": "Loading...",
+      "empty": "No services found"
+    },
+    "card": {
+      "priceNegotiable": "Negotiable price",
+      "priceFrom": "From",
+      "viewAlt": "View",
+      "orderLabel": "Order a service",
+      "editLabel": "Edit service"
+    },
+    "filters": {
+      "priceTitle": "Price",
+      "priceFromLabel": "From",
+      "priceToLabel": "To",
+      "applyPriceAlt": "Apply price",
+      "locationTitle": "Location",
+      "locationPlaceholder": "Search",
+      "locationSearchAria": "Search by location",
+      "showLabel": "Show"
+    },
+    "detail": {
+      "loading": "Loading...",
+      "notFound": "Service not found",
+      "breadcrumbServices": "Services",
+      "priceNegotiable": "Negotiable price",
+      "priceFrom": "From",
+      "nameLabel": "How should we address you",
+      "namePlaceholder": "Your full name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email address",
+      "phoneLabel": "Phone",
+      "phonePlaceholder": "Enter your phone number",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Your message",
+      "orderTitle": "Order",
+      "selectOption": "Select an option",
+      "fillAllFields": "Fill in all form fields",
+      "nameNoDigits": "Name must not contain digits",
+      "emailMustContainAt": "Email must contain the @ symbol",
+      "phoneDigitsOnly": "Phone must contain digits only",
+      "requestSent": "Request sent",
+      "requestSendFailed": "Failed to send the request",
+      "sending": "Sending...",
+      "submit": "Send request"
+    }
+  }
+}

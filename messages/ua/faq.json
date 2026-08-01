@@ -1,0 +1,18 @@
+{
+  "Faq": {
+    "page": {
+      "tagline": "Як працює платформа",
+      "title": "Часті питання",
+      "categoriesFilterTitle": "Категорії",
+      "allCategories": "Усі",
+      "loading": "Завантаження..."
+    },
+    "list": {
+      "noQuestions": "За обраною категорією поки немає запитань.",
+      "questionIconAlt": "Іконка питання",
+      "toggleIconAlt": "Іконка розгортання",
+      "toggleIconHoverAlt": "Іконка розгортання при наведенні",
+      "toggleIconOpenAlt": "Іконка згортання"
+    }
+  }
+}

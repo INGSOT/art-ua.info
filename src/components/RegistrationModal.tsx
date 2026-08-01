@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -19,6 +20,7 @@ export default function RegistrationModal({
   onSwitchToLogin,
   disableAnimation = false,
 }: RegistrationModalProps) {
+  const t = useTranslations("Modals");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isRepeatPasswordVisible, setIsRepeatPasswordVisible] = useState(false);
   const [nameValue, setNameValue] = useState("");
@@ -36,12 +38,12 @@ export default function RegistrationModal({
     e.preventDefault();
 
     if (!isAgreementAccepted) {
-      setError("Потрібно прийняти умови використання платформи");
+      setError(t("registration.agreementRequired"));
       return;
     }
 
     if (passwordValue !== repeatPasswordValue) {
-      setError("Паролі не співпадають");
+      setError(t("registration.passwordMismatch"));
       return;
     }
 
@@ -49,14 +51,14 @@ export default function RegistrationModal({
     setError("");
     try {
       await register(nameValue, emailValue, passwordValue, repeatPasswordValue);
-      showToast("Реєстрація успішна! Вітаємо у спільноті.", "green");
+      showToast(t("registration.success"), "green");
       onClose();
     } catch (err) {
       const fieldErrors = getApiFieldErrors(err);
       if (fieldErrors?.email) {
-        setError("Користувач з таким email вже існує. Спробуйте увійти або відновити пароль.");
+        setError(t("registration.emailTaken"));
       } else {
-        setError(getApiErrorMessage(err, "Не вдалося зареєструватися"));
+        setError(getApiErrorMessage(err, t("registration.error")));
       }
     } finally {
       setIsSubmitting(false);
@@ -94,15 +96,14 @@ export default function RegistrationModal({
               type="button"
               onClick={onClose}
               className="w-10 h-10 flex items-center justify-center hover:bg-[#343434] transition-colors"
-              aria-label="Закрити"
+              aria-label={t("shared.close")}
             >
-              <img src="/yellow_cross.svg" alt="Закрити" className="w-6 h-6" />
+              <img src="/yellow_cross.svg" alt={t("shared.close")} className="w-6 h-6" />
             </button>
           </div>
 
           <div className="mt-8 font-bold text-white text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
-            {SAVE_ART_DOMAIN} - платформа для митців та бажаючих долучитись до
-            створення, розвитку і збереження новітнього українського мистецтва
+            {SAVE_ART_DOMAIN} {t("shared.platformDescription")}
           </div>
 
           <div className="mt-8 w-full border-t border-[#343434]" />
@@ -113,13 +114,13 @@ export default function RegistrationModal({
               onClick={onSwitchToLogin}
               className="font-bold text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)] transition-colors text-white hover:text-[#FECC39]"
             >
-              Вхід до спільноти
+              {t("shared.loginTab")}
             </button>
             <button
               type="button"
               className="font-bold text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)] transition-colors text-[#FECC39]"
             >
-              Реєстрація
+              {t("shared.registerTab")}
             </button>
           </div>
 
@@ -151,7 +152,7 @@ export default function RegistrationModal({
               required
               value={nameValue}
               onChange={(e) => setNameValue(e.target.value)}
-              placeholder="Ваше ім'я"
+              placeholder={t("registration.namePlaceholder")}
               className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
             />
 
@@ -160,7 +161,7 @@ export default function RegistrationModal({
               required
               value={emailValue}
               onChange={(e) => setEmailValue(e.target.value)}
-              placeholder="Електронна пошта"
+              placeholder={t("registration.emailPlaceholder")}
               className="font-wix w-full h-[60px] bg-[#343434] px-6 text-white placeholder-[#A0A0A0]"
             />
 
@@ -170,14 +171,14 @@ export default function RegistrationModal({
                 required
                 value={passwordValue}
                 onChange={(e) => setPasswordValue(e.target.value)}
-                placeholder="Пароль"
+                placeholder={t("registration.passwordPlaceholder")}
                 className="font-wix w-full h-full bg-[#343434] px-6 pr-16 text-white placeholder-[#A0A0A0]"
               />
               <button
                 type="button"
                 onClick={() => setIsPasswordVisible((prev) => !prev)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
-                aria-label={isPasswordVisible ? "Сховати пароль" : "Показати пароль"}
+                aria-label={isPasswordVisible ? t("shared.hidePassword") : t("shared.showPassword")}
               >
                 <img
                   src={isPasswordVisible ? "/visible.svg" : "/hidden.svg"}
@@ -193,7 +194,7 @@ export default function RegistrationModal({
                 required
                 value={repeatPasswordValue}
                 onChange={(e) => setRepeatPasswordValue(e.target.value)}
-                placeholder="Повторіть пароль"
+                placeholder={t("registration.repeatPasswordPlaceholder")}
                 className="font-wix w-full h-full bg-[#343434] px-6 pr-16 text-white placeholder-[#A0A0A0]"
               />
               <button
@@ -201,7 +202,7 @@ export default function RegistrationModal({
                 onClick={() => setIsRepeatPasswordVisible((prev) => !prev)}
                 className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center"
                 aria-label={
-                  isRepeatPasswordVisible ? "Сховати пароль" : "Показати пароль"
+                  isRepeatPasswordVisible ? t("shared.hidePassword") : t("shared.showPassword")
                 }
               >
                 <img
@@ -233,7 +234,7 @@ export default function RegistrationModal({
                     ? "/yellow_check.svg"
                     : "/grey_check.svg"
                 }
-                alt="Умови використання"
+                alt={t("shared.agreementImageAlt")}
                 className="w-[14px] h-[11px]"
               />
             </span>
@@ -244,7 +245,7 @@ export default function RegistrationModal({
                   : "text-white"
               }`}
             >
-              Я приймаю умови використання платформи
+              {t("registration.agreementText")}
             </span>
           </button>
 
@@ -257,7 +258,7 @@ export default function RegistrationModal({
             disabled={isSubmitting}
             className="mt-8 w-full h-[60px] bg-[#FECC39] text-[#343434] font-bold text-[16px] hover:bg-white transition-colors disabled:opacity-60"
           >
-            {isSubmitting ? "Зачекайте..." : "Зареєструватись"}
+            {isSubmitting ? t("shared.wait") : t("registration.submit")}
           </button>
           </form>
 
@@ -271,7 +272,7 @@ export default function RegistrationModal({
               >
                 <img src="/google.svg" alt="Google" className="w-7 h-7" />
                 <span className="font-bold text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)]">
-                  Продовжити з Google
+                  {t("shared.googleContinue")}
                 </span>
               </button>
             </>

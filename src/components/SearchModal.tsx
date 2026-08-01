@@ -1,7 +1,8 @@
 'use client';
 
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import { Link } from "@/src/i18n/navigation";
 import { useRouter } from 'next/navigation';
 import SearchSection from './SearchSection';
 import {
@@ -26,6 +27,7 @@ function SuggestionsList({
   onPick: (href: string) => void;
   listId: string;
 }) {
+  const t = useTranslations("Modals.search");
   if (items.length === 0) return null;
 
   return (
@@ -33,7 +35,7 @@ function SuggestionsList({
       <ul
         id={listId}
         role="listbox"
-        aria-label="Підказки пошуку"
+        aria-label={t("suggestionsAriaLabel")}
         className="font-wix m-0 max-h-[min(360px,42vh)] list-none overflow-y-auto rounded-none border border-[#5a5a5a] bg-[#343434] p-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map((s) => (
@@ -54,6 +56,7 @@ function SuggestionsList({
 }
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
+  const t = useTranslations("Modals.search");
   const router = useRouter();
   const [value, setValue] = useState('');
   const [submittedQuery, setSubmittedQuery] = useState('');
@@ -143,7 +146,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const searchBlock = (
     <div className="w-full shrink-0 [&_section]:bg-transparent [&_section]:p-0">
       <SearchSection
-        placeholder="Пошук учасників, проєктів, послуг, каталогів, новин…"
+        placeholder={t("placeholder")}
         value={value}
         onChange={setValue}
         onSearch={runSearch}
@@ -172,16 +175,16 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             id="search-modal-title"
             className="font-bold text-white text-[18px] font-[family-name:var(--font-unbounded)]"
           >
-            Пошук
+            {t("title")}
           </div>
 
           <button
             type="button"
             onClick={onClose}
             className="flex shrink-0 items-center justify-center"
-            aria-label="Закрити"
+            aria-label={t("close")}
           >
-            <img src="/yellow_cross.svg" alt="Закрити" className="w-8 h-8 md:w-9 md:h-9" />
+            <img src="/yellow_cross.svg" alt={t("close")} className="w-8 h-8 md:w-9 md:h-9" />
           </button>
         </div>
 
@@ -213,14 +216,14 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               <div className="mt-4 min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {nothingFound && (
                   <p className="font-wix text-center text-white text-[16px] leading-relaxed px-2">
-                    За запитом «{submittedQuery}» нічого не знайдено. Спробуйте інші ключові слова.
+                    {t("nothingFound", { query: submittedQuery })}
                   </p>
                 )}
 
                 {hasSearched && withHits.length > 1 && (
                   <div className="flex flex-col gap-3 px-1">
                     <p className="font-wix text-[#FECC39] text-[14px] font-semibold mb-1">
-                      Оберіть розділ з результатами:
+                      {t("chooseSection")}
                     </p>
                     <ul className="flex flex-col gap-2 list-none p-0 m-0">
                       {withHits.map((cat) => (
@@ -241,7 +244,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
                 {hasSearched && withHits.length > 1 && (
                   <p className="font-wix mt-4 text-center text-[#A0A0A0] text-[13px] px-2">
-                    Результати на відповідній сторінці з’являться після переходу за посиланням.
+                    {t("resultsHint")}
                   </p>
                 )}
               </div>

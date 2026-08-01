@@ -1,0 +1,142 @@
+{
+  "ProfileServices": {
+    "services": {
+      "addServiceButton": "Додати послугу",
+      "editServiceButton": "Редагувати послугу",
+      "negotiablePrice": "Договірна ціна",
+      "emptyState": {
+        "message": "Тут ще нічого немає",
+        "subMessage": "Додайте свою першу послугу.",
+        "createButtonText": "Додати послугу"
+      },
+      "form": {
+        "coverUploadHint": "Додайте обкладинку\n(обов'язково)",
+        "coverModalTitle": "Додайте обкладинку",
+        "serviceNameLabel": "Назва послуги",
+        "serviceNameUaPlaceholder": "Вкажіть повну назву послуги",
+        "serviceNameEnPlaceholder": "Please specify the full name of the service",
+        "artCategoryLabel": "Галузь мистецтва",
+        "artCategoryPlaceholder": "Оберіть галузь мистецтва",
+        "costTitle": "Вартість",
+        "priceFromLabel": "Від",
+        "pricePlaceholder": "Вкажіть суму",
+        "orDivider": "або",
+        "priceNegotiableLabel": "Ціна договірна",
+        "descriptionLabel": "Опис послуги",
+        "descriptionUaPlaceholder": "Детально опишіть послугу",
+        "descriptionEnPlaceholder": "Describe the service in detail",
+        "optionsTitle": "Опції",
+        "optionNamePlaceholder": "Назва опції",
+        "optionNameEnPlaceholder": "Option name",
+        "publishButton": "Опублікувати",
+        "saveButton": "Зберегти",
+        "deleteButton": "Видалити",
+        "titleRequiredError": "Вкажіть назву послуги",
+        "categoryRequiredError": "Оберіть галузь мистецтва",
+        "saveError": "Не вдалося зберегти послугу",
+        "deleteError": "Не вдалося видалити послугу",
+        "serviceNotFound": "Послугу не знайдено",
+        "loadError": "Не вдалося завантажити послугу"
+      },
+      "deleteModal": {
+        "title": "Ви видаляєте послугу",
+        "closeAlt": "Закрити",
+        "description": "Ви впевнені, що хочете видалити цю послугу?\nЦю дію неможливо буде відмінити.",
+        "deleteButton": "Так, видалити",
+        "cancelButton": "Ні, залишити"
+      }
+    },
+    "team": {
+      "emptyState": {
+        "message": "Тут ще нічого немає",
+        "subMessage": "Створіть свою першу команду.",
+        "createButtonText": "Створити команду"
+      },
+      "card": {
+        "editAria": "Редагувати команду",
+        "teamActionsAria": "Дії команди {name}",
+        "actionsAlt": "Дії команди",
+        "teamServicesLink": "Послуги команди"
+      },
+      "form": {
+        "coverLabel": "Обкладинка команди",
+        "coverUploadHint": "Додайте обкладинку",
+        "coverModalTitle": "Додайте обкладинку",
+        "nameLabel": "Назва команди",
+        "nameUaPlaceholder": "Вкажіть назву команди",
+        "nameEnPlaceholder": "Please specify the team name",
+        "websiteLabel": "Сайт команди",
+        "websitePlaceholder": "https://example.com",
+        "countryLabel": "Країна",
+        "countryUaPlaceholder": "Вкажіть країну",
+        "countryEnPlaceholder": "Please specify the country",
+        "cityLabel": "Населений пункт",
+        "cityUaPlaceholder": "Вкажіть назву",
+        "cityEnPlaceholder": "Please specify the city",
+        "regionLabel": "Область, регіон",
+        "regionUaPlaceholder": "Вкажіть область",
+        "regionEnPlaceholder": "Please specify the region",
+        "zipLabel": "Поштовий індекс",
+        "zipUaPlaceholder": "Вкажіть індекс",
+        "zipEnPlaceholder": "Please specify the postal code",
+        "specializationLabel": "Спеціалізація команди",
+        "specializationUaPlaceholder": "Наприклад: відеозйомка",
+        "specializationEnPlaceholder": "For example: video shooting",
+        "aboutLabel": "Інформація про команду",
+        "aboutUaPlaceholder": "Розкажіть про діяльність команди",
+        "aboutEnPlaceholder": "Tell us about the team's activity",
+        "membersTitle": "Учасники",
+        "memberIconAlt": "Артист",
+        "removeMemberAria": "Видалити учасника",
+        "removeMemberAlt": "Видалити",
+        "addMemberLabel": "Додайте учасника до команди",
+        "addMemberPlaceholder": "Вкажіть ім'я або email",
+        "addMemberAlt": "Додати",
+        "createButton": "Створити",
+        "saveButton": "Зберегти",
+        "deleteButton": "Видалити",
+        "avatarRequiredError": "Додайте обкладинку команди",
+        "nameUaRequiredError": "Вкажіть назву команди",
+        "nameEnRequiredError": "Please specify the team name",
+        "countryUaRequiredError": "Вкажіть країну",
+        "countryEnRequiredError": "Please specify the country",
+        "cityUaRequiredError": "Вкажіть населений пункт",
+        "cityEnRequiredError": "Please specify the city",
+        "regionUaRequiredError": "Вкажіть область",
+        "regionEnRequiredError": "Please specify the region",
+        "zipUaRequiredError": "Вкажіть поштовий індекс",
+        "zipEnRequiredError": "Please specify the postal code",
+        "specializationUaRequiredError": "Вкажіть спеціалізацію команди",
+        "specializationEnRequiredError": "Please specify the team specialization",
+        "descriptionUaRequiredError": "Розкажіть про діяльність команди",
+        "descriptionEnRequiredError": "Tell us about the team's activity",
+        "saveError": "Не вдалося зберегти команду",
+        "deleteError": "Не вдалося видалити команду",
+        "defaultTeamName": "Команда"
+      },
+      "deleteModal": {
+        "closeAria": "Закрити",
+        "closeAlt": "Закрити",
+        "confirmText": "Ви впевнені, що хочете видалити команду? Цю дію не можна скасувати.",
+        "deleteButton": "Так, видалити",
+        "cancelButton": "Ні, залишити"
+      },
+      "leaveModal": {
+        "closeAria": "Закрити",
+        "closeAlt": "Закрити",
+        "leaveButton": "Покинути команду",
+        "confirmText": "Ви впевнені, що хочете покинути команду?",
+        "confirmLeaveButton": "Так, піти",
+        "cancelButton": "Ні, залишитись"
+      },
+      "list": {
+        "createTeamButton": "Створити команду",
+        "teamNotFound": "Команду не знайдено"
+      },
+      "services": {
+        "teamNotFound": "Команду не знайдено",
+        "loadError": "Не вдалося завантажити послуги команди"
+      }
+    }
+  }
+}

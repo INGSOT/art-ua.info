@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface MessageProps {
   type: "error" | "success";
@@ -8,9 +9,10 @@ interface MessageProps {
 }
 
 const Message: React.FC<MessageProps> = ({ type, message, onClose }) => {
+  const t = useTranslations("Modals.message");
   const isError = type === "error";
   const backgroundColor = isError ? "#FF4433" : "#43A96B";
-  const title = isError ? "Помилка" : "Успіх";
+  const title = isError ? t("error") : t("success");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,11 +34,11 @@ const Message: React.FC<MessageProps> = ({ type, message, onClose }) => {
       <button
         onClick={onClose}
         className="absolute top-4 right-4 hover:opacity-80 transition-opacity"
-        aria-label="Close message"
+        aria-label={t("closeAria")}
       >
         <Image
           src="/yellow_cross.svg"
-          alt="Close"
+          alt=""
           width={24}
           height={24}
         />

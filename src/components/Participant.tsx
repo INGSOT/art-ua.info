@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/src/i18n/navigation";
 
 import { PhotoData } from "../data/artistsData";
 import { withAuthorId } from "../lib/authorQuery";
@@ -53,6 +54,7 @@ export default function Participant({
   teamSlug,
   memberAvatars = [],
 }: ParticipantProps) {
+  const t = useTranslations("Modals.shared");
   const [isExpanded, setIsExpanded] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -196,7 +198,7 @@ export default function Participant({
                     index === 0 ? "" : "-ml-3"
                   }`}
                 >
-                  <AvatarImage src={avatar} alt={`Учасник ${index + 1}`} className="object-cover" />
+                  <AvatarImage src={avatar} alt={t("memberAlt", { index: index + 1 })} className="object-cover" />
                 </Avatar>
               ))}
             </div>

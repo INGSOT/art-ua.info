@@ -1,0 +1,31 @@
+{
+  "Team": {
+    "menu": {
+      "projects": "Projects",
+      "services": "Services",
+      "participants": "Members",
+      "info": "Information"
+    },
+    "services": {
+      "loading": "Loading...",
+      "negotiablePrice": "Negotiable price",
+      "priceFromPrefix": "From "
+    },
+    "participants": {
+      "loading": "Loading...",
+      "teamNotFound": "Team not found",
+      "noMembers": "No members added yet.",
+      "artistType": "Artist",
+      "organizationType": "Organization",
+      "catalogButton": "View work catalog"
+    },
+    "projects": {
+      "loading": "Loading...",
+      "empty": "There's nothing here yet",
+      "filters": {
+        "all": "All categories",
+        "new": "New"
+      }
+    }
+  }
+}

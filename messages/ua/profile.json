@@ -1,0 +1,146 @@
+{
+  "Profile": {
+    "menu": {
+      "projects": "Проєкти",
+      "drafts": "Чернетки",
+      "catalogs": "Каталоги",
+      "services": "Послуги",
+      "team": "Команда",
+      "info": "Інформація",
+      "notifications": "Сповіщення"
+    },
+    "aboutMe": {
+      "editProfileButton": "Редагувати профіль",
+      "avatarAlt": "Аватар автора",
+      "editAlt": "Редагувати"
+    },
+    "viewContext": {
+      "legalEntityDefaultName": "Юридична особа"
+    },
+    "catalogs": {
+      "addCatalogButton": "Додати каталог",
+      "addCatalogButtonIconAlt": "Плюс",
+      "tooltip": "Зробити основним (для відображення на головній та сторінці митців).",
+      "editIconAlt": "Редагувати",
+      "deleteIconAlt": "Видалити",
+      "likeIconAlt": "Вподобати",
+      "empty": {
+        "title": "Тут ще нічого немає",
+        "subtitle": "Додайте свій перший каталог.",
+        "button": "Додати каталог"
+      },
+      "addModal": {
+        "title": "Новий каталог",
+        "editTitle": "Редагувати каталог",
+        "closeAlt": "Закрити",
+        "titleUkLabel": "Назва каталогу (укр.)",
+        "titleUkPlaceholder": "Введіть назву українською",
+        "titleEnLabel": "Назва каталогу (англ.)",
+        "titleEnPlaceholder": "Введіть назву англійською",
+        "categoryLabel": "Галузь мистецтва",
+        "categoryPlaceholder": "Оберіть галузь мистецтва",
+        "imageUploadText": "Додайте обкладинку.\nДобре будуть виглядати зображення зі співвідношенням 4х3.",
+        "imageRemoveAlt": "Видалити",
+        "catalogUploadText": "Завантажте каталог",
+        "catalogRemoveAlt": "Видалити каталог",
+        "uploadIconAlt": "Завантажити",
+        "addButton": "Додати",
+        "saveButton": "Зберегти",
+        "imageTooLargeError": "Обкладинка занадто велика (максимум {maxMb} МБ)",
+        "pdfTooLargeError": "Файл занадто великий (максимум {maxMb} МБ)",
+        "saveError": "Не вдалося зберегти каталог"
+      },
+      "deleteModal": {
+        "title": "Ви видаляєте каталог",
+        "closeAlt": "Закрити",
+        "description": "Ви впевнені, що хочете видалити цей каталог?\nЦю дію неможливо буде відмінити.",
+        "deleteButton": "Так, видалити",
+        "cancelButton": "Ні, залишити"
+      },
+      "categoryForm": {
+        "title": "Галузь мистецтва",
+        "closeAlt": "Закрити"
+      }
+    },
+    "drafts": {
+      "createButton": "Створити проєкт",
+      "editAlt": "Редагувати",
+      "untitled": "Без назви",
+      "empty": {
+        "title": "У вас ще немає чернеток",
+        "subtitle": "Незавершені та неопубліковані проєкти зʼявляться тут.",
+        "button": "Створити проєкт"
+      }
+    },
+    "edit": {
+      "avatarUploadAlt": "Завантажити",
+      "avatarUploadHint": "Додайте аватар",
+      "avatarModalTitle": "Додайте аватар",
+      "fullNameLabel": "Ім'я",
+      "fullNameUkPlaceholder": "Вкажіть повне ім'я",
+      "fullNameEnPlaceholder": "Please specify the full name",
+      "professionLabel": "Професія",
+      "professionUkPlaceholder": "Наприклад: Режисер",
+      "professionEnPlaceholder": "For example: Director",
+      "countryLabel": "Країна",
+      "countryPlaceholder": "Вкажіть країну",
+      "cityLabel": "Місто",
+      "cityPlaceholder": "Вкажіть місто",
+      "descriptionLabel": "Про себе",
+      "descriptionPlaceholder": "Розкажіть про себе",
+      "socialsTitle": "Сайт і соцмережі",
+      "websitePlaceholder": "Веб-сайт (https://...)",
+      "facebookPlaceholder": "Facebook (https://...)",
+      "instagramPlaceholder": "Instagram (https://...)",
+      "linkedinPlaceholder": "LinkedIn (https://...)",
+      "youtubePlaceholder": "YouTube (https://...)",
+      "nameRequiredError": "Вкажіть ім'я",
+      "saveError": "Не вдалося зберегти профіль",
+      "saving": "Збереження...",
+      "save": "Зберегти",
+      "saveIconAlt": "Зберегти"
+    },
+    "info": {
+      "websiteAlt": "Сайт",
+      "locationAlt": "Локація"
+    },
+    "notifications": {
+      "empty": {
+        "title": "У вас ще немає замовлень послуг",
+        "subtitle": "Тут з'являтимуться сповіщення, коли хтось замовить вашу послугу."
+      },
+      "serviceOrderLabel": "Замовлення послуги",
+      "customerLabel": "Замовник",
+      "emailLabel": "Email",
+      "phoneLabel": "Телефон",
+      "optionsLabel": "Опції",
+      "messageLabel": "Повідомлення",
+      "viewService": "Переглянути послугу",
+      "closeAlt": "Закрити"
+    },
+    "projects": {
+      "filters": {
+        "all": "Усі категорії",
+        "newest": "Новіші"
+      },
+      "createButton": "Створити",
+      "plusAlt": "Плюс",
+      "soldAlt": "Продано",
+      "viewAlt": "Переглянути",
+      "likeAlt": "Вподобати",
+      "empty": {
+        "title": "Тут ще нічого немає",
+        "subtitle": "Додайте свою першу роботу.",
+        "button": "Створити"
+      },
+      "project": {
+        "authorAvatarAlt": "Аватар автора",
+        "previousAlt": "Попередній",
+        "nextAlt": "Наступний",
+        "slideAlt": "Слайд {index}",
+        "thumbnailAlt": "Мініатюра {index}",
+        "likeAlt": "Вподобати"
+      }
+    }
+  }
+}

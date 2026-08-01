@@ -1,0 +1,114 @@
+{
+  "Modals": {
+    "shared": {
+      "close": "Закрити",
+      "showPassword": "Показати пароль",
+      "hidePassword": "Сховати пароль",
+      "platformDescription": "- платформа для митців та бажаючих долучитись до створення, розвитку і збереження новітнього українського мистецтва",
+      "loginTab": "Вхід до спільноти",
+      "registerTab": "Реєстрація",
+      "googleContinue": "Продовжити з Google",
+      "wait": "Зачекайте...",
+      "agreementImageAlt": "Умови використання",
+      "memberAlt": "Учасник {index}"
+    },
+    "login": {
+      "emailPlaceholder": "Електронна пошта",
+      "passwordPlaceholder": "Пароль",
+      "forgotPassword": "Я не пам'ятаю пароль",
+      "submit": "Увійти",
+      "loggedIn": "Ви увійшли до спільноти",
+      "loginError": "Не вдалося увійти"
+    },
+    "registration": {
+      "namePlaceholder": "Ваше ім'я",
+      "emailPlaceholder": "Електронна пошта",
+      "passwordPlaceholder": "Пароль",
+      "repeatPasswordPlaceholder": "Повторіть пароль",
+      "agreementText": "Я приймаю умови використання платформи",
+      "agreementRequired": "Потрібно прийняти умови використання платформи",
+      "passwordMismatch": "Паролі не співпадають",
+      "submit": "Зареєструватись",
+      "success": "Реєстрація успішна! Вітаємо у спільноті.",
+      "emailTaken": "Користувач з таким email вже існує. Спробуйте увійти або відновити пароль.",
+      "error": "Не вдалося зареєструватися"
+    },
+    "resetPassword": {
+      "title": "Відновлення паролю",
+      "backToLogin": "Повернутись до входу",
+      "emailPlaceholder": "Електронна пошта",
+      "sentMessage": "Перевірте вашу пошту — ми надіслали посилання для відновлення паролю.",
+      "promptMessage": "Вкажіть email, і ми надішлемо посилання для встановлення нового паролю.",
+      "sending": "Надсилаємо...",
+      "submit": "Надіслати посилання",
+      "error": "Не вдалося надіслати лист"
+    },
+    "resetPasswordConfirm": {
+      "title": "Встановлення нового паролю",
+      "invalidLink": "Посилання недійсне або застаріле. Запросіть відновлення паролю ще раз.",
+      "successMessage": "Пароль успішно змінено.",
+      "home": "На головну",
+      "passwordPlaceholder": "Новий пароль",
+      "repeatPasswordPlaceholder": "Повторіть новий пароль",
+      "passwordMismatch": "Паролі не співпадають",
+      "saving": "Зберігаємо...",
+      "submit": "Зберегти пароль",
+      "error": "Не вдалося змінити пароль"
+    },
+    "search": {
+      "title": "Пошук",
+      "close": "Закрити",
+      "suggestionsAriaLabel": "Підказки пошуку",
+      "placeholder": "Пошук учасників, проєктів, послуг, каталогів, новин…",
+      "nothingFound": "За запитом «{query}» нічого не знайдено. Спробуйте інші ключові слова.",
+      "chooseSection": "Оберіть розділ з результатами:",
+      "resultsHint": "Результати на відповідній сторінці з'являться після переходу за посиланням."
+    },
+    "searchSection": {
+      "placeholderDefault": "Пошук",
+      "placeholderAuthors": "Пошук авторів",
+      "placeholderCatalogs": "Пошук каталогів",
+      "placeholderProjects": "Пошук проєктів",
+      "placeholderNews": "Пошук новин та подій",
+      "placeholderServices": "Пошук послуг"
+    },
+    "application": {
+      "title": "Заявка",
+      "namePlaceholder": "Вкажіть повне ім'я",
+      "emailPlaceholder": "sample@mail.com",
+      "phonePlaceholder": "Вкажіть номер",
+      "aboutPlaceholder": "Розкажіть про себе",
+      "resumePlaceholder": "Завантажте резюме (не обов'язково)",
+      "removeFile": "Видалити файл",
+      "removeFileAlt": "Видалити",
+      "sending": "Надсилаємо...",
+      "submit": "Відправити",
+      "success": "Заявку успішно надіслано!",
+      "error": "Не вдалося надіслати заявку"
+    },
+    "profileMenu": {
+      "projects": "Проєкти",
+      "catalogs": "Каталоги",
+      "services": "Послуги",
+      "team": "Команда",
+      "info": "Інформація",
+      "logout": "Вийти"
+    },
+    "toast": {
+      "error": "Помилка",
+      "success": "Успішно"
+    },
+    "message": {
+      "error": "Помилка",
+      "success": "Успіх",
+      "closeAria": "Закрити повідомлення"
+    },
+    "pagination": {
+      "of": "{current} з {total}"
+    },
+    "emptyState": {
+      "megaphoneAlt": "Мегафон",
+      "plusAlt": "Плюс"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "Catalogs": {
+    "list": {
+      "tagline": "Каталоги",
+      "title": "Каталоги наших митців",
+      "sortPopular": "Популярні",
+      "sortNewest": "Новіші",
+      "sortOldest": "Давніші",
+      "searchResult": "Результат пошуку",
+      "clearSearch": "Очистити пошук",
+      "noSearchResults": "Нічого не знайдено. Спробуйте іншу назву каталогу або автора.",
+      "loading": "Завантаження...",
+      "notFound": "Каталогів не знайдено"
+    },
+    "filters": {
+      "show": "Показати"
+    },
+    "viewer": {
+      "allCatalogs": "Всі каталоги",
+      "direction": "Напрям",
+      "category": "Категорія",
+      "published": "Опубліковано",
+      "openInNewTab": "Відкрити в новій вкладці",
+      "downloadPdf": "Завантажити PDF"
+    },
+    "like": {
+      "loginRequired": "Щоб поставити лайк, потрібно увійти в систему",
+      "updateFailed": "Не вдалося оновити лайк",
+      "errorTitle": "Помилка"
+    },
+    "pdf": {
+      "viewError": "Не вдалося показати перегляд PDF",
+      "openSeparately": "Відкрити файл окремо",
+      "prevPage": "Попередня сторінка",
+      "nextPage": "Наступна сторінка",
+      "pageOf": "Сторінка {current} з {total}",
+      "loading": "Завантаження PDF...",
+      "loadError": "Не вдалося завантажити PDF",
+      "pageLoading": "Завантаження сторінки..."
+    }
+  }
+}

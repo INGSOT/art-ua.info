@@ -1,0 +1,42 @@
+{
+  "Header": {
+    "nav": {
+      "authors": "Members",
+      "projects": "Works",
+      "services": "Services",
+      "catalogs": "Catalogs",
+      "newsEvents": "News & Events"
+    },
+    "logout": "You have logged out"
+  },
+  "Footer": {
+    "slogan": "The art of helping — the most modern of the arts",
+    "expertise": {
+      "title": "We invite experts to collaborate",
+      "description": "The ID_Art UA charitable foundation is open to collaboration ...",
+      "buttonLabel": "Send a request",
+      "items": {
+        "creation": "Creating contemporary Ukrainian art",
+        "exhibitions": "Participating in exhibitions and art events",
+        "promotion": "Promoting Ukrainian artists around the world"
+      }
+    },
+    "nav": {
+      "members": "Members",
+      "catalogs": "Catalogs",
+      "projects": "Projects",
+      "projectsForSale": "Projects for sale",
+      "services": "Services",
+      "newsEvents": "News & Events",
+      "faq": "FAQ",
+      "terms": "Terms of use",
+      "reports": "Reports",
+      "specialProjects": "Special projects",
+      "aboutUs": "About us"
+    },
+    "organizationName": "ID_Art UA CHARITABLE FOUNDATION",
+    "contact": {
+      "address": "Ivano-Frankivsk, Ukraine"
+    }
+  }
+}

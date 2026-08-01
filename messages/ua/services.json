@@ -1,0 +1,53 @@
+{
+  "Services": {
+    "list": {
+      "searchResultsLabel": "Результат пошуку",
+      "clearSearchAlt": "Очистити пошук",
+      "noResults": "Нічого не знайдено. Спробуйте іншу назву послуги або автора.",
+      "loading": "Завантаження...",
+      "empty": "Послуг не знайдено"
+    },
+    "card": {
+      "priceNegotiable": "Ціна договірна",
+      "priceFrom": "Від",
+      "viewAlt": "Переглянути",
+      "orderLabel": "Замовити послугу",
+      "editLabel": "Редагувати послугу"
+    },
+    "filters": {
+      "priceTitle": "Вартість",
+      "priceFromLabel": "Від",
+      "priceToLabel": "До",
+      "applyPriceAlt": "Застосувати ціну",
+      "locationTitle": "Місцезнаходження",
+      "locationPlaceholder": "Пошук",
+      "locationSearchAria": "Пошук за місцем",
+      "showLabel": "Показати"
+    },
+    "detail": {
+      "loading": "Завантаження...",
+      "notFound": "Послугу не знайдено",
+      "breadcrumbServices": "Послуги",
+      "priceNegotiable": "Ціна договірна",
+      "priceFrom": "Від",
+      "nameLabel": "Як до вас звертатись",
+      "namePlaceholder": "Ваше ім'я та прізвище",
+      "emailLabel": "Електронна пошта",
+      "emailPlaceholder": "Вкажіть адресу електронної пошти",
+      "phoneLabel": "Телефон",
+      "phonePlaceholder": "Вкажіть номер телефону",
+      "messageLabel": "Повідомлення",
+      "messagePlaceholder": "Ваше повідомлення",
+      "orderTitle": "Замовлення",
+      "selectOption": "Оберіть опцію",
+      "fillAllFields": "Заповніть всі поля форми",
+      "nameNoDigits": "Ім'я не має містити цифр",
+      "emailMustContainAt": "Електронна пошта повинна містити символ @",
+      "phoneDigitsOnly": "Телефон повинен містити тільки цифри",
+      "requestSent": "Запит надіслано",
+      "requestSendFailed": "Не вдалося надіслати запит",
+      "sending": "Надсилаємо...",
+      "submit": "Відправити запит"
+    }
+  }
+}

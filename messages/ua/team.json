@@ -1,0 +1,31 @@
+{
+  "Team": {
+    "menu": {
+      "projects": "Проєкти",
+      "services": "Послуги",
+      "participants": "Учасники",
+      "info": "Інформація"
+    },
+    "services": {
+      "loading": "Завантаження...",
+      "negotiablePrice": "Договірна ціна",
+      "priceFromPrefix": "Від "
+    },
+    "participants": {
+      "loading": "Завантаження...",
+      "teamNotFound": "Команду не знайдено",
+      "noMembers": "Учасників ще не додано.",
+      "artistType": "Митець",
+      "organizationType": "Організація",
+      "catalogButton": "До каталогу робіт"
+    },
+    "projects": {
+      "loading": "Завантаження...",
+      "empty": "Тут ще нічого немає",
+      "filters": {
+        "all": "Усі категорії",
+        "new": "Нові"
+      }
+    }
+  }
+}

@@ -1,8 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useToast } from "../context/ToastContext";
 
 export default function Toast() {
+  const t = useTranslations("Modals.toast");
+  const tShared = useTranslations("Modals.shared");
   const { toast, hideToast } = useToast();
 
   return (
@@ -12,12 +15,12 @@ export default function Toast() {
       } ${toast.show ? "opacity-100 pointer-events-auto translate-y-0" : "opacity-0 pointer-events-none -translate-y-[104px]"}`}
     >
       <div className="flex items-center gap-3">
-        <p className="w-full font-semibold">{toast.title || (toast.type === "red" ? "Помилка" : "Успішно")}</p>
+        <p className="w-full font-semibold">{toast.title || (toast.type === "red" ? t("error") : t("success"))}</p>
         <button
           type="button"
           onClick={hideToast}
           className="shrink-0 w-6 h-6 flex items-center justify-center hover:bg-[#343434] transition-colors"
-          aria-label="Закрити"
+          aria-label={tShared("close")}
         >
           <img src="/yellow_cross.svg" alt="" className="w-4 h-4" />
         </button>

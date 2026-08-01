@@ -1,0 +1,233 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { usePathname, useRouter } from "@/src/i18n/navigation";
+import { useSearchParams } from "next/navigation";
+import Header from "../../../components/Header";
+import Footer from "../../../components/Footer";
+import JoinCommunityWrapper from "../../../components/JoinCommunityWrapper";
+import SearchSection from "../../../components/SearchSection";
+import ListOfNews, { type NewsListCardItem } from "./ListOfNews";
+import PaginationSection from "../../../components/PaginationSection";
+import Image from "next/image";
+import { newsAPI, type PublicNewsListItem } from "../../../lib/api/news";
+
+const ITEMS_PER_PAGE = 12;
+
+type SortOption = "new" | "old";
+
+const parseNewsDate = (dateValue: string) => {
+    const [day, month, year] = dateValue.split(".").map(Number);
+    return new Date(year, month - 1, day).getTime();
+};
+
+const mapToCardItem = (item: PublicNewsListItem): NewsListCardItem => ({
+    id: item.id,
+    slug: item.slug,
+    category: item.categoryLabel,
+    date: item.date,
+    title: item.title,
+    mainImage: item.mainImageUrl,
+});
+
+export default function NewsEventsPage() {
+    const t = useTranslations("News.list");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const [allNews, setAllNews] = useState<PublicNewsListItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const sortOption: SortOption = searchParams.get("sort") === "old" ? "old" : "new";
+    const sortLabels: Record<SortOption, string> = { new: t("sortNewer"), old: t("sortOlder") };
+
+    const searchQueryParam = searchParams.get("search") ?? "";
+    const [searchInput, setSearchInput] = useState(searchQueryParam);
+
+    useEffect(() => {
+        setSearchInput(searchQueryParam);
+    }, [searchQueryParam]);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        setIsLoading(true);
+        newsAPI
+            .list({ per_page: 200, language: "uk" })
+            .then((result) => {
+                if (isMounted) {
+                    setAllNews(result.items);
+                }
+            })
+            .catch(() => {
+                if (isMounted) {
+                    setAllNews([]);
+                }
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            });
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const normalizedSearchQuery = searchQueryParam.trim().toLowerCase();
+    const filteredNews = normalizedSearchQuery
+        ? allNews.filter((newsItem) => newsItem.title.toLowerCase().includes(normalizedSearchQuery))
+        : allNews;
+
+    const sortedNews = [...filteredNews].sort((a, b) => {
+        const dateA = parseNewsDate(a.date);
+        const dateB = parseNewsDate(b.date);
+
+        return sortOption === "new" ? dateB - dateA : dateA - dateB;
+    });
+
+    const hasResults = sortedNews.length > 0;
+    const totalPages = hasResults ? Math.ceil(sortedNews.length / ITEMS_PER_PAGE) : 0;
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const currentNews = sortedNews.slice(startIndex, endIndex).map(mapToCardItem);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleSortChange = (option: SortOption) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (option === "old") {
+            params.set("sort", "old");
+        } else {
+            params.delete("sort");
+        }
+
+        setCurrentPage(1);
+        setIsSortOpen(false);
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    };
+
+    const handleSearch = () => {
+        const params = new URLSearchParams(searchParams.toString());
+        const trimmedValue = searchInput.trim();
+
+        if (trimmedValue) {
+            params.set("search", trimmedValue);
+        } else {
+            params.delete("search");
+        }
+
+        setCurrentPage(1);
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    };
+
+    const handleClearSearch = () => {
+        setSearchInput("");
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("search");
+
+        setCurrentPage(1);
+        const search = params.toString();
+        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
+    };
+
+    return (
+        <>
+            <Header isHomePage={false} />
+            <SearchSection value={searchInput} onChange={setSearchInput} onSearch={handleSearch} />
+
+            {normalizedSearchQuery && (
+                <div className="bg-[#414141] flex flex-col items-center justify-center pt-4 pb-6 px-4">
+                    <p className="text-white text-center font-wix text-[18px] leading-[24px]">
+                        {t("searchResult")}
+                    </p>
+                </div>
+            )}
+            
+            {hasResults ? (
+                <section className="w-full bg-[#414141] py-8 px-4 sm:px-6 md:px-10 lg:px-20">
+                    {/* Title Section */}
+                    <div className="mb-6 md:mb-8">
+                        <p className="font-wix text-[#FECC39]  font-bold mb-2">{t("tagline")}</p>
+                        <h1 className="text-white font-bold text-2xl sm:text-3xl md:text-[40px] leading-tight max-w-[600px] whitespace-normal md:whitespace-nowrap" style={{ fontWeight: 600 }}>
+                            {t("title")}
+                        </h1>
+                    </div>
+
+                    {/* Sorting and News Section */}
+                    <div className="flex flex-col w-full">
+                        {/* Sorting Dropdown */}
+                        <div className="relative z-20 mb-4 md:mb-6 inline-block w-fit">
+                            <button 
+                                onClick={() => setIsSortOpen(!isSortOpen)}
+                                className="flex items-center gap-2 text-white font-bold text-sm md:text-base bg-[#343434] px-3 md:px-4 py-2 md:py-3 hover:text-[#FECC39] transition-colors"
+                            >
+                                {sortLabels[sortOption]}
+                                <Image
+                                    src={isSortOpen ? "/yellow_triangle_up.svg" : "/white_triangle_down.svg"} 
+                                    alt="" 
+                                    width={24} 
+                                    height={24} 
+                                />
+                            </button>
+                            
+                            {/* Dropdown Menu */}
+                            {isSortOpen && (
+                                <div className="absolute top-full left-0 mt-1 bg-[#343434] z-30 min-w-[200px] border-2 border-[#1a1a1a]">
+                                    {(["new", "old"] as SortOption[]).map((option) => (
+                                        <button
+                                            key={option}
+                                            onClick={() => handleSortChange(option)}
+                                            className={`w-full text-left px-3 md:px-4 py-2 md:py-3 font-bold text-sm md:text-base transition-colors border-b border-[#1a1a1a] last:border-b-0 ${
+                                                sortOption === option
+                                                    ? "text-[#FECC39] bg-[#414141]"
+                                                    : "text-white hover:text-[#FECC39] hover:bg-[#414141]"
+                                            }`}
+                                        >
+                                            {sortLabels[option]}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* News Grid */}
+                        <ListOfNews news={currentNews} disableHover={isSortOpen} />
+                    </div>
+                </section>
+            ) : null}
+            {hasResults ? (
+                <PaginationSection
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
+            ) : isLoading ? null : (
+                <div className="bg-[#414141] flex flex-col items-center justify-center pb-8 px-4">
+                    <button
+                        type="button"
+                        onClick={handleClearSearch}
+                        className="mb-6 flex items-center justify-center"
+                    >
+                        <img src="/yellow_cross.svg" alt={t("clearSearch")} className="w-8 h-8 md:w-9 md:h-9" />
+                    </button>
+                    <h2 className="text-white text-xl md:text-3xl font-bold text-center max-w-[800px]">
+                        {t("noSearchResults")}
+                    </h2>
+                </div>
+            )}
+            <JoinCommunityWrapper />
+        </>
+    );
+}

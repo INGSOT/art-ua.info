@@ -1,0 +1,60 @@
+{
+  "Main": {
+    "hero": {
+      "text": "The art of helping —\nthe most modern of the arts"
+    },
+    "navigation": {
+      "stageArt": "Performing Art",
+      "visualArt": "Visual Art",
+      "finArt": "Fine Art",
+      "literature": "Literature"
+    },
+    "platformDescription": {
+      "tagline": "art-ua",
+      "title": "About the platform",
+      "subtitle": "A community supporting\nUkrainian artists",
+      "paragraph1": "We are building a nationwide platform for individuals from various cultural fields whose professional qualifications carry high creative potential for producing unique works of art that artistically reinterpret contemporary historical events and the state of humanity, promote peace, and enrich the world's artistic heritage.",
+      "paragraph2": "To help overcome the global cultural crisis in a country standing guard for peace throughout the world, we provide an opportunity to shape a new artistic heritage that conveys the art of victory and protects future generations from ruin."
+    },
+    "platformFeatures": {
+      "inspiration": {
+        "title": "Creative inspiration",
+        "description": "Explore the work of others, get inspired, and improve your own projects."
+      },
+      "recognition": {
+        "title": "Recognition and new opportunities",
+        "description": "Boost your visibility and find new projects and collaborations that will help you realize your creative ambitions."
+      },
+      "learning": {
+        "title": "Learn from the best",
+        "description": "Attend webinars and masterclasses that will help you improve your professional skills."
+      }
+    },
+    "featuredWorks": {
+      "tagline": "Works",
+      "title": "The best works by our artists",
+      "buttonText": "All works",
+      "openProject": "Open project: {title}"
+    },
+    "imageCatalog": {
+      "tagline": "Catalogs",
+      "title": "Catalogs",
+      "buttonText": "All catalogs"
+    },
+    "supportArtists": {
+      "title": "Support artists"
+    },
+    "joinCommunity": {
+      "title1": "Join now",
+      "title2": "and become part of the art community",
+      "joinText": "Join\nnow"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "buttonText": "All questions"
+    },
+    "partners": {
+      "title": "Partners"
+    }
+  }
+}

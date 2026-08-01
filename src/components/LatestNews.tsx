@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/src/i18n/navigation";
 import { Card, CardContent } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { newsAPI, type PublicNewsListItem } from "../lib/api/news";
@@ -10,6 +11,7 @@ const LATEST_COUNT = 5;
 const SCROLL_STEP = 500;
 
 export default function LatestNews() {
+  const t = useTranslations("News.latest");
   const [latestNews, setLatestNews] = useState<PublicNewsListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hoveredArrow, setHoveredArrow] = useState<"prev" | "next" | null>(null);
@@ -56,11 +58,11 @@ export default function LatestNews() {
     <section className="flex flex-col items-center gap-[30px] px-4 py-10 md:py-20 w-full bg-white">
       <div className="flex flex-col w-full max-w-[1440px] items-start gap-2.5">
         <p className="self-stretch mt-[-1.00px] font-p1 font-[number:var(--p1-font-weight)] text-[#FECC39] text-[length:var(--p1-font-size)] tracking-[var(--p1-letter-spacing)] leading-[var(--p1-line-height)] [font-style:var(--p1-font-style)]">
-          Новини та події
+          {t("tagline")}
         </p>
 
         <h4 className="self-stretch font-h4 font-bold text-black text-[24px] md:text-[32px] lg:text-[40px] tracking-[var(--h4-letter-spacing)] leading-[var(--h4-line-height)] [font-style:var(--h4-font-style)] max-w-[600px] lg:whitespace-nowrap">
-          Актуальні новини та події у спільноті
+          {t("title")}
         </h4>
       </div>
 
@@ -71,11 +73,11 @@ export default function LatestNews() {
           onMouseEnter={() => setHoveredArrow("prev")}
           onMouseLeave={() => setHoveredArrow(null)}
           className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-20 md:w-12 md:h-28 flex items-center justify-center bg-black/50 hover:bg-[#FECC39] transition-colors"
-          aria-label="Previous"
+          aria-label={t("prev")}
         >
           <img
             src={hoveredArrow === "prev" ? "/arrow-chevron-left-black.svg" : "/arrow-chevron-left-white.svg"}
-            alt="Previous"
+            alt={t("prev")}
             className="w-6 h-6 md:w-8 md:h-8"
           />
         </button>
@@ -104,7 +106,7 @@ export default function LatestNews() {
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                       <img
                         src="/arrow-chevron-right-white.svg"
-                        alt="View"
+                        alt={t("viewAlt")}
                         className="w-12 h-12"
                       />
                     </div>
@@ -140,11 +142,11 @@ export default function LatestNews() {
           onMouseEnter={() => setHoveredArrow("next")}
           onMouseLeave={() => setHoveredArrow(null)}
           className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-20 md:w-12 md:h-28 flex items-center justify-center bg-black/50 hover:bg-[#FECC39] transition-colors"
-          aria-label="Next"
+          aria-label={t("next")}
         >
           <img
             src={hoveredArrow === "next" ? "/arrow-chevron-right-black.svg" : "/arrow-chevron-right-white.svg"}
-            alt="Next"
+            alt={t("next")}
             className="w-6 h-6 md:w-8 md:h-8"
           />
         </button>
@@ -155,7 +157,7 @@ export default function LatestNews() {
           asChild
           className="w-[300px] h-[60px] bg-[#343434] hover:bg-[#FECC39] text-[#FECC39] hover:text-[#343434] font-button font-bold text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)] [font-style:var(--button-font-style)] rounded-none transition-colors"
         >
-          <Link href="/news-events">Більше новин</Link>
+          <Link href="/news-events">{t("moreNews")}</Link>
         </Button>
       </div>
     </section>

@@ -1,0 +1,146 @@
+{
+  "Profile": {
+    "menu": {
+      "projects": "Projects",
+      "drafts": "Drafts",
+      "catalogs": "Catalogs",
+      "services": "Services",
+      "team": "Team",
+      "info": "Information",
+      "notifications": "Notifications"
+    },
+    "aboutMe": {
+      "editProfileButton": "Edit profile",
+      "avatarAlt": "Author avatar",
+      "editAlt": "Edit"
+    },
+    "viewContext": {
+      "legalEntityDefaultName": "Legal entity"
+    },
+    "catalogs": {
+      "addCatalogButton": "Add catalog",
+      "addCatalogButtonIconAlt": "Plus",
+      "tooltip": "Set as primary (shown on the homepage and artist page).",
+      "editIconAlt": "Edit",
+      "deleteIconAlt": "Delete",
+      "likeIconAlt": "Like",
+      "empty": {
+        "title": "There's nothing here yet",
+        "subtitle": "Add your first catalog.",
+        "button": "Add catalog"
+      },
+      "addModal": {
+        "title": "New catalog",
+        "editTitle": "Edit catalog",
+        "closeAlt": "Close",
+        "titleUkLabel": "Catalog title (Ukrainian)",
+        "titleUkPlaceholder": "Enter the title in Ukrainian",
+        "titleEnLabel": "Catalog title (English)",
+        "titleEnPlaceholder": "Enter the title in English",
+        "categoryLabel": "Art category",
+        "categoryPlaceholder": "Choose an art category",
+        "imageUploadText": "Add a cover.\nImages with a 4:3 ratio look best.",
+        "imageRemoveAlt": "Remove",
+        "catalogUploadText": "Upload catalog",
+        "catalogRemoveAlt": "Remove catalog",
+        "uploadIconAlt": "Upload",
+        "addButton": "Add",
+        "saveButton": "Save",
+        "imageTooLargeError": "Cover is too large (maximum {maxMb} MB)",
+        "pdfTooLargeError": "File is too large (maximum {maxMb} MB)",
+        "saveError": "Failed to save catalog"
+      },
+      "deleteModal": {
+        "title": "You are deleting a catalog",
+        "closeAlt": "Close",
+        "description": "Are you sure you want to delete this catalog?\nThis action cannot be undone.",
+        "deleteButton": "Yes, delete",
+        "cancelButton": "No, keep it"
+      },
+      "categoryForm": {
+        "title": "Art category",
+        "closeAlt": "Close"
+      }
+    },
+    "drafts": {
+      "createButton": "Create project",
+      "editAlt": "Edit",
+      "untitled": "Untitled",
+      "empty": {
+        "title": "You don't have any drafts yet",
+        "subtitle": "Unfinished and unpublished projects will appear here.",
+        "button": "Create project"
+      }
+    },
+    "edit": {
+      "avatarUploadAlt": "Upload",
+      "avatarUploadHint": "Add an avatar",
+      "avatarModalTitle": "Add an avatar",
+      "fullNameLabel": "Name",
+      "fullNameUkPlaceholder": "Вкажіть повне ім'я",
+      "fullNameEnPlaceholder": "Please specify the full name",
+      "professionLabel": "Profession",
+      "professionUkPlaceholder": "Наприклад: Режисер",
+      "professionEnPlaceholder": "For example: Director",
+      "countryLabel": "Country",
+      "countryPlaceholder": "Enter your country",
+      "cityLabel": "City",
+      "cityPlaceholder": "Enter your city",
+      "descriptionLabel": "About you",
+      "descriptionPlaceholder": "Tell us about yourself",
+      "socialsTitle": "Website and social media",
+      "websitePlaceholder": "Website (https://...)",
+      "facebookPlaceholder": "Facebook (https://...)",
+      "instagramPlaceholder": "Instagram (https://...)",
+      "linkedinPlaceholder": "LinkedIn (https://...)",
+      "youtubePlaceholder": "YouTube (https://...)",
+      "nameRequiredError": "Please enter your name",
+      "saveError": "Failed to save profile",
+      "saving": "Saving...",
+      "save": "Save",
+      "saveIconAlt": "Save"
+    },
+    "info": {
+      "websiteAlt": "Website",
+      "locationAlt": "Location"
+    },
+    "notifications": {
+      "empty": {
+        "title": "You don't have any service orders yet",
+        "subtitle": "Notifications will appear here when someone orders your service."
+      },
+      "serviceOrderLabel": "Service order",
+      "customerLabel": "Customer",
+      "emailLabel": "Email",
+      "phoneLabel": "Phone",
+      "optionsLabel": "Options",
+      "messageLabel": "Message",
+      "viewService": "View service",
+      "closeAlt": "Close"
+    },
+    "projects": {
+      "filters": {
+        "all": "All categories",
+        "newest": "Newest"
+      },
+      "createButton": "Create",
+      "plusAlt": "Plus",
+      "soldAlt": "Sold",
+      "viewAlt": "View",
+      "likeAlt": "Like",
+      "empty": {
+        "title": "There's nothing here yet",
+        "subtitle": "Add your first project.",
+        "button": "Create"
+      },
+      "project": {
+        "authorAvatarAlt": "Author avatar",
+        "previousAlt": "Previous",
+        "nextAlt": "Next",
+        "slideAlt": "Slide {index}",
+        "thumbnailAlt": "Thumbnail {index}",
+        "likeAlt": "Like"
+      }
+    }
+  }
+}

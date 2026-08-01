@@ -1,0 +1,42 @@
+{
+  "Catalogs": {
+    "list": {
+      "tagline": "Catalogs",
+      "title": "Catalogs of our artists",
+      "sortPopular": "Popular",
+      "sortNewest": "Newest",
+      "sortOldest": "Oldest",
+      "searchResult": "Search result",
+      "clearSearch": "Clear search",
+      "noSearchResults": "Nothing found. Try a different catalog or author name.",
+      "loading": "Loading...",
+      "notFound": "No catalogs found"
+    },
+    "filters": {
+      "show": "Show"
+    },
+    "viewer": {
+      "allCatalogs": "All catalogs",
+      "direction": "Direction",
+      "category": "Category",
+      "published": "Published",
+      "openInNewTab": "Open in new tab",
+      "downloadPdf": "Download PDF"
+    },
+    "like": {
+      "loginRequired": "You need to sign in to like this",
+      "updateFailed": "Failed to update the like",
+      "errorTitle": "Error"
+    },
+    "pdf": {
+      "viewError": "Failed to display the PDF preview",
+      "openSeparately": "Open file separately",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pageOf": "Page {current} of {total}",
+      "loading": "Loading PDF...",
+      "loadError": "Failed to load the PDF",
+      "pageLoading": "Loading page..."
+    }
+  }
+}

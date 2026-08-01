@@ -1,0 +1,142 @@
+{
+  "ProfileServices": {
+    "services": {
+      "addServiceButton": "Add service",
+      "editServiceButton": "Edit service",
+      "negotiablePrice": "Negotiable price",
+      "emptyState": {
+        "message": "Nothing here yet",
+        "subMessage": "Add your first service.",
+        "createButtonText": "Add service"
+      },
+      "form": {
+        "coverUploadHint": "Add a cover\n(required)",
+        "coverModalTitle": "Add a cover",
+        "serviceNameLabel": "Service name",
+        "serviceNameUaPlaceholder": "Вкажіть повну назву послуги",
+        "serviceNameEnPlaceholder": "Please specify the full name of the service",
+        "artCategoryLabel": "Art category",
+        "artCategoryPlaceholder": "Select an art category",
+        "costTitle": "Cost",
+        "priceFromLabel": "From",
+        "pricePlaceholder": "Enter the amount",
+        "orDivider": "or",
+        "priceNegotiableLabel": "Negotiable price",
+        "descriptionLabel": "Service description",
+        "descriptionUaPlaceholder": "Детально опишіть послугу",
+        "descriptionEnPlaceholder": "Describe the service in detail",
+        "optionsTitle": "Options",
+        "optionNamePlaceholder": "Назва опції",
+        "optionNameEnPlaceholder": "Option name",
+        "publishButton": "Publish",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "titleRequiredError": "Вкажіть назву послуги",
+        "categoryRequiredError": "Please select an art category",
+        "saveError": "Failed to save the service",
+        "deleteError": "Failed to delete the service",
+        "serviceNotFound": "Service not found",
+        "loadError": "Failed to load the service"
+      },
+      "deleteModal": {
+        "title": "You are deleting the service",
+        "closeAlt": "Close",
+        "description": "Are you sure you want to delete this service?\nThis action cannot be undone.",
+        "deleteButton": "Yes, delete",
+        "cancelButton": "No, keep it"
+      }
+    },
+    "team": {
+      "emptyState": {
+        "message": "Nothing here yet",
+        "subMessage": "Create your first team.",
+        "createButtonText": "Create team"
+      },
+      "card": {
+        "editAria": "Edit team",
+        "teamActionsAria": "Team actions {name}",
+        "actionsAlt": "Team actions",
+        "teamServicesLink": "Team services"
+      },
+      "form": {
+        "coverLabel": "Team cover",
+        "coverUploadHint": "Add a cover",
+        "coverModalTitle": "Add a cover",
+        "nameLabel": "Team name",
+        "nameUaPlaceholder": "Вкажіть назву команди",
+        "nameEnPlaceholder": "Please specify the team name",
+        "websiteLabel": "Team website",
+        "websitePlaceholder": "https://example.com",
+        "countryLabel": "Country",
+        "countryUaPlaceholder": "Вкажіть країну",
+        "countryEnPlaceholder": "Please specify the country",
+        "cityLabel": "City",
+        "cityUaPlaceholder": "Вкажіть назву",
+        "cityEnPlaceholder": "Please specify the city",
+        "regionLabel": "Region",
+        "regionUaPlaceholder": "Вкажіть область",
+        "regionEnPlaceholder": "Please specify the region",
+        "zipLabel": "Postal code",
+        "zipUaPlaceholder": "Вкажіть індекс",
+        "zipEnPlaceholder": "Please specify the postal code",
+        "specializationLabel": "Team specialization",
+        "specializationUaPlaceholder": "Наприклад: відеозйомка",
+        "specializationEnPlaceholder": "For example: video shooting",
+        "aboutLabel": "About the team",
+        "aboutUaPlaceholder": "Розкажіть про діяльність команди",
+        "aboutEnPlaceholder": "Tell us about the team's activity",
+        "membersTitle": "Members",
+        "memberIconAlt": "Artist",
+        "removeMemberAria": "Remove member",
+        "removeMemberAlt": "Remove",
+        "addMemberLabel": "Add a member to the team",
+        "addMemberPlaceholder": "Enter a name or email",
+        "addMemberAlt": "Add",
+        "createButton": "Create",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "avatarRequiredError": "Please add a team cover",
+        "nameUaRequiredError": "Вкажіть назву команди",
+        "nameEnRequiredError": "Please specify the team name",
+        "countryUaRequiredError": "Вкажіть країну",
+        "countryEnRequiredError": "Please specify the country",
+        "cityUaRequiredError": "Вкажіть населений пункт",
+        "cityEnRequiredError": "Please specify the city",
+        "regionUaRequiredError": "Вкажіть область",
+        "regionEnRequiredError": "Please specify the region",
+        "zipUaRequiredError": "Вкажіть поштовий індекс",
+        "zipEnRequiredError": "Please specify the postal code",
+        "specializationUaRequiredError": "Вкажіть спеціалізацію команди",
+        "specializationEnRequiredError": "Please specify the team specialization",
+        "descriptionUaRequiredError": "Розкажіть про діяльність команди",
+        "descriptionEnRequiredError": "Tell us about the team's activity",
+        "saveError": "Failed to save the team",
+        "deleteError": "Failed to delete the team",
+        "defaultTeamName": "Team"
+      },
+      "deleteModal": {
+        "closeAria": "Close",
+        "closeAlt": "Close",
+        "confirmText": "Are you sure you want to delete the team? This action cannot be undone.",
+        "deleteButton": "Yes, delete",
+        "cancelButton": "No, keep it"
+      },
+      "leaveModal": {
+        "closeAria": "Close",
+        "closeAlt": "Close",
+        "leaveButton": "Leave team",
+        "confirmText": "Are you sure you want to leave the team?",
+        "confirmLeaveButton": "Yes, leave",
+        "cancelButton": "No, stay"
+      },
+      "list": {
+        "createTeamButton": "Create team",
+        "teamNotFound": "Team not found"
+      },
+      "services": {
+        "teamNotFound": "Team not found",
+        "loadError": "Failed to load team services"
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "Projects": {
+    "list": {
+      "searchResultsLabel": "Search results",
+      "clearSearchAlt": "Clear search",
+      "noResults": "Nothing found. Try a different project or author name.",
+      "allCategories": "All",
+      "loading": "Loading...",
+      "empty": "No projects found",
+      "sortByDate": "By date",
+      "sortByName": "By name"
+    },
+    "filters": {
+      "statusTitle": "Project status",
+      "parametersTitle": "Parameters"
+    },
+    "detail": {
+      "shareLinkAlt": "Link",
+      "characteristicDefault": "Characteristic",
+      "direction": "Direction",
+      "genreMarkers": "Genre markers",
+      "conceptAuthor": "Concept author",
+      "status": "Status",
+      "characteristicsTitle": "Project characteristics:",
+      "tableHeaderName": "Name",
+      "tableHeaderDescription": "Description",
+      "notesTitle": "Notes on the project “{title}”",
+      "projectOnSaveArt": "Project on {label}",
+      "projectOnArtUa": "Project on {label}",
+      "loginToLike": "Sign in to like this project",
+      "errorTitle": "Error",
+      "likeSyncFailed": "Failed to update like",
+      "likeUpdateFailed": "Failed to update like, please try again later"
+    },
+    "showcase": {
+      "editProject": "Edit project",
+      "editAlt": "Edit",
+      "linkCopied": "Project link copied",
+      "linkCopyFailed": "Failed to copy the link",
+      "shareIn": "Share on {network}",
+      "copyProjectLink": "Copy project link",
+      "prevSlide": "Previous",
+      "nextSlide": "Next"
+    }
+  },
+  "Filters": {
+    "filtersCount": "Filters ({count})",
+    "dialogLabel": "Filters",
+    "close": "Close",
+    "foundCount": "Found: {count}",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "clearAll": "Clear all",
+    "removeFilter": "Remove filter {label}"
+  }
+}

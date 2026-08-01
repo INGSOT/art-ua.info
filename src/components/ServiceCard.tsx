@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/src/i18n/navigation";
 
-const DEFAULT_ORDER_LABEL = "Замовити послугу";
-const DEFAULT_EDIT_LABEL = "Редагувати послугу";
 const DEFAULT_ORDER_HREF = "/services";
 
 export type ServiceCardFooter =
@@ -24,10 +23,11 @@ export default function ServiceCard({
   title,
   footer,
 }: ServiceCardProps) {
+  const t = useTranslations("Services.card");
   const footerLabel =
     footer.variant === "order"
-      ? (footer.label ?? DEFAULT_ORDER_LABEL)
-      : (footer.label ?? DEFAULT_EDIT_LABEL);
+      ? (footer.label ?? t("orderLabel"))
+      : (footer.label ?? t("editLabel"));
 
   return (
     <div className="flex flex-col bg-[#272727] w-full">
