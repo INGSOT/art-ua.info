@@ -93,7 +93,7 @@ export default function Projects() {
               {myProjects.map((project) => (
                 <Link
                   key={project.id}
-                  href={`/projects/${project.slug}`}
+                  href={withProfileId(`/profile/edit-project?edit=${project.slug}`, slug)}
                   className="block group"
                 >
                   <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">

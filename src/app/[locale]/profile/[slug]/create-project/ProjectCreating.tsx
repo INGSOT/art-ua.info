@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/src/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { artCategories } from "../../../../../data/newProjectData";
 import { getVideoInfo } from "../../../../../utils/videoUtils";
 import { useProfileView } from "../../ProfileViewContext";
 import {
@@ -18,7 +17,7 @@ import {
 } from "../../../../../lib/api/projects";
 import { getApiErrorMessage, getApiFieldErrors } from "../../../../../lib/apiError";
 import { withProfileId } from "../../../../../lib/authorQuery";
-import { catalogsAPI, type Parameter } from "../../../../../lib/api/catalogs";
+import { catalogsAPI, type ArtCategory as ArtCategoryOption, type Parameter } from "../../../../../lib/api/catalogs";
 import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 import AddProjectCover from "./AddProjectCover";
 import AddWork from "./AddWork";
@@ -38,17 +37,23 @@ import type { AdditionalContentBlock } from "./additionalContentBlock";
 import PublicationPreviewSection from "./PublicationPreviewSection";
 import ProjectPublication from "./ProjectPublication";
 
-function findArtCategoryIdForSubcategory(subcategoryId: string | undefined): string | undefined {
+function findArtCategoryIdForSubcategory(
+  categories: ArtCategoryOption[],
+  subcategoryId: string | undefined
+): string | undefined {
   if (!subcategoryId) return undefined;
-  return artCategories.find((category) =>
-    category.subcategories.some((subcategory) => subcategory.id === subcategoryId)
-  )?.id;
+  return categories.find((category) =>
+    category.subcategories.some((subcategory) => subcategory.value === subcategoryId)
+  )?.value;
 }
 
-function findSubcategoryLabel(subcategoryId: string | null | undefined): string | undefined {
+function findSubcategoryLabel(
+  categories: ArtCategoryOption[],
+  subcategoryId: string | null | undefined
+): string | undefined {
   if (!subcategoryId) return undefined;
-  for (const category of artCategories) {
-    const subcategory = category.subcategories.find((item) => item.id === subcategoryId);
+  for (const category of categories) {
+    const subcategory = category.subcategories.find((item) => item.value === subcategoryId);
     if (subcategory) return subcategory.label;
   }
   return undefined;
@@ -154,6 +159,8 @@ export default function ProjectCreating() {
     id: string;
     label: string;
   } | null>(null);
+  const [artCategories, setArtCategories] = useState<ArtCategoryOption[]>([]);
+  const [pendingArtSubcategorySlug, setPendingArtSubcategorySlug] = useState<string | null>(null);
   const [parameterCatalog, setParameterCatalog] = useState<Parameter[]>([]);
   const [isLoadingParameters, setIsLoadingParameters] = useState(false);
   const [parameterAnswers, setParameterAnswers] = useState<ParameterAnswers>({});
@@ -172,6 +179,34 @@ export default function ProjectCreating() {
       return next;
     });
   };
+
+  // Довідник галузей/жанрів мистецтва тягнемо з бекенду (реальні slug'и art_categories),
+  // а не з локального хардкоду — інакше slug'и розходяться з тим, що знає бекенд, і
+  // категорія/жанр не резолвиться при збереженні та редагуванні проєкту.
+  useEffect(() => {
+    let cancelled = false;
+    catalogsAPI
+      .categories()
+      .then((data) => {
+        if (!cancelled) setArtCategories(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Дочекатись завантаження довідника категорій, перш ніж перетворити збережений
+  // slug підкатегорії проєкту на видиму мітку — інакше при паралельному запиті
+  // myShow() довідник ще міг бути порожнім і галузь мистецтва скидалась.
+  useEffect(() => {
+    if (!pendingArtSubcategorySlug || artCategories.length === 0) return;
+    const label = findSubcategoryLabel(artCategories, pendingArtSubcategorySlug);
+    if (label) {
+      setSelectedArtField({ id: pendingArtSubcategorySlug, label });
+      setPendingArtSubcategorySlug(null);
+    }
+  }, [artCategories, pendingArtSubcategorySlug]);
 
   // Режим редагування (?edit=slug): підтягуємо дані вже опублікованого проєкту
   // і заповнюємо ними форму замість порожнього створення.
@@ -205,8 +240,7 @@ export default function ProjectCreating() {
         setProjectStatus(project.status);
         setProjectStatusLabel(project.statusLabel);
         if (project.artSubcategory) {
-          const label = findSubcategoryLabel(project.artSubcategory);
-          if (label) setSelectedArtField({ id: project.artSubcategory, label });
+          setPendingArtSubcategorySlug(project.artSubcategory);
         }
         setParameterAnswers(
           project.parameters.reduce<ParameterAnswers>((acc, param) => {
@@ -319,7 +353,7 @@ export default function ProjectCreating() {
     setSelectedArtField({ id, label });
   };
 
-  const artCategorySlug = findArtCategoryIdForSubcategory(selectedArtField?.id);
+  const artCategorySlug = findArtCategoryIdForSubcategory(artCategories, selectedArtField?.id);
 
   // Каталог характеристик залежить від обраної галузі мистецтва (як на save-art) —
   // перезавантажуємо його щоразу, коли змінюється категорія/підкатегорія.
@@ -549,7 +583,7 @@ export default function ProjectCreating() {
         uk: descriptionUa.trim() || undefined,
         en: descriptionEn.trim() || undefined,
       },
-      art_category: findArtCategoryIdForSubcategory(selectedArtField?.id),
+      art_category: findArtCategoryIdForSubcategory(artCategories, selectedArtField?.id),
       art_subcategory: selectedArtField?.id,
       cover: toApiRelativePath(projectCover || undefined),
       final_result: finalResult.length ? finalResult : undefined,
@@ -601,6 +635,7 @@ export default function ProjectCreating() {
 
       await projectsAPI.createArtUaInfoProject({ ...commonPayload, status: "moderation" });
       resetFormState();
+      router.push(withProfileId("/profile/projects", profileSlug));
 
       return { type: "success", text: t("publication.messages.createSuccess") };
     } catch (error) {
@@ -921,6 +956,7 @@ export default function ProjectCreating() {
         onClose={() => setIsArtFormModalOpen(false)}
         onSelect={handleSelectArtField}
         selectedSubcategory={selectedArtField?.id || null}
+        categories={artCategories}
       />
 
       {/* Add Image Gallery Modal */}

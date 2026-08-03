@@ -34,7 +34,7 @@
       },
       "messages": {
         "updateSuccess": "Project updated",
-        "createSuccess": "Project sent for moderation",
+        "createSuccess": "Project published",
         "publishError": "Error while sending the project",
         "draftUnpublished": "The project has been unpublished and saved as a draft",
         "draftSaved": "Draft saved",

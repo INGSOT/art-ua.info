@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { artCategories } from "../../../../../data/newProjectData";
+import type { ArtCategory } from "../../../../../lib/api/catalogs";
 
 interface SelectArtFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (subcategoryId: string, subcategoryLabel: string) => void;
   selectedSubcategory: string | null;
+  categories: ArtCategory[];
 }
 
 export default function SelectArtForm({
@@ -17,6 +18,7 @@ export default function SelectArtForm({
   onClose,
   onSelect,
   selectedSubcategory,
+  categories,
 }: SelectArtFormProps) {
   const t = useTranslations("CreateProject.selectArtFormModal");
   const [hoveredSubcategory, setHoveredSubcategory] = useState<string | null>(null);
@@ -58,32 +60,32 @@ export default function SelectArtForm({
 
         {/* Content */}
         <div className="flex-1 px-6 pb-6 flex flex-col gap-6 overflow-y-auto scrollbar-hide">
-          {artCategories.map((category) => (
-            <div key={category.id} className="flex flex-col gap-4">
+          {categories.map((category) => (
+            <div key={category.value} className="flex flex-col gap-4">
               {/* Category Title */}
               <h3 className="text-[#FECC39] text-[18px] font-bold">
-                {category.title}
+                {category.label}
               </h3>
 
               {/* Subcategories */}
               <div className="flex flex-col">
                 {category.subcategories.map((subcategory) => (
                   <button
-                    key={subcategory.id}
-                    onClick={() => handleSubcategoryClick(subcategory.id, subcategory.label)}
-                    onMouseEnter={() => setHoveredSubcategory(subcategory.id)}
+                    key={subcategory.value}
+                    onClick={() => handleSubcategoryClick(subcategory.value, subcategory.label)}
+                    onMouseEnter={() => setHoveredSubcategory(subcategory.value)}
                     onMouseLeave={() => setHoveredSubcategory(null)}
                     className="flex items-center gap-4 px-4 py-4 bg-[#343434] transition-colors border-b border-[#414141] last:border-b-0"
                   >
                     {/* Checkbox */}
                     <div
                       className={`w-5 h-5 border-2 flex items-center justify-center transition-colors ${
-                        selectedSubcategory === subcategory.id || hoveredSubcategory === subcategory.id
+                        selectedSubcategory === subcategory.value || hoveredSubcategory === subcategory.value
                           ? "border-[#FFD700]"
                           : "border-white"
                       }`}
                     >
-                      {selectedSubcategory === subcategory.id && (
+                      {selectedSubcategory === subcategory.value && (
                         <div className="w-3 h-3 bg-[#FFD700]"></div>
                       )}
                     </div>
@@ -91,7 +93,7 @@ export default function SelectArtForm({
                     {/* Label */}
                     <span
                       className={`flex-1 text-left font-bold transition-colors ${
-                        selectedSubcategory === subcategory.id || hoveredSubcategory === subcategory.id
+                        selectedSubcategory === subcategory.value || hoveredSubcategory === subcategory.value
                           ? "text-[#FFD700]"
                           : "text-white"
                       }`}
