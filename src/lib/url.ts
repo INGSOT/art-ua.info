@@ -31,3 +31,9 @@ export function getImageUrl(path?: string | null): string | null {
   const withStorage = path.startsWith("storage/") ? path : `storage/${path.replace(/^storage\/?/, "")}`;
   return API_BASE ? `${API_BASE}/${withStorage}` : `/${withStorage}`;
 }
+
+// Поле "Сайт" зберігається як довільний рядок без валідації протоколу на бекенді —
+// без нього <a href> трактує адресу як відносний шлях і посилання веде в нікуди.
+export function withHttpProtocol(url: string): string {
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}

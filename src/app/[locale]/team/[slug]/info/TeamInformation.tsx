@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useTeamProfile } from "../../TeamProfileContext";
+import { withHttpProtocol } from "../../../../../lib/url";
 
 export default function TeamInformation() {
   const t = useTranslations("Team.participants");
@@ -30,10 +31,15 @@ export default function TeamInformation() {
         <div className="w-full bg-[#343434] h-auto md:h-[80px] mb-4 py-4 md:py-0">
           <div className="flex flex-col md:flex-row md:items-center justify-start h-full px-4 md:px-[30px] gap-4 md:gap-6">
             {team.website && (
-              <div className="flex items-center gap-4">
+              <a
+                href={withHttpProtocol(team.website)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 hover:opacity-80 transition-opacity"
+              >
                 <Image src="/planet.svg" alt="Website" width={24} height={24} />
                 <span className="text-white text-sm font-bold">{team.website}</span>
-              </div>
+              </a>
             )}
             {team.socialLinks.length > 0 && (
               <div className="flex items-center gap-4 flex-wrap md:flex-nowrap">
