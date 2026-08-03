@@ -4,15 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
-import { useSearchParams } from "next/navigation";
-import AddProjectCover from "../../create-project/AddProjectCover";
-import { myServicesAPI } from "../../../../../../lib/api/myServices";
-import { withProfileId } from "../../../../../../lib/authorQuery";
-import { useProfileView } from "../../../ProfileViewContext";
-import { getApiErrorMessage, getApiFieldErrors } from "../../../../../../lib/apiError";
-import { catalogsAPI, type ArtCategory } from "../../../../../../lib/api/catalogs";
-import SelectCatalogCategoryForm from "../../catalogs/SelectCatalogCategoryForm";
-import DeleteService from "../../services/DeleteService";
+import { useParams, useSearchParams } from "next/navigation";
+import AddProjectCover from "../../../profile/[slug]/create-project/AddProjectCover";
+import { myServicesAPI } from "../../../../../lib/api/myServices";
+import { getApiErrorMessage, getApiFieldErrors } from "../../../../../lib/apiError";
+import { catalogsAPI, type ArtCategory } from "../../../../../lib/api/catalogs";
+import SelectCatalogCategoryForm from "../../../profile/[slug]/catalogs/SelectCatalogCategoryForm";
+import DeleteService from "./DeleteService";
+import { hrefWithTeam } from "../../useCurrentTeam";
 
 interface TeamServiceFormProps {
   mode?: "create" | "edit";
@@ -42,10 +41,10 @@ export default function TeamServiceForm({ mode = "create" }: TeamServiceFormProp
   const t = useTranslations("ProfileServices.services.form");
   const tTeam = useTranslations("ProfileServices.team.services");
   const router = useRouter();
+  const params = useParams<{ slug?: string }>();
+  const teamSlug = params?.slug ?? "";
   const searchParams = useSearchParams();
-  const teamSlug = searchParams.get("team");
   const editSlug = searchParams.get("slug");
-  const { slug: profileSlug } = useProfileView();
 
   const [serviceCover, setServiceCover] = useState<string | null>(null);
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
@@ -85,7 +84,7 @@ export default function TeamServiceForm({ mode = "create" }: TeamServiceFormProp
   const isMissingEditTarget = mode === "edit" && !editSlug;
 
   const goBackToTeamServices = () => {
-    router.push(`${withProfileId("/profile/team/services", profileSlug)}?team=${teamSlug}`);
+    router.push(hrefWithTeam("/team/services", teamSlug));
   };
 
   useEffect(() => {
@@ -647,35 +646,37 @@ export default function TeamServiceForm({ mode = "create" }: TeamServiceFormProp
         </button>
 
         {/* Delete Button */}
-        <button
-          type="button"
-          onClick={() => setIsDeleteModalOpen(true)}
-          onMouseEnter={() => setIsDeleteHovered(true)}
-          onMouseLeave={() => setIsDeleteHovered(false)}
-          className={`w-[300px] h-[60px] flex items-stretch transition-all duration-300 ${
-            isDeleteHovered ? "bg-[#FECC39]" : "bg-[#343434]"
-          }`}
-        >
-          <span
-            className={`flex items-center justify-center flex-1 px-6 font-bold transition-colors ${
-              isDeleteHovered ? "text-[#343434]" : "text-[#FECC39]"
+        {isEditMode && (
+          <button
+            type="button"
+            onClick={() => setIsDeleteModalOpen(true)}
+            onMouseEnter={() => setIsDeleteHovered(true)}
+            onMouseLeave={() => setIsDeleteHovered(false)}
+            className={`w-[300px] h-[60px] flex items-stretch transition-all duration-300 ${
+              isDeleteHovered ? "bg-[#FECC39]" : "bg-[#343434]"
             }`}
           >
-            {t("deleteButton")}
-          </span>
-          <div
-            className={`flex items-center justify-center w-[60px] border-l transition-colors ${
-              isDeleteHovered ? "border-[#343434]" : "border-[#FECC39]"
-            }`}
-          >
-            <Image
-              src={isDeleteHovered ? "/black_cross.svg" : "/yellow_cross.svg"}
-              alt="Delete"
-              width={24}
-              height={24}
-            />
-          </div>
-        </button>
+            <span
+              className={`flex items-center justify-center flex-1 px-6 font-bold transition-colors ${
+                isDeleteHovered ? "text-[#343434]" : "text-[#FECC39]"
+              }`}
+            >
+              {t("deleteButton")}
+            </span>
+            <div
+              className={`flex items-center justify-center w-[60px] border-l transition-colors ${
+                isDeleteHovered ? "border-[#343434]" : "border-[#FECC39]"
+              }`}
+            >
+              <Image
+                src={isDeleteHovered ? "/black_cross.svg" : "/yellow_cross.svg"}
+                alt="Delete"
+                width={24}
+                height={24}
+              />
+            </div>
+          </button>
+        )}
       </form>
 
       {/* Add Project Cover Modal */}

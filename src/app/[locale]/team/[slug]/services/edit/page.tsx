@@ -2,16 +2,15 @@
 
 import { Suspense } from "react";
 import Header from "../../../../../../components/Header";
-import TeamForm from "../../team/TeamForm";
+import TeamServiceForm from "../TeamServiceForm";
 
-export default function EditTeamPage() {
+export default function EditTeamServicePage() {
   return (
     <>
       <Header isHomePage={false} />
       <Suspense fallback={null}>
-        <TeamForm mode="edit" />
+        <TeamServiceForm mode="edit" />
       </Suspense>
     </>
   );
 }
-

@@ -20,7 +20,6 @@ export default function Menu({ activeItem }: MenuProps) {
     { id: "drafts", label: t("drafts"), href: withProfileId("/profile/drafts", slug) },
     { id: "catalogs", label: t("catalogs"), href: withProfileId("/profile/catalogs", slug) },
     { id: "services", label: t("services"), href: withProfileId("/profile/services", slug) },
-    { id: "team", label: t("team"), href: withProfileId("/profile/team", slug) },
     { id: "info", label: t("info"), href: withProfileId("/profile/info", slug) },
     { id: "notifications", label: t("notifications"), href: withProfileId("/profile/notifications", slug) },
   ];

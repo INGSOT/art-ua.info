@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/src/i18n/navigation";
-import AddProjectCover from "../create-project/AddProjectCover";
+import { useParams } from "next/navigation";
+import AddProjectCover from "../../../profile/[slug]/create-project/AddProjectCover";
+import DeleteTeamModal from "./DeleteTeamModal";
 import { myTeamsAPI } from "../../../../../lib/api/myTeams";
 import { getApiErrorMessage, getApiFieldErrors } from "../../../../../lib/apiError";
-import { withProfileId } from "../../../../../lib/authorQuery";
-import { useProfileView } from "../../ProfileViewContext";
+import { hrefWithTeam } from "../../useCurrentTeam";
 
 // Порядок відповідає розташуванню полів у формі (згори вниз) — перше поле з
 // помилкою в цьому порядку отримує фокус, коли сервер повертає 422.
@@ -41,7 +42,8 @@ interface MemberOption {
 export default function TeamForm() {
   const t = useTranslations("ProfileServices.team.form");
   const router = useRouter();
-  const { slug: profileSlug } = useProfileView();
+  const params = useParams<{ slug?: string }>();
+  const teamSlug = params?.slug ?? "";
 
   const [teamCover, setTeamCover] = useState<string | null>(null);
   const [isCoverModalOpen, setIsCoverModalOpen] = useState(false);
@@ -75,6 +77,8 @@ export default function TeamForm() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
   const [isPrimaryHovered, setIsPrimaryHovered] = useState(false);
+  const [isDeleteHovered, setIsDeleteHovered] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const avatarRef = useRef<HTMLDivElement>(null);
   const nameUaRef = useRef<HTMLInputElement>(null);
@@ -131,6 +135,38 @@ export default function TeamForm() {
   }, [fieldErrors]);
 
   useEffect(() => {
+    if (!teamSlug) return;
+    myTeamsAPI.getForEdit(teamSlug).then((team) => {
+      if (!team) return;
+      setTeamCover(team.avatarUrl);
+      setWebsiteUrl(team.website ?? "");
+      setNameUa(team.name.uk ?? "");
+      setNameEn(team.name.en ?? "");
+      setCountryUa(team.country.uk ?? "");
+      setCountryEn(team.country.en ?? "");
+      setCityUa(team.city.uk ?? "");
+      setCityEn(team.city.en ?? "");
+      setRegionUa(team.region.uk ?? "");
+      setRegionEn(team.region.en ?? "");
+      setZipUa(team.zip.uk ?? "");
+      setZipEn(team.zip.en ?? "");
+      setAboutUa(team.description.uk ?? "");
+      setAboutEn(team.description.en ?? "");
+      setSpecializationUa(team.specialization.uk ?? "");
+      setSpecializationEn(team.specialization.en ?? "");
+      setSelectedMembers(
+        team.members.map((m) => ({
+          key: `member-${m.id}`,
+          id: m.id,
+          name: m.name,
+          icon: m.avatarUrl ?? "/megaphone.svg",
+        }))
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teamSlug]);
+
+  useEffect(() => {
     const query = membersQuery.trim();
     if (!query) {
       setSearchResults([]);
@@ -155,13 +191,16 @@ export default function TeamForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [membersQuery]);
 
+  const goBackToTeam = () => {
+    router.push(hrefWithTeam("/team/projects", teamSlug));
+  };
+
   const handlePrimary = async () => {
     setError(null);
     setFieldErrors({});
 
-    // Дзеркалить обов'язкові поля StoreTeamRequest/UpdateTeamRequest на бекенді
-    // (усі поля, крім website) — щоб не чекати на round-trip для очевидно
-    // порожніх полів.
+    // Дзеркалить обов'язкові поля UpdateTeamRequest на бекенді (усі поля,
+    // крім website) — щоб не чекати на round-trip для очевидно порожніх полів.
     const requiredChecks: Array<[(typeof FIELD_ORDER)[number], boolean, string]> = [
       ["avatar", !teamCover, t("avatarRequiredError")],
       ["name.uk", !nameUa.trim(), t("nameUaRequiredError")],
@@ -206,8 +245,8 @@ export default function TeamForm() {
     };
 
     try {
-      await myTeamsAPI.create(payload);
-      router.push(withProfileId("/profile/team", profileSlug));
+      await myTeamsAPI.update(teamSlug, payload);
+      goBackToTeam();
     } catch (err) {
       const errors = getApiFieldErrors(err);
       if (errors) {
@@ -215,6 +254,17 @@ export default function TeamForm() {
       } else {
         setError(getApiErrorMessage(err, t("saveError")));
       }
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!teamSlug) return;
+    try {
+      await myTeamsAPI.remove(teamSlug);
+      router.push("/team");
+    } catch (err) {
+      setIsDeleteModalOpen(false);
+      setError(getApiErrorMessage(err, t("deleteError")));
     }
   };
 
@@ -736,10 +786,41 @@ export default function TeamForm() {
           }`}
         >
           <span className="flex items-center justify-center flex-1 px-6 font-bold text-[#343434]">
-            {t("createButton")}
+            {t("saveButton")}
           </span>
           <div className="flex items-center justify-center w-[60px] border-l border-[#343434]">
             <Image src="/grey_check.svg" alt="Primary" width={20} height={20} />
+          </div>
+        </button>
+
+        {/* Delete Button */}
+        <button
+          type="button"
+          onClick={() => setIsDeleteModalOpen(true)}
+          onMouseEnter={() => setIsDeleteHovered(true)}
+          onMouseLeave={() => setIsDeleteHovered(false)}
+          className={`w-[300px] h-[60px] flex items-stretch transition-all duration-300 ${
+            isDeleteHovered ? "bg-[#FECC39]" : "bg-[#343434]"
+          }`}
+        >
+          <span
+            className={`flex items-center justify-center flex-1 px-6 font-bold transition-colors ${
+              isDeleteHovered ? "text-[#343434]" : "text-[#FECC39]"
+            }`}
+          >
+            {t("deleteButton")}
+          </span>
+          <div
+            className={`flex items-center justify-center w-[60px] border-l transition-colors ${
+              isDeleteHovered ? "border-[#343434]" : "border-[#FECC39]"
+            }`}
+          >
+            <Image
+              src={isDeleteHovered ? "/black_cross.svg" : "/yellow_cross.svg"}
+              alt="Delete"
+              width={24}
+              height={24}
+            />
           </div>
         </button>
       </form>
@@ -752,7 +833,13 @@ export default function TeamForm() {
         currentImage={teamCover}
         customTitle={t("coverModalTitle")}
       />
+
+      <DeleteTeamModal
+        isOpen={isDeleteModalOpen}
+        teamName={nameUa || t("defaultTeamName")}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onDelete={handleDelete}
+      />
     </div>
   );
 }
-

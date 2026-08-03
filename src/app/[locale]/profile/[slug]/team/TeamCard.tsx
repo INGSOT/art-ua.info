@@ -1,9 +1,8 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/src/i18n/navigation";
-import { withProfileId } from "../../../../../lib/authorQuery";
+import { Link } from "@/src/i18n/navigation";
+import { withTeamId } from "../../../../../lib/authorQuery";
 import type { MyTeam } from "../../../../../lib/api/myTeams";
-import { useProfileView } from "../../ProfileViewContext";
 
 interface TeamCardProps {
   team: MyTeam;
@@ -18,8 +17,6 @@ export default function TeamCard({
   onLeaveTeamClick,
 }: TeamCardProps) {
   const t = useTranslations("ProfileServices.team.card");
-  const router = useRouter();
-  const { slug } = useProfileView();
 
   return (
     <article className="relative w-full bg-[#343434] p-6 flex flex-col gap-4">
@@ -36,24 +33,23 @@ export default function TeamCard({
         </div>
 
         <div className="flex-1">
-          <h2 className="text-white text-3xl font-bold leading-tight">
-            {team.name}
-          </h2>
+          <Link href={withTeamId("/team/projects", team.slug)}>
+            <h2 className="text-white text-3xl font-bold leading-tight hover:underline">
+              {team.name}
+            </h2>
+          </Link>
         </div>
 
         {!readOnly && (
           <div className="ml-4 flex-shrink-0">
             {team.isOwner ? (
-              <button
-                type="button"
-                onClick={() =>
-                router.push(`${withProfileId("/profile/team/edit", slug)}?slug=${team.slug}`)
-              }
+              <Link
+                href={withTeamId("/team/edit", team.slug)}
                 aria-label={t("editAria")}
-                className="p-1 -m-1"
+                className="p-1 -m-1 inline-block"
               >
                 <Image src="/edit_yellow.svg" alt="" width={24} height={24} />
-              </button>
+              </Link>
             ) : (
               <button
                 type="button"
@@ -98,18 +94,6 @@ export default function TeamCard({
           </div>
         ))}
       </div>
-
-      {!readOnly && (
-        <button
-          type="button"
-          onClick={() =>
-            router.push(`${withProfileId("/profile/team/services", slug)}?team=${team.slug}`)
-          }
-          className="self-start text-[#FECC39] text-sm font-bold hover:underline mt-2"
-        >
-          {t("teamServicesLink")}
-        </button>
-      )}
     </article>
   );
 }
