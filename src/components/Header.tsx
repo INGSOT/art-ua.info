@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Link, usePathname } from "../i18n/navigation";
 import { routing } from "../i18n/routing";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { navigationItems, socialIcons } from "../data/headerData";
 import SearchModal from "./SearchModal";
@@ -16,6 +16,7 @@ import { useToast } from "../context/ToastContext";
 import { getImageUrl } from "../lib/url";
 import AvatarPlaceholder from "./ui/AvatarPlaceholder";
 import SiteSwitcher from "./SiteSwitcher";
+import { notificationsAPI } from "../lib/api/notifications";
 
 interface HeaderProps {
   isHomePage?: boolean;
@@ -36,6 +37,32 @@ export default function Header({ isHomePage = false }: HeaderProps) {
     const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
     const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+    const [hasUnread, setHasUnread] = useState(false);
+
+    useEffect(() => {
+      if (!user) {
+        setHasUnread(false);
+        return;
+      }
+
+      let cancelled = false;
+      const fetchUnreadCount = () => {
+        notificationsAPI
+          .unreadCount()
+          .then((count) => {
+            if (!cancelled) setHasUnread(count > 0);
+          })
+          .catch(() => {});
+      };
+
+      fetchUnreadCount();
+      const intervalId = setInterval(fetchUnreadCount, 60000);
+
+      return () => {
+        cancelled = true;
+        clearInterval(intervalId);
+      };
+    }, [user, isProfileMenuOpen]);
 
     const openLoginModal = () => {
       setDisableAuthAnimation(false);
@@ -51,19 +78,21 @@ export default function Header({ isHomePage = false }: HeaderProps) {
       <button
         type="button"
         onClick={() => setIsProfileMenuOpen(true)}
-        className="relative w-11 h-11 flex items-center justify-center shrink-0"
+        className="relative w-11 h-11 shrink-0"
         aria-label={user.name}
       >
         {getImageUrl(user.avatar_url) ? (
           <img
             src={getImageUrl(user.avatar_url)!}
             alt={user.name}
-            className="w-9 h-9 rounded-full object-cover"
+            className="w-11 h-11 rounded-full border border-[#FECC39] object-cover"
           />
         ) : (
-          <AvatarPlaceholder name={user.name} className="w-9 h-9" textClassName="text-[14px]" />
+          <AvatarPlaceholder name={user.name} className="w-11 h-11 border border-[#FECC39]" textClassName="text-[14px]" />
         )}
-        <span className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-[#4CAF50] border-2 border-[#414141]" />
+        {hasUnread && (
+          <span className="absolute top-[calc(100%+8px)] left-[calc(50%-4px)] w-2 h-2 rounded-full bg-[#343434] animate-pulse" />
+        )}
       </button>
     ) : (
       <Button

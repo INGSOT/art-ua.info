@@ -55,6 +55,11 @@ export const notificationsAPI = {
     return response.data.data.map(mapNotification);
   },
 
+  unreadCount: async (): Promise<number> => {
+    const response = await api.get<{ unread_count: number }>("/v1/art-ua-info/my/notifications/unread-count");
+    return response.data.unread_count ?? 0;
+  },
+
   markAsRead: async (source: NotificationSource, id: number): Promise<void> => {
     await api.post(`/v1/art-ua-info/my/notifications/${source}/${id}/read`);
   },
