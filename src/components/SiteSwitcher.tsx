@@ -20,9 +20,9 @@ export default function SiteSwitcher() {
         <DropdownMenu.Trigger asChild>
           <button
             type="button"
-            className="group inline-flex items-center gap-2 px-2 py-1 transition-colors duration-200 data-[state=open]:bg-[#FECC39]"
+            className="group inline-flex items-center gap-2 px-2 py-1 min-w-0 transition-colors duration-200 data-[state=open]:bg-[#FECC39]"
           >
-            <div className="w-fit font-bold text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap transition-colors duration-200 text-white group-hover:text-[#FECC39] group-data-[state=open]:text-[#1E1E1E] group-data-[state=open]:group-hover:text-[#1E1E1E]">
+            <div className="min-w-0 max-w-[140px] sm:max-w-none truncate font-bold text-[14px] font-[family-name:var(--font-unbounded)] transition-colors duration-200 text-white group-hover:text-[#FECC39] group-data-[state=open]:text-[#1E1E1E] group-data-[state=open]:group-hover:text-[#1E1E1E]">
               {SITE_DOMAIN}
             </div>
 

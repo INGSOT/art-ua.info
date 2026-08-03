@@ -17,14 +17,17 @@
       "noMembers": "No members added yet.",
       "artistType": "Artist",
       "organizationType": "Organization",
-      "catalogButton": "View work catalog"
+      "catalogButton": "View work catalog",
+      "editTeamAria": "Edit team",
+      "editTeamButton": "Edit team"
     },
     "projects": {
       "loading": "Loading...",
       "empty": "There's nothing here yet",
       "filters": {
         "all": "All categories",
-        "new": "New"
+        "new": "New",
+        "popular": "Popular"
       }
     }
   }

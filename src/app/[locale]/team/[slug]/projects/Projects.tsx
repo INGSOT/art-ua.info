@@ -1,30 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import { Card, CardContent } from "../../../../../components/ui/card";
+import EmptyState from "../../../../../components/ui/empty-state";
 import { teamsAPI } from "../../../../../lib/api/teams";
 import type { PublicArtistProject } from "../../../../../lib/api/authorProfiles";
 import { localeToApiLanguage, type Locale } from "../../../../../i18n/routing";
+import { useTeamProfile } from "../../TeamProfileContext";
+import { useAuth } from "../../../../../context/AuthContext";
+import { withProfileId } from "../../../../../lib/authorQuery";
 
 const FALLBACK_COVER = "/artists/artist-photo-5.png";
 
 export default function Projects() {
   const t = useTranslations("Team.projects");
+  const tProfile = useTranslations("Profile.projects");
+  const tAboutMe = useTranslations("Profile.aboutMe");
   const locale = useLocale() as Locale;
   const language = localeToApiLanguage(locale);
-  const teamProjectFilterButtons = [
-    { id: "all", text: t("filters.all") },
-    { id: "new", text: t("filters.new") },
-  ];
-  const [hoveredFilter, setHoveredFilter] = useState<string | null>(null);
   const params = useParams<{ slug?: string }>();
   const slug = params?.slug ?? "";
+  const { isOwner } = useTeamProfile();
+  const { user } = useAuth();
+  const canManage = isOwner && Boolean(user?.slug);
   const [projects, setProjects] = useState<PublicArtistProject[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"newest" | "popular">("newest");
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -50,6 +58,39 @@ export default function Projects() {
     };
   }, [slug, language]);
 
+  const categories = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const project of projects) {
+      if (project.artCategory && !seen.has(project.artCategory)) {
+        seen.set(project.artCategory, project.artCategoryLabel || project.artCategory);
+      }
+    }
+    return [...seen.entries()].map(([slugValue, name]) => ({ slug: slugValue, name }));
+  }, [projects]);
+
+  const sortOptions = [
+    { id: "newest" as const, label: t("filters.new") },
+    { id: "popular" as const, label: t("filters.popular") },
+  ];
+
+  const visibleProjects = useMemo(() => {
+    const filtered = selectedCategory
+      ? projects.filter((project) => project.artCategory === selectedCategory)
+      : projects;
+    const sorted = [...filtered];
+    if (sortBy === "popular") {
+      sorted.sort((a, b) => b.likesCount - a.likesCount);
+    } else {
+      sorted.sort((a, b) => {
+        const aTime = a.announcedAt ? new Date(a.announcedAt).getTime() : 0;
+        const bTime = b.announcedAt ? new Date(b.announcedAt).getTime() : 0;
+        if (aTime !== bTime) return bTime - aTime;
+        return b.id - a.id;
+      });
+    }
+    return sorted;
+  }, [projects, selectedCategory, sortBy]);
+
   if (loading) {
     return (
       <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px] min-h-[300px] flex items-center justify-center">
@@ -59,75 +100,187 @@ export default function Projects() {
   }
 
   const hasProjects = projects.length > 0;
+  const selectedCategoryLabel = categories.find((c) => c.slug === selectedCategory)?.name;
+  const activeSortOption = sortOptions.find((option) => option.id === sortBy);
 
   return (
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
       {hasProjects ? (
         <>
-          <div className="w-full bg-[#343434] h-[80px] mb-8">
-            <div className="flex items-center h-full px-4 md:px-[30px]">
+          {canManage && (
+            <div className="mb-8 flex justify-center">
+              <Link
+                href={withProfileId("/profile/create-project", user!.slug)}
+                className="h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-white w-full md:w-[320px]"
+              >
+                <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">
+                  {tProfile("createButton")}
+                </span>
+                <div className="flex items-center justify-center w-[60px] flex-shrink-0 border-l border-black">
+                  <Image src="/plus.svg" alt={tProfile("plusAlt")} width={24} height={24} />
+                </div>
+              </Link>
+            </div>
+          )}
+
+          <div className="w-full bg-[#343434] mb-8">
+            <div className="flex items-center flex-wrap gap-4 min-h-[80px] px-4 md:px-[30px] py-4 md:py-0">
               <div className="flex items-center gap-8">
-                {teamProjectFilterButtons.map((filter) => (
+                <div className="relative">
                   <button
-                    key={filter.id}
                     type="button"
+                    onClick={() => {
+                      setIsCategoryOpen((prev) => !prev);
+                      setIsSortOpen(false);
+                    }}
                     className={`flex items-center gap-2 text-sm font-bold transition-colors duration-300 ${
-                      hoveredFilter === filter.id ? "text-[#FECC39]" : "text-white"
+                      isCategoryOpen || selectedCategory ? "text-[#FECC39]" : "text-white"
                     }`}
-                    onMouseEnter={() => setHoveredFilter(filter.id)}
-                    onMouseLeave={() => setHoveredFilter(null)}
                   >
-                    {filter.text}
-                    <Image src="/white_triangle_down.svg" alt="" width={16} height={16} />
+                    {selectedCategoryLabel ?? t("filters.all")}
+                    <Image
+                      src="/white_triangle_down.svg"
+                      alt=""
+                      width={16}
+                      height={16}
+                      className={`transition-transform ${isCategoryOpen ? "rotate-180" : ""}`}
+                    />
                   </button>
-                ))}
+                  {isCategoryOpen && (
+                    <div className="absolute top-full left-0 z-50 mt-2 min-w-[220px] flex flex-col gap-px">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategory(null);
+                          setIsCategoryOpen(false);
+                        }}
+                        className={`block w-full text-left px-4 py-3 font-bold text-sm whitespace-nowrap transition-colors bg-[#272727] ${
+                          !selectedCategory ? "text-[#FECC39]" : "text-white hover:text-[#FECC39]"
+                        }`}
+                      >
+                        {t("filters.all")}
+                      </button>
+                      {categories.map((category) => (
+                        <button
+                          key={category.slug}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCategory(category.slug);
+                            setIsCategoryOpen(false);
+                          }}
+                          className={`block w-full text-left px-4 py-3 font-bold text-sm whitespace-nowrap transition-colors bg-[#272727] ${
+                            selectedCategory === category.slug
+                              ? "text-[#FECC39]"
+                              : "text-white hover:text-[#FECC39]"
+                          }`}
+                        >
+                          {category.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSortOpen((prev) => !prev);
+                      setIsCategoryOpen(false);
+                    }}
+                    className={`flex items-center gap-2 text-sm font-bold transition-colors duration-300 ${
+                      isSortOpen ? "text-[#FECC39]" : "text-white"
+                    }`}
+                  >
+                    {activeSortOption?.label}
+                    <Image
+                      src="/white_triangle_down.svg"
+                      alt=""
+                      width={16}
+                      height={16}
+                      className={`transition-transform ${isSortOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  {isSortOpen && (
+                    <div className="absolute top-full left-0 z-50 mt-2 min-w-[220px] flex flex-col gap-px">
+                      {sortOptions.map((option) => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => {
+                            setSortBy(option.id);
+                            setIsSortOpen(false);
+                          }}
+                          className={`block w-full text-left px-4 py-3 font-bold text-sm whitespace-nowrap transition-colors bg-[#272727] ${
+                            sortBy === option.id ? "text-[#FECC39]" : "text-white hover:text-[#FECC39]"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => (
-                <Link
-                  key={project.id}
-                  href={`/projects/${project.slug}`}
-                  className="block group"
-                >
-                  <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
-                    <CardContent className="p-0 flex flex-col gap-3">
-                      <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
-                        <Image
-                          src={project.coverUrl ?? FALLBACK_COVER}
-                          alt={project.title}
-                          fill
-                          className="object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+              {visibleProjects.map((project) => (
+                <div key={project.id} className="relative group">
+                  <Link href={`/projects/${project.slug}`} className="block">
+                    <Card className="bg-transparent border-0 outline-none shadow-none rounded-none">
+                      <CardContent className="p-0 flex flex-col gap-3">
+                        <div className="relative w-full aspect-[460/316] bg-cover bg-center overflow-hidden">
                           <Image
-                            src="/arrow-chevron-right-white.svg"
-                            alt="View"
-                            width={48}
-                            height={48}
+                            src={project.coverUrl ?? FALLBACK_COVER}
+                            alt={project.title}
+                            fill
+                            className="object-cover"
                           />
+                          <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                            <Image
+                              src="/arrow-chevron-right-white.svg"
+                              alt="View"
+                              width={48}
+                              height={48}
+                            />
+                          </div>
+                          <div className="absolute right-3 bottom-3 flex items-center gap-2 z-10">
+                            <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
+                              {project.likesCount}
+                            </span>
+                            <Image src="/like.svg" alt="Like" width={32} height={32} />
+                          </div>
                         </div>
-                        <div className="absolute right-3 bottom-3 flex items-center gap-2 z-10">
-                          <span className="font-button font-bold text-white text-[length:var(--button-font-size)] tracking-[var(--button-letter-spacing)] leading-[var(--button-line-height)]">
-                            {project.likesCount}
-                          </span>
-                          <Image src="/like.svg" alt="Like" width={32} height={32} />
-                        </div>
-                      </div>
-                      <h3 className="font-h6 font-bold text-white text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
-                        {project.title}
-                      </h3>
-                    </CardContent>
-                  </Card>
-                </Link>
+                        <h3 className="font-h6 font-bold text-white text-[length:var(--h6-font-size)] tracking-[var(--h6-letter-spacing)] leading-[var(--h6-line-height)]">
+                          {project.title}
+                        </h3>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  {canManage && (
+                    <Link
+                      href={withProfileId(`/profile/edit-project?edit=${project.slug}`, user!.slug)}
+                      className="absolute right-3 top-3 z-20 flex items-center justify-center w-10 h-10 bg-[#FECC39] hover:bg-white transition-colors"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <Image src="/edit.svg" alt={tAboutMe("editAlt")} width={20} height={20} />
+                    </Link>
+                  )}
+                </div>
               ))}
             </div>
           </div>
         </>
+      ) : canManage ? (
+        <EmptyState
+          title={t("empty")}
+          buttonText={tProfile("createButton")}
+          buttonHref={withProfileId("/profile/create-project", user!.slug)}
+        />
       ) : (
         <div className="flex flex-col items-center justify-center min-h-[400px] py-16 px-4">
           <Image

@@ -26,7 +26,7 @@ export default function Menu({ activeItem }: MenuProps) {
   return (
     <section className="w-full bg-[#414141] py-8 px-0 border-t border-[#343434]">
       <div className="max-w-4xl w-full px-4 md:px-[30px]">
-        <nav className="flex flex-col md:flex-row md:flex-wrap justify-start gap-4 md:gap-8 pl-[45px]">
+        <nav className="flex flex-row flex-nowrap md:flex-wrap overflow-x-auto md:overflow-visible justify-start gap-4 md:gap-8 pl-[45px] whitespace-nowrap md:whitespace-normal">
           {menuItems.map((item) => (
             <Link
               key={item.id}

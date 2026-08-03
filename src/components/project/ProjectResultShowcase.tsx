@@ -314,7 +314,7 @@ export default function ProjectResultShowcase({
         {editHref && (
           <Link
             href={editHref}
-            className="w-[300px] max-w-full flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors"
+            className="w-[350px] max-w-full flex items-stretch h-[60px] bg-[#FECC39] hover:bg-white transition-colors"
           >
             <span className="flex items-center justify-center flex-1 px-6 font-bold text-[#343434] whitespace-nowrap">
               {t("editProject")}

@@ -17,14 +17,17 @@
       "noMembers": "Учасників ще не додано.",
       "artistType": "Митець",
       "organizationType": "Організація",
-      "catalogButton": "До каталогу робіт"
+      "catalogButton": "До каталогу робіт",
+      "editTeamAria": "Редагувати команду",
+      "editTeamButton": "Редагувати команду"
     },
     "projects": {
       "loading": "Завантаження...",
       "empty": "Тут ще нічого немає",
       "filters": {
         "all": "Усі категорії",
-        "new": "Нові"
+        "new": "Нові",
+        "popular": "Популярні"
       }
     }
   }
