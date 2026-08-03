@@ -15,6 +15,8 @@ interface TeamProfileState {
   team: PublicTeam | null;
   /** Чи є поточний авторизований користувач власником цієї команди. */
   isOwner: boolean;
+  /** Чи є поточний авторизований користувач учасником цієї команди (власник теж рахується). */
+  isMember: boolean;
 }
 
 const TeamProfileContext = createContext<TeamProfileState | null>(null);
@@ -41,33 +43,40 @@ export function TeamProfileProvider({ children }: { children: ReactNode }) {
     notFound: false,
     team: null,
     isOwner: false,
+    isMember: false,
   });
 
   useEffect(() => {
     let ignore = false;
 
     (async () => {
-      setState((prev) => ({ ...prev, slug, loading: true, notFound: false, isOwner: false }));
+      setState((prev) => ({ ...prev, slug, loading: true, notFound: false, isOwner: false, isMember: false }));
 
       try {
         const team = await teamsAPI.get(slug, language);
 
         let isOwner = false;
+        let isMember = false;
         if (user) {
           try {
             const myTeams = await myTeamsAPI.list();
-            isOwner = myTeams.some((myTeam) => myTeam.slug === slug && myTeam.isOwner);
+            const myTeam = myTeams.find((t) => t.slug === slug);
+            isMember = Boolean(myTeam);
+            isOwner = Boolean(myTeam?.isOwner);
           } catch {
             isOwner = false;
+            isMember = false;
           }
         }
 
-        if (!ignore) setState({ slug, loading: false, notFound: false, team, isOwner });
+        if (!ignore) setState({ slug, loading: false, notFound: false, team, isOwner, isMember });
       } catch (error) {
         if (!isNotFoundError(error)) {
           console.error(`Failed to load team "${slug}":`, error);
         }
-        if (!ignore) setState({ slug, loading: false, notFound: true, team: null, isOwner: false });
+        if (!ignore) {
+          setState({ slug, loading: false, notFound: true, team: null, isOwner: false, isMember: false });
+        }
       }
     })();
 

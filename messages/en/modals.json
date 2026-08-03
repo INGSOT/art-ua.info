@@ -55,6 +55,11 @@
       "submit": "Save password",
       "error": "Failed to change the password"
     },
+    "impersonate": {
+      "loading": "Signing you in...",
+      "error": "This sign-in link is invalid or already used",
+      "home": "Home"
+    },
     "search": {
       "title": "Search",
       "close": "Close",

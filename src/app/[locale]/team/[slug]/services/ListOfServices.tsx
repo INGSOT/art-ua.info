@@ -106,12 +106,12 @@ export default function ListOfServices() {
   const t = useTranslations("Team.services");
   const locale = useLocale() as Locale;
   const language = localeToApiLanguage(locale);
-  const { slug, loading: teamLoading, notFound, isOwner } = useTeamProfile();
+  const { slug, loading: teamLoading, notFound, isMember } = useTeamProfile();
   const [teamServices, setTeamServices] = useState<PublicService[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (teamLoading || notFound || isOwner) return;
+    if (teamLoading || notFound || isMember) return;
     let ignore = false;
 
     (async () => {
@@ -136,7 +136,7 @@ export default function ListOfServices() {
     return () => {
       ignore = true;
     };
-  }, [slug, teamLoading, notFound, isOwner, language]);
+  }, [slug, teamLoading, notFound, isMember, language]);
 
   if (notFound) {
     return null;
@@ -150,7 +150,7 @@ export default function ListOfServices() {
     );
   }
 
-  if (isOwner) {
+  if (isMember) {
     return <OwnerServices slug={slug} />;
   }
 

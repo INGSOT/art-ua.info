@@ -18,6 +18,7 @@ import {
 import { getApiErrorMessage, getApiFieldErrors } from "../../../../../lib/apiError";
 import { withProfileId } from "../../../../../lib/authorQuery";
 import { catalogsAPI, type ArtCategory as ArtCategoryOption, type Parameter } from "../../../../../lib/api/catalogs";
+import { myTeamsAPI } from "../../../../../lib/api/myTeams";
 import type { ProjectWorkMediaItem } from "./projectWorkMedia";
 import AddProjectCover from "./AddProjectCover";
 import AddWork from "./AddWork";
@@ -170,6 +171,10 @@ export default function ProjectCreating() {
   const [likesCount, setLikesCount] = useState(0);
   const [projectStatus, setProjectStatus] = useState<string | null>(null);
   const [projectStatusLabel, setProjectStatusLabel] = useState<string | null>(null);
+  // Змінювати власника (вкладка "owner") може лише власник команди, якій
+  // зараз належить проєкт — рядовий учасник команди редагує все інше,
+  // але не може переприв'язати проєкт на себе/іншу команду.
+  const [canChangeOwner, setCanChangeOwner] = useState(true);
 
   const clearFieldErrors = (keys: string[]) => {
     setFieldErrors((prev) => {
@@ -220,11 +225,23 @@ export default function ProjectCreating() {
         if (cancelled) return;
         if (project.authorType === "legal") {
           setSelectedOwner("legal-entity");
+          setCanChangeOwner(true);
         } else if (project.authorType === "team") {
           const teamIndex = aboutMe.teams.findIndex((team) => team.slug === project.authorSlug);
           setSelectedOwner(teamIndex >= 0 ? `team-${teamIndex}` : "author");
+          myTeamsAPI
+            .list()
+            .then((myTeams) => {
+              if (cancelled) return;
+              const myTeam = myTeams.find((t) => t.slug === project.authorSlug);
+              setCanChangeOwner(Boolean(myTeam?.isOwner));
+            })
+            .catch(() => {
+              if (!cancelled) setCanChangeOwner(false);
+            });
         } else {
           setSelectedOwner("author");
+          setCanChangeOwner(true);
         }
         setProjectNameUa(project.title.uk ?? "");
         setProjectNameEn(project.title.en ?? "");
@@ -782,7 +799,35 @@ export default function ProjectCreating() {
         </div>
       )}
 
-      {activeTab === "owner" && (
+      {activeTab === "owner" && !canChangeOwner && (
+        <div className="w-full max-w-[1000px] flex flex-col items-center gap-4">
+          <p className="font-wix text-white text-[18px] font-semibold text-center">
+            {t("owner.question")}
+          </p>
+          <div className="flex items-center justify-start gap-3 px-4 py-3 bg-[#343434] whitespace-nowrap h-[60px] w-[400px] max-w-full opacity-70">
+            {(() => {
+              const current = owners.find((owner) => owner.id === selectedOwner);
+              return current ? (
+                <>
+                  <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                    <Image
+                      src={current.avatar}
+                      alt={current.name}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="font-wix text-white flex-1 text-left">{current.name}</span>
+                </>
+              ) : null;
+            })()}
+          </div>
+          <p className="font-wix text-[#A0A0A0] text-sm text-center">{t("owner.locked")}</p>
+        </div>
+      )}
+
+      {activeTab === "owner" && canChangeOwner && (
         <OwnerSelectionSection
           owners={owners}
           selectedOwner={selectedOwner}

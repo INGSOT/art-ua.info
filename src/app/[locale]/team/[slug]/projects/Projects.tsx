@@ -24,9 +24,9 @@ export default function Projects() {
   const language = localeToApiLanguage(locale);
   const params = useParams<{ slug?: string }>();
   const slug = params?.slug ?? "";
-  const { isOwner } = useTeamProfile();
+  const { isMember } = useTeamProfile();
   const { user } = useAuth();
-  const canManage = isOwner && Boolean(user?.slug);
+  const canManage = isMember && Boolean(user?.slug);
   const [projects, setProjects] = useState<PublicArtistProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);

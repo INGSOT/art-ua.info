@@ -71,6 +71,10 @@ interface AuthResponse {
   token: string;
 }
 
+interface ImpersonateExchangeResponse extends AuthResponse {
+  redirect_path: string;
+}
+
 export const authAPI = {
   login: async (email: string, password: string, device_name = "Web Browser"): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>("/v1/art-ua-info/auth/login", { email, password, device_name });
@@ -106,6 +110,13 @@ export const authAPI = {
 
   forgotPassword: async (email: string, locale?: string): Promise<{ message: string }> => {
     const response = await api.post("/v1/art-ua-info/auth/forgot-password", { email, locale });
+    return response.data;
+  },
+
+  // Одноразовий грант "Увійти як" з адмінки (Filament) — обмінюємо на справжній
+  // Bearer-токен. Не під /v1/art-ua-info/*, ендпоінт спільний для всіх фронтендів.
+  exchangeImpersonationToken: async (token: string): Promise<ImpersonateExchangeResponse> => {
+    const response = await api.post<ImpersonateExchangeResponse>(`/v1/auth/impersonate/${token}/exchange`);
     return response.data;
   },
 

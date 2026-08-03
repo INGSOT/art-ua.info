@@ -8,6 +8,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  setSession: (token: string, user: AuthUser) => void;
   register: (
     name: string,
     email: string,
@@ -64,6 +65,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user);
   };
 
+  // Використовується сторінкою /impersonate/[token] — токен і user вже
+  // отримані через exchangeImpersonationToken(), повторний login() не потрібен.
+  const setSession = (newToken: string, newUser: AuthUser) => {
+    storage.set("token", newToken);
+    setToken(newToken);
+    setUser(newUser);
+  };
+
   const register = async (
     name: string,
     email: string,
@@ -89,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser: loadMe }}>
+    <AuthContext.Provider value={{ user, loading, login, setSession, register, logout, refreshUser: loadMe }}>
       {children}
     </AuthContext.Provider>
   );

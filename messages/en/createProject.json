@@ -47,7 +47,8 @@
     },
     "owner": {
       "question": "Specify the project owner",
-      "error": "Select the project owner"
+      "error": "Select the project owner",
+      "locked": "Only the team owner can change the project owner"
     },
     "name": {
       "label": "Project name",
