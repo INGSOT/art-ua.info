@@ -18,19 +18,45 @@ function formatDate(iso: string, locale: string): string {
   });
 }
 
+// Кожен тип сповіщення має власний акцентний колір і бейдж, щоб картки
+// легко відрізнялись одна від одної в загальній стрічці.
+const TYPE_ACCENT: Record<string, string> = {
+  service_order: "#FECC39",
+  message: "#6DB8FF",
+};
+
+function ChatIcon({ color }: { color: string }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M4 4h16v12H7l-3 3V4z"
+        stroke={color}
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function TypeIcon({ type, color }: { type: string; color: string }) {
+  if (type === "message") return <ChatIcon color={color} />;
+  return (
+    <Image src="/yellow_dollar.svg" alt="" width={22} height={22} className="max-w-full max-h-full object-contain" />
+  );
+}
+
 interface NotificationCardProps {
   notification: NotificationItem;
   onClose: () => Promise<void> | void;
 }
 
-// Наразі на вкладці показуються лише сповіщення типу service_order
-// (замовлення послуги), тож картка заточена саме під його поля.
 export default function NotificationCard({ notification, onClose }: NotificationCardProps) {
   const t = useTranslations("Profile.notifications");
   const locale = useLocale();
   const [deleting, setDeleting] = useState(false);
 
-  const { data } = notification;
+  const { data, type } = notification;
+  const accent = TYPE_ACCENT[type] ?? "#FECC39";
 
   const handleClose = async () => {
     if (deleting) return;
@@ -49,18 +75,26 @@ export default function NotificationCard({ notification, onClose }: Notification
   const customerMessage = typeof data.customer_message === "string" ? data.customer_message : null;
   const options = Array.isArray(data.options) ? (data.options as string[]) : [];
 
+  const projectSlug = typeof data.project_slug === "string" ? data.project_slug : null;
+  const typeLabel = type === "message" ? t("adminMessageLabel") : t("serviceOrderLabel");
+
   return (
     <div
-      className={`relative bg-[#343434] p-6 md:p-[30px] pb-10 flex flex-col md:flex-row gap-4 md:gap-[30px] border ${
+      className={`relative bg-[#343434] p-6 md:p-[30px] pb-10 flex flex-col md:flex-row gap-4 md:gap-[30px] border transition-colors ${
         notification.isRead ? "border-transparent" : "border-[#FECC39]"
       }`}
     >
-      <div className="w-7 h-7 flex-shrink-0 flex items-center justify-center">
-        <Image src="/yellow_dollar.svg" alt="" width={28} height={28} className="max-w-full max-h-full object-contain" />
+      <div
+        className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full"
+        style={{ backgroundColor: `${accent}26` }}
+      >
+        <TypeIcon type={type} color={accent} />
       </div>
 
       <div className="w-full flex flex-col gap-3 text-white">
-        <span className="text-[#FECC39] text-xs font-bold uppercase tracking-wide">{t("serviceOrderLabel")}</span>
+        <span className="text-xs font-bold uppercase tracking-wide" style={{ color: accent }}>
+          {typeLabel}
+        </span>
 
         {notification.title && <h6 className="font-bold text-sm leading-5">{notification.title}</h6>}
 
@@ -81,6 +115,12 @@ export default function NotificationCard({ notification, onClose }: Notification
         {serviceSlug && (
           <Link href={`/services/${serviceSlug}`} className="w-fit text-[#FECC39] font-bold text-sm hover:text-white">
             {t("viewService")}
+          </Link>
+        )}
+
+        {type === "message" && projectSlug && (
+          <Link href={`/projects/${projectSlug}`} className="w-fit text-[#6DB8FF] font-bold text-sm hover:text-white">
+            {t("viewProject")}
           </Link>
         )}
 

@@ -106,16 +106,18 @@
     },
     "notifications": {
       "empty": {
-        "title": "У вас ще немає замовлень послуг",
-        "subtitle": "Тут з'являтимуться сповіщення, коли хтось замовить вашу послугу."
+        "title": "У вас ще немає сповіщень",
+        "subtitle": "Тут з'являтимуться замовлення послуг і повідомлення від адміністрації."
       },
       "serviceOrderLabel": "Замовлення послуги",
+      "adminMessageLabel": "Повідомлення від адміністрації",
       "customerLabel": "Замовник",
       "emailLabel": "Email",
       "phoneLabel": "Телефон",
       "optionsLabel": "Опції",
       "messageLabel": "Повідомлення",
       "viewService": "Переглянути послугу",
+      "viewProject": "Переглянути проєкт",
       "closeAlt": "Закрити"
     },
     "projects": {

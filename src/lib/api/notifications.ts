@@ -34,13 +34,20 @@ export interface NotificationItem {
   createdAt: string;
 }
 
-function mapNotification(raw: RawNotification): NotificationItem {
+// Бекенд зберігає тексти під ключами "uk"/"en", тоді як локаль фронтенду —
+// "ua"/"en", тож напряму зіставити не можна.
+function pickLocalized(text: RawLocalizedText | null, locale: string): string {
+  const backendLocale = locale === "en" ? "en" : "uk";
+  return text?.[backendLocale] ?? text?.uk ?? text?.en ?? "";
+}
+
+function mapNotification(raw: RawNotification, locale: string): NotificationItem {
   return {
     id: raw.id,
     source: raw.source,
     type: raw.type,
-    title: raw.title?.uk ?? raw.title?.en ?? "",
-    message: raw.message?.uk ?? raw.message?.en ?? "",
+    title: pickLocalized(raw.title, locale),
+    message: pickLocalized(raw.message, locale),
     data: raw.data ?? {},
     isRead: raw.is_read,
     createdAt: raw.created_at,
@@ -48,11 +55,11 @@ function mapNotification(raw: RawNotification): NotificationItem {
 }
 
 export const notificationsAPI = {
-  list: async (): Promise<NotificationItem[]> => {
+  list: async (locale: string = "ua"): Promise<NotificationItem[]> => {
     const response = await api.get<NotificationsResponse>("/v1/art-ua-info/my/notifications", {
       params: { type: "all", unread_only: false, per_page: 50, page: 1 },
     });
-    return response.data.data.map(mapNotification);
+    return response.data.data.map((raw) => mapNotification(raw, locale));
   },
 
   unreadCount: async (): Promise<number> => {

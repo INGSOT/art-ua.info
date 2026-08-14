@@ -106,16 +106,18 @@
     },
     "notifications": {
       "empty": {
-        "title": "You don't have any service orders yet",
-        "subtitle": "Notifications will appear here when someone orders your service."
+        "title": "You don't have any notifications yet",
+        "subtitle": "Service orders and messages from administration will appear here."
       },
       "serviceOrderLabel": "Service order",
+      "adminMessageLabel": "Message from administration",
       "customerLabel": "Customer",
       "emailLabel": "Email",
       "phoneLabel": "Phone",
       "optionsLabel": "Options",
       "messageLabel": "Message",
       "viewService": "View service",
+      "viewProject": "View project",
       "closeAlt": "Close"
     },
     "projects": {

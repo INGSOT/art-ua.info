@@ -2,23 +2,25 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { notificationsAPI, type NotificationItem } from "../../../../../lib/api/notifications";
 import NotificationCard from "./NotificationCard";
 
-// Вкладка показує лише сповіщення про замовлення послуг — решта типів
-// (донати, модерація тощо) сюди навмисно не потрапляють.
-const VISIBLE_TYPES = ["service_order"];
+// Вкладка показує сповіщення про замовлення послуг і повідомлення від
+// адміністрації — решта типів (донати, модерація тощо) сюди навмисно
+// не потрапляють, для них є окремі місця в кабінеті.
+const VISIBLE_TYPES = ["service_order", "message"];
 
 export default function Notifications() {
   const t = useTranslations("Profile.notifications");
+  const locale = useLocale();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     notificationsAPI
-      .list()
+      .list(locale)
       .then((items) => {
         const visible = items.filter((item) => VISIBLE_TYPES.includes(item.type));
         if (!cancelled) setNotifications(visible);
@@ -37,7 +39,7 @@ export default function Notifications() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locale]);
 
   const handleClose = async (notification: NotificationItem) => {
     await notificationsAPI.remove(notification.source, notification.id);
