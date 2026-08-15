@@ -52,10 +52,13 @@ function resolveSalesStatus(status: string): SalesStatus {
 function mapToProject(raw: PublicProjectDetail, t: ProjectDetailTranslations): Project {
   // Слайди можуть бути як зображеннями, так і посиланнями на відео (YouTube/Vimeo) —
   // ProjectPageClient сам розрізняє їх через getVideoInfo() і рендерить або <Image>, або плеєр.
+  // "link" — застарілий тип (до розділення на youtube/vimeo/issuu), лишений заради
+  // сумісності зі старими записами.
+  const VIDEO_TYPES = ["link", "youtube", "vimeo"];
   const slides = [
     raw.coverUrl,
     ...raw.finalResult
-      .filter((item) => (item.type === "image" && item.image) || (item.type === "link" && item.url))
+      .filter((item) => (item.type === "image" && item.image) || (VIDEO_TYPES.includes(item.type) && item.url))
       .map((item) => (item.type === "image" ? item.image : item.url) as string),
   ].filter((src): src is string => !!src);
 

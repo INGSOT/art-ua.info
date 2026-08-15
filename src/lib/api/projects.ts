@@ -594,7 +594,7 @@ export interface PublicProjectDetail {
   author: ProjectAuthor;
   additionalInfo: string;
   contentBlocks: ProjectContentBlock[];
-  finalResult: { type: "image" | "link"; image: string | null; url: string | null }[];
+  finalResult: { type: "image" | "link" | "gallery" | "youtube" | "vimeo" | "issuu"; image: string | null; url: string | null }[];
   stages: ProjectStage[];
   bonuses: ProjectBonus[];
   parameters: ProjectParameterValue[];
@@ -692,7 +692,7 @@ interface RawProjectDetail {
   author: RawProjectAuthor;
   additional_info: LocalizedText | null;
   content_blocks: RawProjectContentBlock[] | null;
-  final_result: { type: "image" | "link"; image?: string | null; url?: string | null }[] | null;
+  final_result: { type: "image" | "link" | "gallery" | "youtube" | "vimeo" | "issuu"; image?: string | null; url?: string | null }[] | null;
   stages: RawProjectStage[];
   bonuses: RawProjectBonus[];
   parameters: RawProjectParameter[];
