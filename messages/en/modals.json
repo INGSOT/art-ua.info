@@ -97,7 +97,9 @@
       "services": "Services",
       "team": "Team",
       "info": "Info",
-      "logout": "Log out"
+      "logout": "Log out",
+      "profileIncomplete": "Fill in your profile first to start using the dashboard",
+      "completeProfile": "Complete profile"
     },
     "toast": {
       "error": "Error",

@@ -27,6 +27,10 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
     { label: t("info"), href: `/profile/${user.slug}/info` },
   ];
 
+  // Доступ до розділів кабінету відкривається лише після заповнення профілю
+  // (наявність profile_type) — інакше на бекенді там просто нема з чим працювати.
+  const isProfileComplete = Boolean(user.profile_type);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -72,18 +76,33 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
             </p>
           </div>
 
-          <nav className="mt-8 flex flex-col gap-5">
-            {menuItems.map((item) => (
+          {isProfileComplete ? (
+            <nav className="mt-8 flex flex-col gap-5">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  className="font-bold text-[#343434] text-[16px] font-[family-name:var(--font-unbounded)] hover:text-[#FECC39] transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          ) : (
+            <div className="mt-8 bg-black/[0.03] p-3">
+              <p className="font-wix text-[13px] leading-[18px] text-[#343434]/70 mb-2.5">
+                {t("profileIncomplete")}
+              </p>
               <Link
-                key={item.href}
-                href={item.href}
+                href={`/profile/${user.slug}/edit`}
                 onClick={onClose}
-                className="font-bold text-[#343434] text-[16px] font-[family-name:var(--font-unbounded)] hover:text-[#FECC39] transition-colors"
+                className="inline-block font-bold text-[14px] leading-5 text-[#343434] bg-[#FECC39] px-3 py-2 hover:opacity-85 transition-opacity"
               >
-                {item.label}
+                {t("completeProfile")}
               </Link>
-            ))}
-          </nav>
+            </div>
+          )}
 
           <Link
             href={`/author/${user.slug}`}
