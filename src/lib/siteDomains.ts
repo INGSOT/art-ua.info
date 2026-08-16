@@ -12,13 +12,13 @@ export const SAVE_ART_URL = `https://${SAVE_ART_DOMAIN}`;
 export const SITE_URL = `https://${SITE_DOMAIN}`;
 export const ART_UA_COM_URL = `https://${ART_UA_COM_DOMAIN}`;
 
-// Публічний профіль митця на save-art живе за шляхом /profile/public/<slug>.
+// Профіль митця на save-art живе за шляхом /profile/<slug>.
 export function saveArtProfileLabel(slug: string): string {
-  return `${SAVE_ART_DOMAIN}/profile/public/${slug}`;
+  return `${SAVE_ART_DOMAIN}/profile/${slug}`;
 }
 
 export function saveArtProfileUrl(slug: string): string {
-  return `${SAVE_ART_URL}/profile/public/${slug}`;
+  return `${SAVE_ART_URL}/profile/${slug}`;
 }
 
 export function siteProfileLabel(slug: string): string {
