@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from "react";
 import { authAPI, AuthUser } from "../lib/api/auth";
 import { storage } from "../lib/storage";
 
@@ -34,14 +34,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // SSR-safe: ленивая инициализация, чтобы не читать localStorage на сервере
   const [token, setToken] = useState<string | null>(() => storage.get("token"));
   const [loading, setLoading] = useState(true);
+  const initialUserRequestStarted = useRef(false);
 
   const loadMe = useCallback(async () => {
     try {
       const data = await authAPI.getMe();
       setUser(data.user);
+      storage.setJSON("authUser", data.user);
     } catch {
       // Токен неверный/просрочен — очищаем локальное состояние
       storage.remove("token");
+      storage.remove("authUser");
       setToken(null);
       setUser(null);
     } finally {
@@ -51,7 +54,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (token) {
-      loadMe();
+      const cachedUser = storage.getJSON<AuthUser>("authUser");
+      if (cachedUser) setUser(cachedUser);
+
+      // React StrictMode повторно запускає effect у dev. Не дублюємо /auth/me.
+      if (!initialUserRequestStarted.current) {
+        initialUserRequestStarted.current = true;
+        void loadMe();
+      }
     } else {
       setLoading(false);
     }
@@ -61,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     const data = await authAPI.login(email, password);
     storage.set("token", data.token);
+    storage.setJSON("authUser", data.user);
     setToken(data.token);
     setUser(data.user);
   };
@@ -69,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // отримані через exchangeImpersonationToken(), повторний login() не потрібен.
   const setSession = (newToken: string, newUser: AuthUser) => {
     storage.set("token", newToken);
+    storage.setJSON("authUser", newUser);
     setToken(newToken);
     setUser(newUser);
   };
@@ -81,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     const data = await authAPI.register(name, email, password, password_confirmation);
     storage.set("token", data.token);
+    storage.setJSON("authUser", data.user);
     setToken(data.token);
     setUser(data.user);
   };
@@ -92,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // токена уже может не быть на сервере — всё равно чистим локально
     } finally {
       storage.remove("token");
+      storage.remove("authUser");
       setToken(null);
       setUser(null);
     }

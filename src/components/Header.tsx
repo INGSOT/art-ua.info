@@ -35,7 +35,7 @@ function BurgerIcon() {
 }
 
 export default function Header({ isHomePage = false }: HeaderProps) {
-    const { user, logout } = useAuth();
+    const { user, logout, loading: authLoading } = useAuth();
     const { showToast } = useToast();
     const pathname = usePathname();
     const locale = useLocale();
@@ -51,6 +51,9 @@ export default function Header({ isHomePage = false }: HeaderProps) {
     const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
+    const avatarUrl = getImageUrl(user?.avatar_url);
+    const [loadedAvatarUrl, setLoadedAvatarUrl] = useState<string | null>(null);
+    const avatarLoaded = avatarUrl !== null && loadedAvatarUrl === avatarUrl;
 
     useEffect(() => {
       if (!user) {
@@ -87,19 +90,37 @@ export default function Header({ isHomePage = false }: HeaderProps) {
       setActiveAuthModal(null);
     };
 
-    const authButton = user ? (
+    const authButton = authLoading && !user ? (
+      <div
+        className="flex w-11 h-11 shrink-0 items-center justify-center rounded-[44px]"
+        role="status"
+        aria-label="Loading"
+      >
+        <span className="w-11 h-11 rounded-[44px] border-2 border-white/30 border-t-[#FECC39] animate-spin" />
+      </div>
+    ) : user ? (
       <button
         type="button"
         onClick={() => setIsProfileMenuOpen(true)}
-        className="relative w-11 h-11 shrink-0 rounded-[44px] border border-[#FECC39]"
+        className={`relative w-11 h-11 shrink-0 rounded-[44px] border ${avatarUrl && !avatarLoaded ? "border-transparent" : "border-[#FECC39]"}`}
         aria-label={user.name}
       >
-        {getImageUrl(user.avatar_url) ? (
-          <img
-            src={getImageUrl(user.avatar_url)!}
-            alt={user.name}
-            className="w-11 h-11 rounded-[44px] object-cover"
-          />
+        {avatarUrl ? (
+          <>
+            {!avatarLoaded && (
+              <span className="absolute inset-0 rounded-[44px] border-2 border-white/30 border-t-[#FECC39] animate-spin" />
+            )}
+            <img
+              src={avatarUrl}
+              alt={user.name}
+              className={`w-11 h-11 rounded-[44px] object-cover transition-opacity duration-150 ${avatarLoaded ? "opacity-100" : "opacity-0"}`}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
+              onLoad={() => setLoadedAvatarUrl(avatarUrl)}
+              onError={() => setLoadedAvatarUrl(avatarUrl)}
+            />
+          </>
         ) : (
           <AvatarPlaceholder name={user.name} className="w-11 h-11 rounded-[44px]" textClassName="text-[14px]" />
         )}

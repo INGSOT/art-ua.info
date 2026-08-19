@@ -26,6 +26,21 @@ export const storage = {
     }
   },
 
+  getJSON<T>(key: string, defaultValue: T | null = null): T | null {
+    const value = this.get(key);
+    if (value === null) return defaultValue;
+    try {
+      return JSON.parse(value) as T;
+    } catch (e) {
+      console.warn("localStorage JSON parse error:", e);
+      return defaultValue;
+    }
+  },
+
+  setJSON(key: string, value: unknown): void {
+    this.set(key, JSON.stringify(value));
+  },
+
   remove(key: string): void {
     if (!isBrowser) return;
     try {
