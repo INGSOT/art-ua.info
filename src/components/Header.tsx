@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { navigationItems, socialIcons } from "../data/headerData";
 import SearchModal from "./SearchModal";
+import MobileMenu from "./MobileMenu";
 import LoginModal from "./LoginModal";
 import RegistrationModal from "./RegistrationModal";
 import ResetPassModal from "./ResetPassModal";
@@ -22,6 +23,17 @@ interface HeaderProps {
   isHomePage?: boolean;
 }
 
+// Іконка бургер-меню (3 смужки) — як header .burger у save-art.
+function BurgerIcon() {
+  return (
+    <span className="flex h-5 w-5 flex-col justify-between">
+      <span className="block h-1 w-5 bg-[#FECC39]" />
+      <span className="block h-1 w-5 bg-[#FECC39]" />
+      <span className="block h-1 w-3 bg-[#FECC39]" />
+    </span>
+  );
+}
+
 export default function Header({ isHomePage = false }: HeaderProps) {
     const { user, logout } = useAuth();
     const { showToast } = useToast();
@@ -34,6 +46,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
       showToast(t("logout"), "green");
     };
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
     const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -78,17 +91,17 @@ export default function Header({ isHomePage = false }: HeaderProps) {
       <button
         type="button"
         onClick={() => setIsProfileMenuOpen(true)}
-        className="relative w-11 h-11 shrink-0"
+        className="relative w-11 h-11 shrink-0 overflow-hidden rounded-[44px] border border-[#FECC39]"
         aria-label={user.name}
       >
         {getImageUrl(user.avatar_url) ? (
           <img
             src={getImageUrl(user.avatar_url)!}
             alt={user.name}
-            className="w-11 h-11 rounded-full border border-[#FECC39] object-cover"
+            className="w-11 h-11 rounded-[44px] object-cover"
           />
         ) : (
-          <AvatarPlaceholder name={user.name} className="w-11 h-11 border border-[#FECC39]" textClassName="text-[14px]" />
+          <AvatarPlaceholder name={user.name} className="w-11 h-11 rounded-[44px]" textClassName="text-[14px]" />
         )}
         {hasUnread && (
           <span className="absolute top-[calc(100%+8px)] left-[calc(50%-4px)] w-2 h-2 rounded-full bg-[#343434] animate-pulse" />
@@ -107,10 +120,10 @@ export default function Header({ isHomePage = false }: HeaderProps) {
 
     return (
     <>
-    <header className={`flex items-center gap-4 md:gap-[30px] p-4 md:p-[30px] flex-wrap lg:flex-nowrap ${isHomePage ? 'bg-transparent' : 'bg-[#414141]'}`}>
+    <header className={`flex flex-nowrap items-center gap-3 p-4 min-[550px]:gap-[30px] min-[550px]:p-[30px] ${isHomePage ? 'bg-transparent' : 'bg-[#414141]'}`}>
         <SiteSwitcher />
 
-        <div className="hidden lg:flex h-10 items-center gap-[30px] flex-1">
+        <div className="hidden min-[1301px]:flex h-10 items-center gap-[30px] flex-1">
           <nav className="flex items-center gap-[30px] flex-1">
             {navigationItems.map((item, index) => {
               const isActive = Boolean(item.href) && (pathname === item.href || pathname.startsWith(`${item.href}/`));
@@ -143,6 +156,15 @@ export default function Header({ isHomePage = false }: HeaderProps) {
           </nav>
 
           <div className="inline-flex items-center justify-end gap-[30px]">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-11 h-11 hover:bg-transparent"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <img className="w-5 h-5" alt="Search" src="/search.svg" />
+            </Button>
+
             {socialIcons.map((icon, index) => (
               <Button
                 key={index}
@@ -156,7 +178,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
           </div>
         </div>
 
-        <div className="hidden md:inline-flex items-center gap-2">
+        <div className="hidden min-[1301px]:inline-flex items-center gap-2">
           {routing.locales.map((code) => (
             <Button
               key={code}
@@ -175,46 +197,26 @@ export default function Header({ isHomePage = false }: HeaderProps) {
           ))}
         </div>
 
-        <div className="flex md:hidden flex-1 justify-end items-center gap-2">
-          {authButton}
-
+        <div className="ml-auto flex items-center gap-3 min-[1301px]:hidden">
           <Button
             variant="ghost"
             size="icon"
-            className="w-11 h-11 hover:bg-transparent"
-            onClick={() => setIsSearchOpen(true)}
+            className="w-6 h-6 rounded-none p-0 hover:bg-transparent"
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-label={t("menu")}
           >
-            <img className="w-6 h-6" alt="Search" src="/search.svg" />
+            <BurgerIcon />
           </Button>
+
+          {authButton}
         </div>
 
-        <div className="hidden md:flex lg:hidden flex-1 justify-end items-center gap-2">
+        <div className="hidden min-[1301px]:flex items-center gap-2">
           {authButton}
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-11 h-11 hover:bg-transparent"
-            onClick={() => setIsSearchOpen(true)}
-          >
-            <img className="w-6 h-6" alt="Search" src="/search.svg" />
-          </Button>
-        </div>
-
-        <div className="hidden lg:flex items-center gap-2">
-          {authButton}
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-11 h-11 hover:bg-transparent"
-            onClick={() => setIsSearchOpen(true)}
-          >
-            <img className="w-6 h-6" alt="Search" src="/search.svg" />
-          </Button>
         </div>
       </header>
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       {user && (
         <ProfileMenuModal
           isOpen={isProfileMenuOpen}

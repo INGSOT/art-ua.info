@@ -1,67 +1,98 @@
 'use client';
 
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@/src/i18n/navigation";
-import { SITE_DOMAIN, SAVE_ART_DOMAIN, SAVE_ART_URL, ART_UA_COM_DOMAIN, ART_UA_COM_URL } from "../lib/siteDomains";
+import {
+  SITE_DOMAIN,
+  SAVE_ART_DOMAIN,
+  SAVE_ART_URL,
+  ART_UA_COM_DOMAIN,
+  ART_UA_COM_URL,
+} from "../lib/siteDomains";
 
 const siteLinks = [
-  { label: SAVE_ART_DOMAIN, url: SAVE_ART_URL },
-  { label: ART_UA_COM_DOMAIN, url: ART_UA_COM_URL },
+  { label: SITE_DOMAIN, url: "/", isActive: true },
+  { label: SAVE_ART_DOMAIN, url: SAVE_ART_URL, isActive: false },
+  { label: ART_UA_COM_DOMAIN, url: ART_UA_COM_URL, isActive: false },
 ];
 
+const itemClassName =
+  "block w-full truncate p-3 font-[family-name:var(--font-unbounded)] text-[14px] font-bold leading-5 outline-none transition-colors";
+
 export default function SiteSwitcher() {
+  const [isOpen, setIsOpen] = useState(false);
+  const switcherRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (!switcherRef.current?.contains(event.target as Node)) setIsOpen(false);
+    };
+
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, [isOpen]);
+
   return (
-    <div className="inline-flex items-center gap-2 flex-[0_0_auto]">
-      <Link href="/" className="shrink-0">
-        <img className="w-11 h-11 shrink-0" alt="Logos" src="/logos.svg" />
+    <div ref={switcherRef} className="relative inline-flex min-w-0 flex-[0_1_auto] items-center gap-2 max-[1300px]:flex-1">
+      <Link href="/" className="inline-flex min-w-0 items-center gap-2">
+        <img className="h-11 w-11 shrink-0" alt="Logos" src="/logos.svg" />
+        <span
+          className="min-w-0 cursor-pointer truncate font-[family-name:var(--font-unbounded)] text-[12px] font-semibold tracking-[0.5px] text-white min-[550px]:text-[14px]"
+          onClick={(event) => {
+            event.preventDefault();
+            setIsOpen((open) => !open);
+          }}
+        >
+          {SITE_DOMAIN}
+        </span>
       </Link>
 
-      <DropdownMenu.Root>
-        <DropdownMenu.Trigger asChild>
-          <button
-            type="button"
-            className="group inline-flex items-center gap-2 px-2 py-1 min-w-0 transition-colors duration-200 data-[state=open]:bg-[#FECC39]"
-          >
-            <div className="min-w-0 max-w-[140px] sm:max-w-none truncate font-bold text-[14px] font-[family-name:var(--font-unbounded)] transition-colors duration-200 text-white group-hover:text-[#FECC39] group-data-[state=open]:text-[#1E1E1E] group-data-[state=open]:group-hover:text-[#1E1E1E]">
-              {SITE_DOMAIN}
-            </div>
+      <button
+        type="button"
+        className={`inline-flex h-6 w-6 shrink-0 items-center justify-center transition-colors duration-200 hover:bg-[#FECC39] ${
+          isOpen ? "bg-[#FECC39]" : ""
+        }`}
+        aria-label={SITE_DOMAIN}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((open) => !open)}
+      >
+        <img
+          className={isOpen ? "h-3.5 w-3.5 rotate-180" : "h-6 w-6"}
+          alt=""
+          src={isOpen ? "/black_triangle_down.svg" : "/white_triangle_down.svg"}
+        />
+      </button>
 
-            <div className="relative w-6 h-6 flex items-center justify-center shrink-0">
-              <img
-                className="w-6 h-6 group-data-[state=open]:hidden"
-                alt="Ui"
-                src="/white_triangle_down.svg"
-              />
-              <img
-                className="hidden w-3.5 h-3 rotate-180 group-data-[state=open]:block"
-                alt="Ui"
-                src="/black_triangle_down.svg"
-              />
-            </div>
-          </button>
-        </DropdownMenu.Trigger>
-
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            align="start"
-            sideOffset={1}
-            className="z-50 flex flex-col gap-[1px] min-w-[220px] shadow-lg overflow-hidden"
-          >
-            {siteLinks.map((site) => (
-              <DropdownMenu.Item key={site.url} asChild>
-                <a
-                  href={site.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full px-4 py-3 font-bold text-[14px] font-[family-name:var(--font-unbounded)] whitespace-nowrap outline-none cursor-pointer transition-colors duration-200 bg-[#414141] text-[#FECC39] hover:text-white"
-                >
-                  {site.label}
-                </a>
-              </DropdownMenu.Item>
-            ))}
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </DropdownMenu.Root>
+      {isOpen && (
+        <div
+          className="absolute top-full left-[52px] z-50 flex w-[220px] max-w-[calc(100vw-32px)] flex-col gap-px overflow-hidden bg-[#414141] shadow-lg max-[550px]:left-0 max-[550px]:w-[calc(100vw-32px)]"
+        >
+          {siteLinks.map((site) =>
+            site.isActive ? (
+              <Link
+                key={site.url}
+                href="/"
+                aria-current="page"
+                className={`${itemClassName} pointer-events-none bg-[#FECC39] text-[#343434]`}
+              >
+                {site.label}
+              </Link>
+            ) : (
+              <a
+                key={site.url}
+                href={site.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${itemClassName} cursor-pointer bg-[#343434] text-[#FECC39] hover:bg-[#FECC39] hover:text-[#343434]`}
+              >
+                {site.label}
+              </a>
+            )
+          )}
+        </div>
+      )}
     </div>
   );
 }
