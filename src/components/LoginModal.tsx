@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { getApiErrorMessage } from "../lib/apiError";
-import { ART_UA_COM_DOMAIN, SAVE_ART_DOMAIN, SITE_DOMAIN } from "../lib/siteDomains";
+import { authAPI } from "../lib/api/auth";
+import { SAVE_ART_DOMAIN } from "../lib/siteDomains";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export default function LoginModal({
   const [passwordValue, setPasswordValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +45,18 @@ export default function LoginModal({
       setError(getApiErrorMessage(err, t("login.loginError")));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    setError("");
+    try {
+      const { url } = await authAPI.getGoogleRedirectUrl();
+      window.location.href = url;
+    } catch (err) {
+      setError(getApiErrorMessage(err, t("login.loginError")));
+      setIsGoogleLoading(false);
     }
   };
 
@@ -102,27 +116,6 @@ export default function LoginModal({
               className="font-bold text-[16px] leading-[1.2] font-[family-name:var(--font-unbounded)] transition-colors text-white hover:text-[#FECC39]"
             >
               {t("shared.registerTab")}
-            </button>
-          </div>
-
-          <div className="mt-6 flex items-center justify-center gap-8">
-            <button
-              type="button"
-              className="font-wix text-sm text-white hover:text-[#FECC39] transition-colors"
-            >
-              {SAVE_ART_DOMAIN}
-            </button>
-            <button
-              type="button"
-              className="font-wix text-sm text-white hover:text-[#FECC39] transition-colors"
-            >
-              {ART_UA_COM_DOMAIN}
-            </button>
-            <button
-              type="button"
-              className="font-wix text-sm text-white hover:text-[#FECC39] transition-colors"
-            >
-              {SITE_DOMAIN}
             </button>
           </div>
 
@@ -188,7 +181,9 @@ export default function LoginModal({
 
               <button
                 type="button"
-                className="mt-8 w-full flex items-center justify-center gap-3 text-white hover:text-[#FECC39] transition-colors"
+                onClick={handleGoogleLogin}
+                disabled={isGoogleLoading}
+                className="mt-8 w-full flex items-center justify-center gap-3 text-white hover:text-[#FECC39] transition-colors disabled:opacity-50"
               >
                 <img src="/google.svg" alt="Google" className="w-7 h-7" />
                 <span className="font-bold text-[14px] leading-[1.2] font-[family-name:var(--font-unbounded)]">

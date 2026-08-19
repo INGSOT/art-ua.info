@@ -75,6 +75,10 @@ interface ImpersonateExchangeResponse extends AuthResponse {
   redirect_path: string;
 }
 
+interface GoogleRedirectResponse {
+  url: string;
+}
+
 export const authAPI = {
   login: async (email: string, password: string, device_name = "Web Browser"): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>("/v1/art-ua-info/auth/login", { email, password, device_name });
@@ -117,6 +121,22 @@ export const authAPI = {
   // Bearer-токен. Не під /v1/art-ua-info/*, ендпоінт спільний для всіх фронтендів.
   exchangeImpersonationToken: async (token: string): Promise<ImpersonateExchangeResponse> => {
     const response = await api.post<ImpersonateExchangeResponse>(`/v1/auth/impersonate/${token}/exchange`);
+    return response.data;
+  },
+
+  // Google OAuth (SPA-флоу): getGoogleRedirectUrl() віддає посилання на Google,
+  // після згоди користувача Google редиректить на /auth/google/callback?code=...,
+  // звідти code обмінюється на Bearer-токен через googleCallback().
+  getGoogleRedirectUrl: async (): Promise<GoogleRedirectResponse> => {
+    const response = await api.get<GoogleRedirectResponse>("/v1/art-ua-info/auth/google/redirect");
+    return response.data;
+  },
+
+  googleCallback: async (code: string, accessToken?: string): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>("/v1/art-ua-info/auth/google/callback", {
+      code,
+      access_token: accessToken,
+    });
     return response.data;
   },
 

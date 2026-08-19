@@ -2,30 +2,51 @@
 
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/src/i18n/navigation";
 import { AuthUser } from "../lib/api/auth";
-import { socialIcons } from "../data/headerData";
-import { getImageUrl } from "../lib/url";
+import { profileAPI } from "../lib/api/profile";
+import {
+  getImageUrl,
+  getEditProfileUrl,
+  getProfileProjectsUrl,
+  getProfileCatalogsUrl,
+  getProfileServicesUrl,
+  getProfileTeamsUrl,
+  getProfileNotificationsUrl,
+} from "../lib/url";
 import AvatarPlaceholder from "./ui/AvatarPlaceholder";
-import { ART_UA_COM_DOMAIN, ART_UA_COM_URL, SAVE_ART_DOMAIN, SAVE_ART_URL, SITE_DOMAIN } from "../lib/siteDomains";
 
 interface ProfileMenuModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: AuthUser;
   onLogout: () => void;
+  unreadCount?: number;
 }
 
-export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: ProfileMenuModalProps) {
+export default function ProfileMenuModal({ isOpen, onClose, user, onLogout, unreadCount = 0 }: ProfileMenuModalProps) {
   const t = useTranslations("Modals.profileMenu");
   const tShared = useTranslations("Modals.shared");
+
+  // Особистий кабінет переїхав у Filament-панель бекенду (як у save-art) —
+  // пункти меню лише відкривають одноразовий SSO-грант і перекидають туди
+  // вже залогіненим (redirectPath має збігатись з ProfileApiController::
+  // SSO_ALLOWED_PATHS). "Чернетки" згорнуті в "Проєкти" (в Filament — вкладка).
   const menuItems = [
-    { label: t("projects"), href: `/profile/${user.slug}/projects` },
-    { label: t("catalogs"), href: `/profile/${user.slug}/catalogs` },
-    { label: t("services"), href: `/profile/${user.slug}/services` },
-    { label: t("team"), href: `/profile/${user.slug}/team` },
-    { label: t("info"), href: `/profile/${user.slug}/info` },
+    { label: t("projects"), href: getProfileProjectsUrl(), path: "/profile/projects" },
+    { label: t("catalogs"), href: getProfileCatalogsUrl(), path: "/profile/catalogs" },
+    { label: t("services"), href: getProfileServicesUrl(), path: "/profile/services" },
+    { label: t("team"), href: getProfileTeamsUrl(), path: "/profile/teams" },
+    { label: t("notifications"), href: getProfileNotificationsUrl(), path: "/profile/notifications", badge: unreadCount },
   ];
+
+  // Клік із модифікатором (ctrl/cmd/shift, середня кнопка) — не перехоплюємо,
+  // хай браузер сам відкриє посилання як завжди (нова вкладка тощо).
+  const handleProfileLinkClick = (e: React.MouseEvent, path: string) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+    e.preventDefault();
+    onClose();
+    void profileAPI.redirectToProfile(path);
+  };
 
   // Доступ до розділів кабінету відкривається лише після заповнення профілю
   // (наявність profile_type) — інакше на бекенді там просто нема з чим працювати.
@@ -46,74 +67,71 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
+      {/* Невидимий шар лише для закриття по кліку поза меню — на відміну від
+          LoginModal/RegistrationModal, у save-art .logged_modal немає темної
+          підкладки, це компактний дропдаун, а не повноекранна панель. */}
+      <div className="fixed inset-0 z-40" onClick={onClose} />
 
-      <div className="fixed right-0 top-0 h-full w-full md:w-[400px] bg-[#FFFCF5] z-50 flex flex-col overflow-y-auto animate-slide-in">
-        <div className="p-6 md:p-[30px] flex-1 flex flex-col">
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-10 h-10 flex items-center justify-center hover:bg-black/5 transition-colors"
-              aria-label={tShared("close")}
-            >
-              <img src="/yellow_cross.svg" alt="" className="w-6 h-6" />
-            </button>
-          </div>
+      <div className="fixed top-4 right-4 md:top-[30px] md:right-[30px] w-[calc(100%-2rem)] max-w-[360px] bg-[#FFFCF5] shadow-xl z-50 p-[30px]">
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-8 h-8 flex items-center justify-center hover:bg-black/5 transition-colors"
+          aria-label={tShared("close")}
+        >
+          <img src="/yellow_cross.svg" alt="" className="w-4 h-4" />
+        </button>
 
-          <div className="mt-4 flex items-center gap-3">
-            {getImageUrl(user.avatar_url) ? (
-              <img
-                src={getImageUrl(user.avatar_url)!}
-                alt={user.name}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-            ) : (
-              <AvatarPlaceholder name={user.name} className="w-12 h-12" textClassName="text-[16px]" />
-            )}
-            <p className="font-bold text-[#343434] text-[16px] font-[family-name:var(--font-unbounded)]">
-              {user.name}
-            </p>
-          </div>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="font-bold text-[#343434] text-[14px] font-[family-name:var(--font-unbounded)]">
+            {user.name}
+          </p>
+          {getImageUrl(user.avatar_url) ? (
+            <img
+              src={getImageUrl(user.avatar_url)!}
+              alt={user.name}
+              className="w-10 h-10 rounded-full object-cover shrink-0"
+            />
+          ) : (
+            <AvatarPlaceholder name={user.name} className="w-10 h-10 shrink-0" textClassName="text-[14px]" />
+          )}
+        </div>
 
+        <div className="mt-[30px] flex flex-col">
           {isProfileComplete ? (
-            <nav className="mt-8 flex flex-col gap-5">
+            <nav className="flex flex-col">
               {menuItems.map((item) => (
-                <Link
-                  key={item.href}
+                <a
+                  key={item.path}
                   href={item.href}
-                  onClick={onClose}
-                  className="font-bold text-[#343434] text-[16px] font-[family-name:var(--font-unbounded)] hover:text-[#FECC39] transition-colors"
+                  onClick={(e) => handleProfileLinkClick(e, item.path)}
+                  className="flex items-center justify-between gap-2 font-bold text-[#343434] text-[14px] font-[family-name:var(--font-unbounded)] py-3 hover:text-[#FECC39] transition-colors"
                 >
                   {item.label}
-                </Link>
+                  {Boolean(item.badge) && (
+                    <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[#343434] text-[11px] font-bold">
+                      {item.badge}
+                    </span>
+                  )}
+                </a>
               ))}
             </nav>
           ) : (
-            <div className="mt-8 bg-black/[0.03] p-3">
+            <div className="bg-black/[0.03] p-3">
               <p className="font-wix text-[13px] leading-[18px] text-[#343434]/70 mb-2.5">
                 {t("profileIncomplete")}
               </p>
-              <Link
-                href={`/profile/${user.slug}/edit`}
-                onClick={onClose}
+              <a
+                href={getEditProfileUrl()}
+                onClick={(e) => handleProfileLinkClick(e, "/profile/profile")}
                 className="inline-block font-bold text-[14px] leading-5 text-[#343434] bg-[#FECC39] px-3 py-2 hover:opacity-85 transition-opacity"
               >
                 {t("completeProfile")}
-              </Link>
+              </a>
             </div>
           )}
 
-          <Link
-            href={`/author/${user.slug}`}
-            onClick={onClose}
-            className="mt-8 flex items-center justify-between gap-3 bg-[#343434] px-4 py-3 hover:bg-[#272727] transition-colors"
-          >
-            <span className="font-bold text-[#FECC39] text-[14px]">
-              {SITE_DOMAIN}/author/{user.slug}
-            </span>
-            <img src="/yellow_triangle_down.svg" alt="" className="w-4 h-4 -rotate-90 shrink-0" />
-          </Link>
+          <div className="h-px bg-[#343434]/10 my-3" />
 
           <button
             type="button"
@@ -121,36 +139,10 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout }: Pr
               onClose();
               onLogout();
             }}
-            className="mt-6 text-left font-bold text-[#343434] text-[16px] font-[family-name:var(--font-unbounded)] hover:text-[#FECC39] transition-colors"
+            className="text-left font-bold text-[#343434] text-[14px] font-[family-name:var(--font-unbounded)] py-3 hover:text-[#FECC39] transition-colors"
           >
             {t("logout")}
           </button>
-
-          <div className="mt-auto pt-8">
-            <div className="w-full border-t border-black/10" />
-            <div className="mt-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <a href={SAVE_ART_URL} className="font-wix text-sm text-[#343434] hover:text-[#FECC39] transition-colors">
-                  {SAVE_ART_DOMAIN}
-                </a>
-                <a href={ART_UA_COM_URL} className="font-wix text-sm text-[#343434] hover:text-[#FECC39] transition-colors">
-                  {ART_UA_COM_DOMAIN}
-                </a>
-              </div>
-              <div className="flex items-center gap-3">
-                {socialIcons.map((icon, index) => (
-                  <a key={index} href="#" className="w-5 h-5">
-                    <img
-                      className="w-5 h-5 opacity-70 hover:opacity-100 transition-opacity"
-                      alt={icon.alt}
-                      src={icon.src}
-                      style={{ filter: "invert(1)" }}
-                    />
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </>

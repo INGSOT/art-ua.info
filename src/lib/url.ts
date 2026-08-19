@@ -37,3 +37,14 @@ export function getImageUrl(path?: string | null): string | null {
 export function withHttpProtocol(url: string): string {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
 }
+
+// Прямі посилання на розділи Filament-панелі "profile" бекенду — використовуються
+// як href (для звичайної навігації/відкриття в новій вкладці), поки клік не
+// перехоплений на SSO-редирект (див. redirectToProfile у lib/api/auth.ts).
+// Порт save-art/src/utils/url.js (getEditProfileUrl, getProfileProjectsUrl тощо).
+export const getEditProfileUrl = (): string => `${API_BASE}/profile/profile`;
+export const getProfileProjectsUrl = (): string => `${API_BASE}/profile/projects`;
+export const getProfileCatalogsUrl = (): string => `${API_BASE}/profile/catalogs`;
+export const getProfileServicesUrl = (): string => `${API_BASE}/profile/services`;
+export const getProfileTeamsUrl = (): string => `${API_BASE}/profile/teams`;
+export const getProfileNotificationsUrl = (): string => `${API_BASE}/profile/notifications`;

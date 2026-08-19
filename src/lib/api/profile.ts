@@ -1,5 +1,7 @@
 import api from "./auth";
 
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
+
 interface RawProfilePersonal {
   avatar: string | null;
   full_name: { uk?: string; en?: string } | null;
@@ -38,25 +40,6 @@ export interface MyProfileInfo {
   description: string[];
 }
 
-export interface MyProfileEditData {
-  avatar: string | null;
-  fullNameUk: string;
-  fullNameEn: string;
-  professionUk: string;
-  professionEn: string;
-  countryUk: string;
-  countryEn: string;
-  cityUk: string;
-  cityEn: string;
-  descriptionUk: string;
-  descriptionEn: string;
-  website: string;
-  facebook: string;
-  instagram: string;
-  linkedin: string;
-  youtube: string;
-}
-
 const SOCIAL_ICONS: { key: keyof RawProfileSocial; alt: string; icon: string }[] = [
   { key: "facebook", alt: "Facebook", icon: "/socials/facebook_yellow.svg" },
   { key: "instagram", alt: "Instagram", icon: "/socials/instagram_yellow.svg" },
@@ -66,28 +49,6 @@ const SOCIAL_ICONS: { key: keyof RawProfileSocial; alt: string; icon: string }[]
   { key: "deviantart", alt: "DeviantArt", icon: "/socials/deviantart_yellow.svg" },
   { key: "twitter", alt: "X", icon: "/socials/x_yellow.svg" },
 ];
-
-function mapEditData(data: GetProfileResponse): MyProfileEditData {
-  const { profilePersonal, profileSocial } = data;
-  return {
-    avatar: profilePersonal.avatar,
-    fullNameUk: profilePersonal.full_name?.uk ?? "",
-    fullNameEn: profilePersonal.full_name?.en ?? "",
-    professionUk: profilePersonal.profession?.uk ?? "",
-    professionEn: profilePersonal.profession?.en ?? "",
-    countryUk: profilePersonal.country?.uk ?? "",
-    countryEn: profilePersonal.country?.en ?? "",
-    cityUk: profilePersonal.city?.uk ?? "",
-    cityEn: profilePersonal.city?.en ?? "",
-    descriptionUk: profilePersonal.description?.uk ?? "",
-    descriptionEn: profilePersonal.description?.en ?? "",
-    website: profileSocial?.website ?? "",
-    facebook: profileSocial?.facebook ?? "",
-    instagram: profileSocial?.instagram ?? "",
-    linkedin: profileSocial?.linkedin ?? "",
-    youtube: profileSocial?.youtube ?? "",
-  };
-}
 
 export const profileAPI = {
   getMyProfileInfo: async (): Promise<MyProfileInfo> => {
@@ -116,27 +77,25 @@ export const profileAPI = {
     };
   },
 
-  getMyProfileEditData: async (): Promise<MyProfileEditData> => {
-    const response = await api.get<GetProfileResponse>("/v1/art-ua-info/profile");
-    return mapEditData(response.data);
+  // Редагування профілю переїхало в Filament-панель бекенду. Ендпоінт спільний
+  // для всіх фронтендів (не під /v1/art-ua-info/*) — видає одноразовий грант,
+  // який логінить того ж юзера в сесію Filament без повторного вводу пароля.
+  requestProfileSso: async (redirectPath: string): Promise<{ url: string }> => {
+    const response = await api.post<{ url: string }>("/v1/profile/sso-grant", {
+      redirect_path: redirectPath,
+    });
+    return response.data;
   },
 
-  updateProfile: async (data: MyProfileEditData): Promise<void> => {
-    await api.put("/v1/art-ua-info/profile/personal", {
-      avatar: data.avatar || undefined,
-      full_name: { uk: data.fullNameUk, en: data.fullNameEn || undefined },
-      profession: { uk: data.professionUk, en: data.professionEn || undefined },
-      country: { uk: data.countryUk, en: data.countryEn || undefined },
-      city: { uk: data.cityUk, en: data.cityEn || undefined },
-      description: { uk: data.descriptionUk, en: data.descriptionEn || undefined },
-    });
-
-    await api.put("/v1/art-ua-info/profile/social", {
-      website: data.website || undefined,
-      facebook: data.facebook || undefined,
-      instagram: data.instagram || undefined,
-      linkedin: data.linkedin || undefined,
-      youtube: data.youtube || undefined,
-    });
+  // Порт save-art/src/api/auth.js redirectToBackendProfile — якщо видача
+  // одноразового гранту чомусь не вдалась, ведемо просто на бекенд без
+  // автологіну (користувач залогіниться там вручну), а не блокуємо перехід.
+  redirectToProfile: async (redirectPath: string): Promise<void> => {
+    try {
+      const { url } = await profileAPI.requestProfileSso(redirectPath);
+      window.location.href = url;
+    } catch {
+      window.location.href = `${API_BASE}${redirectPath}`;
+    }
   },
 };

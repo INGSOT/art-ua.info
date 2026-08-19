@@ -2,34 +2,45 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/src/i18n/navigation";
-import { withProfileId } from "../../../lib/authorQuery";
-import { useProfileView } from "./ProfileViewContext";
+import { profileAPI } from "../../../lib/api/profile";
+import {
+  getProfileProjectsUrl,
+  getProfileCatalogsUrl,
+  getProfileServicesUrl,
+  getProfileTeamsUrl,
+  getProfileNotificationsUrl,
+} from "../../../lib/url";
 
 type MenuProps = {
   activeItem?: string;
 };
 
+// Особистий кабінет переїхав у Filament-панель бекенду (як у save-art) —
+// вкладки лише відкривають одноразовий SSO-грант, див. ProfileMenuModal.tsx.
 export default function Menu({ activeItem }: MenuProps) {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const { slug } = useProfileView();
   const t = useTranslations("Profile.menu");
 
   const menuItems = [
-    { id: "projects", label: t("projects"), href: withProfileId("/profile/projects", slug) },
-    { id: "drafts", label: t("drafts"), href: withProfileId("/profile/drafts", slug) },
-    { id: "catalogs", label: t("catalogs"), href: withProfileId("/profile/catalogs", slug) },
-    { id: "services", label: t("services"), href: withProfileId("/profile/services", slug) },
-    { id: "info", label: t("info"), href: withProfileId("/profile/info", slug) },
-    { id: "notifications", label: t("notifications"), href: withProfileId("/profile/notifications", slug) },
+    { id: "projects", label: t("projects"), href: getProfileProjectsUrl(), path: "/profile/projects" },
+    { id: "catalogs", label: t("catalogs"), href: getProfileCatalogsUrl(), path: "/profile/catalogs" },
+    { id: "services", label: t("services"), href: getProfileServicesUrl(), path: "/profile/services" },
+    { id: "team", label: t("team"), href: getProfileTeamsUrl(), path: "/profile/teams" },
+    { id: "notifications", label: t("notifications"), href: getProfileNotificationsUrl(), path: "/profile/notifications" },
   ];
+
+  const handleClick = (e: React.MouseEvent, path: string) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+    e.preventDefault();
+    void profileAPI.redirectToProfile(path);
+  };
 
   return (
     <section className="w-full bg-[#414141] py-8 px-0 border-t border-[#343434]">
       <div className="max-w-4xl w-full px-4 md:px-[30px]">
         <nav className="flex flex-col md:flex-row justify-between gap-4 pl-[45px]">
           {menuItems.map((item) => (
-            <Link
+            <a
               key={item.id}
               href={item.href}
               className={`text-sm font-bold transition-colors duration-300 ${
@@ -39,9 +50,10 @@ export default function Menu({ activeItem }: MenuProps) {
               }`}
               onMouseEnter={() => setHoveredItem(item.id)}
               onMouseLeave={() => setHoveredItem(null)}
+              onClick={(e) => handleClick(e, item.path)}
             >
               {item.label}
-            </Link>
+            </a>
           ))}
         </nav>
       </div>

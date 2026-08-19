@@ -31,7 +31,8 @@
       "submit": "Register",
       "success": "Registration successful! Welcome to the community.",
       "emailTaken": "A user with this email already exists. Try logging in or resetting your password.",
-      "error": "Failed to register"
+      "error": "Failed to register",
+      "checkEmail": "We have sent a confirmation email. Follow the link in the email to confirm your address and continue setting up your profile."
     },
     "resetPassword": {
       "title": "Password recovery",
@@ -58,6 +59,11 @@
     "impersonate": {
       "loading": "Signing you in...",
       "error": "This sign-in link is invalid or already used",
+      "home": "Home"
+    },
+    "googleCallback": {
+      "loading": "Signing you in with Google...",
+      "error": "Failed to sign in with Google",
       "home": "Home"
     },
     "search": {
@@ -93,10 +99,12 @@
     },
     "profileMenu": {
       "projects": "Projects",
+      "drafts": "Drafts",
       "catalogs": "Catalogs",
       "services": "Services",
       "team": "Team",
       "info": "Info",
+      "notifications": "Notifications",
       "logout": "Log out",
       "profileIncomplete": "Fill in your profile first to start using the dashboard",
       "completeProfile": "Complete profile"

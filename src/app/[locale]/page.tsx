@@ -36,11 +36,20 @@ export default async function Home() {
   const seed = Date.now();
   const locale = (await getLocale()) as Locale;
   const language = localeToApiLanguage(locale);
+  // Три незалежні запити — виконуємо паралельно (Promise.allSettled), а не
+  // послідовно один за одним, інакше час завантаження головної складається
+  // з усіх трьох round-trip'ів замість найповільнішого з них.
+  const [projectsResult, catalogsResult, artistsResult] = await Promise.allSettled([
+    projectsAPI.list(language, { per_page: 20, sort_by: "popular" }),
+    publicCatalogsAPI.browse(language, { per_page: 30, sort_by: "likes" }),
+    artistsAPI.list(language, { per_page: 30 }),
+  ]);
+
   let projects: Awaited<ReturnType<typeof projectsAPI.list>> = [];
-  try {
-    projects = await projectsAPI.list(language, { per_page: 20, sort_by: "popular" });
-  } catch (error) {
-    console.error("Failed to load featured projects:", error);
+  if (projectsResult.status === "fulfilled") {
+    projects = projectsResult.value;
+  } else {
+    console.error("Failed to load featured projects:", projectsResult.reason);
   }
 
   const featuredProjectSlides = shuffleProjects(projects).map((project) => ({
@@ -52,18 +61,17 @@ export default async function Home() {
   }));
 
   let catalogs: PublicCatalog[] = [];
-  try {
-    const result = await publicCatalogsAPI.browse(language, { per_page: 30, sort_by: "likes" });
-    catalogs = result.data;
-  } catch (error) {
-    console.error("Failed to load catalogs:", error);
+  if (catalogsResult.status === "fulfilled") {
+    catalogs = catalogsResult.value.data;
+  } else {
+    console.error("Failed to load catalogs:", catalogsResult.reason);
   }
 
   let artists: PublicArtist[] = [];
-  try {
-    artists = await artistsAPI.list(language, { per_page: 30 });
-  } catch (error) {
-    console.error("Failed to load artists:", error);
+  if (artistsResult.status === "fulfilled") {
+    artists = artistsResult.value;
+  } else {
+    console.error("Failed to load artists:", artistsResult.reason);
   }
 
   return (

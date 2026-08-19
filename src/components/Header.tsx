@@ -50,11 +50,11 @@ export default function Header({ isHomePage = false }: HeaderProps) {
     const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
     const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-    const [hasUnread, setHasUnread] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
       if (!user) {
-        setHasUnread(false);
+        setUnreadCount(0);
         return;
       }
 
@@ -63,7 +63,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         notificationsAPI
           .unreadCount()
           .then((count) => {
-            if (!cancelled) setHasUnread(count > 0);
+            if (!cancelled) setUnreadCount(count);
           })
           .catch(() => {});
       };
@@ -103,8 +103,8 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         ) : (
           <AvatarPlaceholder name={user.name} className="w-11 h-11 rounded-[44px]" textClassName="text-[14px]" />
         )}
-        {hasUnread && (
-          <span className="absolute top-[calc(100%+8px)] left-[calc(50%-4px)] w-2 h-2 rounded-full bg-[#343434] animate-pulse" />
+        {unreadCount > 0 && (
+          <span className="absolute top-[calc(100%+8px)] left-[calc(50%-4px)] w-2 h-2 rounded-full bg-green-500 animate-pulse" />
         )}
       </button>
     ) : (
@@ -223,6 +223,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
           onClose={() => setIsProfileMenuOpen(false)}
           user={user}
           onLogout={handleLogout}
+          unreadCount={unreadCount}
         />
       )}
       <LoginModal

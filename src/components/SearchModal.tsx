@@ -19,7 +19,7 @@ interface SearchModalProps {
   onClose: () => void;
 }
 
-function SuggestionsList({
+export function SuggestionsList({
   items,
   onPick,
   listId,
