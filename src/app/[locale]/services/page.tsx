@@ -5,7 +5,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
-import SearchSection from '../../../components/SearchSection';
 import ServicesFilterSidebar from './ServicesFilterSidebar';
 import FiltersButton from '../../../components/filters/FiltersButton';
 import SelectedFiltersBar from '../../../components/filters/SelectedFiltersBar';
@@ -51,7 +50,6 @@ export default function ServicesPage() {
     const selectedLocation = searchParams.get('location')?.trim() ?? '';
     const currentPage = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1);
 
-    const [searchInput, setSearchInput] = useState(searchQueryParam);
     const [locationInput, setLocationInput] = useState(selectedLocation);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
@@ -60,10 +58,6 @@ export default function ServicesPage() {
     const [filtersData, setFiltersData] = useState<ServicesListFilters>(DEFAULT_FILTERS);
     const [loading, setLoading] = useState(true);
     const [hasLoaded, setHasLoaded] = useState(false);
-
-    useEffect(() => {
-        setSearchInput(searchQueryParam);
-    }, [searchQueryParam]);
 
     useEffect(() => {
         setLocationInput(selectedLocation);
@@ -184,19 +178,7 @@ export default function ServicesPage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleSearch = () => {
-        pushParams((params) => {
-            const trimmedValue = searchInput.trim();
-            if (trimmedValue) {
-                params.set('search', trimmedValue);
-            } else {
-                params.delete('search');
-            }
-        });
-    };
-
     const handleClearSearch = () => {
-        setSearchInput('');
         pushParams((params) => {
             params.delete('search');
         });
@@ -273,8 +255,6 @@ export default function ServicesPage() {
     return (
         <div className="min-h-screen bg-[#414141]">
             <Header />
-
-            <SearchSection value={searchInput} onChange={setSearchInput} onSearch={handleSearch} />
 
             {normalizedSearchQuery && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pt-4 pb-6 px-4">

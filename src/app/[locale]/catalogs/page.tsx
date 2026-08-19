@@ -7,7 +7,6 @@ import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
 import LatestNews from "../../../components/LatestNews";
 import JoinCommunityWrapper from "../../../components/JoinCommunityWrapper";
-import SearchSection from "../../../components/SearchSection";
 import SelectedFiltersBar from "../../../components/filters/SelectedFiltersBar";
 import FiltersButton from "../../../components/filters/FiltersButton";
 import { FilterChip } from "../../../components/filters/filterChipUtils";
@@ -57,16 +56,11 @@ export default function CatalogsPage() {
     const sortSlug = (searchParams.get("sort") ?? "likes") as SortSlug;
     const currentPage = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
-    const [searchInput, setSearchInput] = useState(searchQueryParam);
     const [catalogs, setCatalogs] = useState<PublicCatalog[]>([]);
     const [meta, setMeta] = useState({ current_page: 1, last_page: 1, per_page: ITEMS_PER_PAGE, total: 0 });
     const [filtersData, setFiltersData] = useState<CatalogsListFilters>(DEFAULT_FILTERS);
     const [loading, setLoading] = useState(true);
     const [hasLoaded, setHasLoaded] = useState(false);
-
-    useEffect(() => {
-        setSearchInput(searchQueryParam);
-    }, [searchQueryParam]);
 
     useEffect(() => {
         let ignore = false;
@@ -148,19 +142,7 @@ export default function CatalogsPage() {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handleSearch = () => {
-        pushParams((params) => {
-            const trimmed = searchInput.trim();
-            if (trimmed) {
-                params.set("search", trimmed);
-            } else {
-                params.delete("search");
-            }
-        });
-    };
-
     const handleClearSearch = () => {
-        setSearchInput("");
         pushParams((params) => {
             params.delete("search");
         });
@@ -236,8 +218,6 @@ export default function CatalogsPage() {
     return (
         <>
             <Header isHomePage={false} />
-            <SearchSection value={searchInput} onChange={setSearchInput} onSearch={handleSearch} />
-
             {normalizedSearchQuery && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pt-4 pb-6 px-4">
                     <p className="text-white text-center font-wix text-[18px] leading-[24px]">

@@ -6,7 +6,6 @@ import { routing } from "../i18n/routing";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { navigationItems, socialIcons } from "../data/headerData";
-import SearchModal from "./SearchModal";
 import MobileMenu from "./MobileMenu";
 import LoginModal from "./LoginModal";
 import RegistrationModal from "./RegistrationModal";
@@ -45,7 +44,6 @@ export default function Header({ isHomePage = false }: HeaderProps) {
       await logout();
       showToast(t("logout"), "green");
     };
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
     const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
@@ -177,15 +175,6 @@ export default function Header({ isHomePage = false }: HeaderProps) {
           </nav>
 
           <div className="inline-flex items-center justify-end gap-[30px]">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-11 h-11 hover:bg-transparent"
-              onClick={() => setIsSearchOpen(true)}
-            >
-              <img className="w-5 h-5" alt="Search" src="/search.svg" />
-            </Button>
-
             {socialIcons.map((icon, index) => (
               <Button
                 key={index}
@@ -236,7 +225,6 @@ export default function Header({ isHomePage = false }: HeaderProps) {
           {authButton}
         </div>
       </header>
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       {user && (
         <ProfileMenuModal

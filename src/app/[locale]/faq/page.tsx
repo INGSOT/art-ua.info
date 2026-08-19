@@ -7,7 +7,6 @@ import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import JoinCommunityWrapper from "../../../components/JoinCommunityWrapper";
-import SearchSection from "../../../components/SearchSection";
 import FilterSection from "../../../components/filters/FilterSection";
 import SelectedFiltersBar from "../../../components/filters/SelectedFiltersBar";
 import { buildFilterChips, getClearedFiltersState, removeFilterFromState } from "../../../components/filters/filterChipUtils";
@@ -132,8 +131,7 @@ export default function FAQPage() {
     return (
         <>
             <Header isHomePage={false} />
-            <SearchSection />
-            
+
             {/* Main Content Section */}
             <section className="w-full bg-[#414141] py-8 px-4 sm:px-6 md:px-10 lg:px-20">
                 {/* Title Section */}

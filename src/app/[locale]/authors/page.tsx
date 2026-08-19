@@ -8,7 +8,6 @@ import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
 import LatestNews from "../../../components/LatestNews";
 import JoinCommunityWrapper from "../../../components/JoinCommunityWrapper";
-import SearchSection from "../../../components/SearchSection";
 import SelectedFiltersBar from "../../../components/filters/SelectedFiltersBar";
 import FiltersButton from "../../../components/filters/FiltersButton";
 import { FilterChip } from "../../../components/filters/filterChipUtils";
@@ -187,17 +186,12 @@ export default function AuthorsPage() {
     const sortBy = searchParams.get("sort_by") ?? "projects_count";
     const currentPage = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
-    const [searchInput, setSearchInput] = useState(searchQueryParam);
     const [items, setItems] = useState<AuthorCardData[]>([]);
     const [meta, setMeta] = useState<{ current_page: number; last_page: number } | null>(null);
     const [filtersData, setFiltersData] = useState<AuthorsListFilters>(EMPTY_FILTERS);
     const [loading, setLoading] = useState(true);
     const [hasLoaded, setHasLoaded] = useState(false);
     const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
-
-    useEffect(() => {
-        setSearchInput(searchQueryParam);
-    }, [searchQueryParam]);
 
     useEffect(() => {
         let ignore = false;
@@ -372,19 +366,7 @@ export default function AuthorsPage() {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handleSearch = () => {
-        pushParams((params) => {
-            const trimmed = searchInput.trim();
-            if (trimmed) {
-                params.set("search", trimmed);
-            } else {
-                params.delete("search");
-            }
-        });
-    };
-
     const handleClearSearch = () => {
-        setSearchInput("");
         pushParams((params) => {
             params.delete("search");
         });
@@ -466,7 +448,6 @@ export default function AuthorsPage() {
     return (
         <>
             <Header isHomePage={false} />
-            <SearchSection value={searchInput} onChange={setSearchInput} onSearch={handleSearch} />
 
             {normalizedSearchQuery && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pt-4 pb-6 px-4">

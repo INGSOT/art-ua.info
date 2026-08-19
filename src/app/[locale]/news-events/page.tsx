@@ -7,7 +7,6 @@ import { useSearchParams } from "next/navigation";
 import Header from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import JoinCommunityWrapper from "../../../components/JoinCommunityWrapper";
-import SearchSection from "../../../components/SearchSection";
 import ListOfNews, { type NewsListCardItem } from "./ListOfNews";
 import PaginationSection from "../../../components/PaginationSection";
 import Image from "next/image";
@@ -48,12 +47,6 @@ export default function NewsEventsPage() {
     const sortLabels: Record<SortOption, string> = { new: t("sortNewer"), old: t("sortOlder") };
 
     const searchQueryParam = searchParams.get("search") ?? "";
-    const [searchInput, setSearchInput] = useState(searchQueryParam);
-
-    useEffect(() => {
-        setSearchInput(searchQueryParam);
-    }, [searchQueryParam]);
-
     useEffect(() => {
         let isMounted = true;
 
@@ -119,23 +112,7 @@ export default function NewsEventsPage() {
         router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
     };
 
-    const handleSearch = () => {
-        const params = new URLSearchParams(searchParams.toString());
-        const trimmedValue = searchInput.trim();
-
-        if (trimmedValue) {
-            params.set("search", trimmedValue);
-        } else {
-            params.delete("search");
-        }
-
-        setCurrentPage(1);
-        const search = params.toString();
-        router.push(search ? `${pathname}?${search}` : pathname, { scroll: false });
-    };
-
     const handleClearSearch = () => {
-        setSearchInput("");
         const params = new URLSearchParams(searchParams.toString());
         params.delete("search");
 
@@ -147,8 +124,6 @@ export default function NewsEventsPage() {
     return (
         <>
             <Header isHomePage={false} />
-            <SearchSection value={searchInput} onChange={setSearchInput} onSearch={handleSearch} />
-
             {normalizedSearchQuery && (
                 <div className="bg-[#414141] flex flex-col items-center justify-center pt-4 pb-6 px-4">
                     <p className="text-white text-center font-wix text-[18px] leading-[24px]">

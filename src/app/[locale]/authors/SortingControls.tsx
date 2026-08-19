@@ -28,12 +28,13 @@ export default function SortingControls({ options, value, onChange }: SortingCon
   };
 
   return (
-    <div className="relative flex-initial h-[44px] md:h-[48px] lg:h-[60px] w-auto flex-shrink-0">
+    <div className="relative h-[44px] w-full min-w-0 md:h-[48px] lg:h-[60px]">
       <button
+        type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center justify-between gap-1 md:gap-2 lg:gap-4 px-2 md:px-3 lg:px-4 h-[44px] md:h-[48px] lg:h-[60px] min-w-[88px] md:min-w-[104px] lg:min-w-[180px] bg-[#343434] hover:bg-[#3a3a3a] transition-colors"
+        className="flex h-[44px] w-full min-w-0 items-center justify-between gap-1 bg-[#343434] px-2 transition-colors hover:bg-[#3a3a3a] md:h-[48px] md:gap-2 md:px-3 lg:h-[60px] lg:min-w-[180px] lg:gap-4 lg:px-4"
       >
-        <span className="font-bold text-white text-sm md:text-base lg:font-h6 lg:text-[length:var(--h6-font-size)] lg:tracking-[var(--h6-letter-spacing)] lg:leading-[var(--h6-line-height)] lg:[font-style:var(--h6-font-style)] whitespace-nowrap">
+        <span className="min-w-0 truncate whitespace-nowrap text-sm font-bold text-white md:text-base lg:font-h6 lg:text-[length:var(--h6-font-size)] lg:tracking-[var(--h6-letter-spacing)] lg:leading-[var(--h6-line-height)] lg:[font-style:var(--h6-font-style)]">
           {activeOption?.name}
         </span>
         <Image
@@ -51,6 +52,7 @@ export default function SortingControls({ options, value, onChange }: SortingCon
             .filter((option) => option.slug !== activeOption?.slug)
             .map((option) => (
               <button
+                type="button"
                 key={option.slug}
                 onClick={() => handleSelectOption(option.slug)}
                 className="block w-full px-2 md:px-3 lg:px-4 py-2 md:py-3 text-left font-bold text-white text-sm md:text-base lg:text-[length:var(--p1-font-size)] whitespace-nowrap hover:bg-[#3a3a3a] transition-colors"
