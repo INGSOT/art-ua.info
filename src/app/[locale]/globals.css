@@ -87,6 +87,29 @@ textarea:focus {
   outline: none !important;
 }
 
+/* Keep the mobile search focus marker on the outer edge of its container. */
+.mobile-menu-search {
+  position: relative;
+}
+
+.mobile-menu-search::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: #FECC39;
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-menu-search:focus-within::before {
+  opacity: 1;
+}
+
+.mobile-menu-search input:focus {
+  border-left: 0 !important;
+}
+
 button:not(:disabled) {
   cursor: pointer;
 }

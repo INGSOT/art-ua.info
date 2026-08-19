@@ -116,7 +116,10 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </button>
 
           <div className="mt-10 flex flex-col gap-2">
-            <form onSubmit={handleSubmit} className="flex items-center justify-between gap-2 bg-[#343434] p-3">
+            <form
+              onSubmit={handleSubmit}
+              className="mobile-menu-search flex items-center justify-between gap-2 bg-[#343434] p-3"
+            >
               <input
                 type="text"
                 value={query}
