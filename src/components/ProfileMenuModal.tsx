@@ -86,15 +86,20 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout, unre
           <p className="font-bold text-[#343434] text-[14px] font-[family-name:var(--font-unbounded)]">
             {user.name}
           </p>
-          {getImageUrl(user.avatar_url) ? (
-            <img
-              src={getImageUrl(user.avatar_url)!}
-              alt={user.name}
-              className="w-10 h-10 rounded-full object-cover shrink-0"
-            />
-          ) : (
-            <AvatarPlaceholder name={user.name} className="w-10 h-10 shrink-0" textClassName="text-[14px]" />
-          )}
+          <div className="relative w-10 h-10 shrink-0">
+            {getImageUrl(user.avatar_url) ? (
+              <img
+                src={getImageUrl(user.avatar_url)!}
+                alt={user.name}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <AvatarPlaceholder name={user.name} className="w-10 h-10" textClassName="text-[14px]" />
+            )}
+            {unreadCount > 0 && (
+              <span className="absolute top-[calc(100%+8px)] left-[calc(50%-4px)] w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            )}
+          </div>
         </div>
 
         <div className="mt-[30px] flex flex-col">

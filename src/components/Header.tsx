@@ -91,7 +91,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
       <button
         type="button"
         onClick={() => setIsProfileMenuOpen(true)}
-        className="relative w-11 h-11 shrink-0 overflow-hidden rounded-[44px] border border-[#FECC39]"
+        className="relative w-11 h-11 shrink-0 rounded-[44px] border border-[#FECC39]"
         aria-label={user.name}
       >
         {getImageUrl(user.avatar_url) ? (
