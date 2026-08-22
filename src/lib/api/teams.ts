@@ -148,20 +148,6 @@ function mapTeam(raw: RawTeam, language: ApiLanguage): PublicTeam {
 }
 
 export const teamsAPI = {
-  list: async (
-    language: ApiLanguage,
-    params?: {
-      search?: string;
-      per_page?: number;
-      page?: number;
-    }
-  ): Promise<PublicTeam[]> => {
-    const response = await api.get<TeamsListResponse>("/v1/art-ua-info/teams", {
-      params: { language, ...params },
-    });
-    return response.data.data.map((raw) => mapTeam(raw, language));
-  },
-
   // З пагінацією (meta) — для /authors, симетрично до artistsAPI.browse.
   browse: async (
     language: ApiLanguage,

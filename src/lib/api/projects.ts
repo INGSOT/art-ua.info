@@ -10,24 +10,6 @@ function absoluteUrl(path: string | null | undefined): string | null {
   return path.startsWith("http") ? path : `${API_BASE}${path}`;
 }
 
-// Зворотне до absoluteUrl: перед відправкою на бекенд вже завантажене (не base64)
-// зображення повертаємо у "голий" шлях відносно диску (без домену й без "/storage" —
-// саме так шлях зберігається в БД, а Storage::url() сам додає "/storage" при читанні).
-// Якщо цього не зробити, "/storage" задвоюється на кожному наступному збереженні.
-export function toApiRelativePath(url: string | null | undefined): string | undefined {
-  if (!url) return undefined;
-  // Base64 data URL (свіжозавантажене зображення) — не чіпаємо: алфавіт base64
-  // містить "/", тож split("/")-логіка нижче ламає дані, "з'їдаючи" байти на
-  // кожному "//" всередині payload'у.
-  if (url.startsWith("data:")) return url;
-  const relative = url.startsWith(API_BASE) ? url.slice(API_BASE.length) : url;
-  const segments = relative.split("/").filter(Boolean);
-  while (segments[0] === "storage") {
-    segments.shift();
-  }
-  return segments.join("/");
-}
-
 export interface PublicProjectListItem {
   id: number;
   slug: string;
@@ -43,192 +25,6 @@ interface RawProjectListItem extends Omit<PublicProjectListItem, "cover_url"> {
 
 interface ProjectsListResponse {
   data: RawProjectListItem[];
-}
-
-export interface CreateProjectPayload {
-  status?: "new" | "draft" | "moderation";
-  local_id?: string;
-  title: { uk: string; en?: string };
-  short_description?: { uk?: string; en?: string };
-  cover?: string | null;
-  art_category?: string;
-  art_subcategory?: string;
-  tags?: { uk?: string; en?: string };
-}
-
-export interface CreateProjectResponse {
-  id: number;
-  slug: string;
-  status: string;
-}
-
-// Додаткова інформація про проєкт — блоки заголовок/текст/зображення/посилання
-// (точний аналог content_blocks-редактора з save-art).
-export interface ArtUaInfoContentBlock {
-  type: "heading" | "paragraph" | "image" | "link";
-  heading_level?: string;
-  heading_text?: { uk?: string; en?: string };
-  paragraph_text?: { uk?: string; en?: string };
-  image?: string;
-  url?: string;
-}
-
-// Робота (галерея зображень + посилання на відео), яку показуємо в прев'ю проєкту —
-// окреме поле final_result, не плутати з content_blocks (додатковою інформацією).
-export interface ArtUaInfoFinalResultItem {
-  type: "image" | "link";
-  image?: string;
-  url?: string;
-}
-
-export interface ArtUaInfoParameterAnswer {
-  parameter_id: number;
-  parameter_value_id?: number | null;
-  custom_value?: { uk?: string; en?: string };
-}
-
-export interface CreateArtUaInfoProjectPayload {
-  status?: "new" | "draft" | "moderation";
-  user_type: "personal" | "legal" | "team";
-  team_id?: number;
-  title: { uk: string; en?: string };
-  short_description?: { uk?: string; en?: string };
-  art_category?: string;
-  art_subcategory?: string;
-  parameters?: ArtUaInfoParameterAnswer[];
-  cover?: string | null;
-  final_result?: ArtUaInfoFinalResultItem[];
-  content_blocks?: ArtUaInfoContentBlock[];
-  tags?: { uk?: string[]; en?: string[] };
-  sold_externally?: boolean;
-}
-
-// Оновлення: дозволені статус-переходи — "draft" (зняти опублікований проєкт
-// з публікації) та "moderation" (опублікувати чернетку). Будь-які інші
-// значення бекенд відхилить.
-export type UpdateArtUaInfoProjectPayload = Omit<CreateArtUaInfoProjectPayload, "status"> & {
-  status?: "draft" | "moderation";
-};
-
-// ---------------------------------------------------------------------------
-// Мій проєкт для редагування (GET /v1/art-ua-info/my/projects/{slug} без ?language —
-// повертає всі мультимовні поля повністю, {uk, en}, а не локалізований рядок)
-// ---------------------------------------------------------------------------
-
-export interface Bilingual {
-  uk?: string;
-  en?: string;
-}
-
-// Теги art-ua-info зберігаються як списки рядків по мовах (не comma-separated
-// рядок, як у save-art) — { uk: string[], en: string[] }.
-export interface BilingualTags {
-  uk?: string[];
-  en?: string[];
-}
-
-export interface MyProjectContentBlock {
-  type: "heading" | "paragraph" | "image" | "link";
-  heading_level?: string | null;
-  heading_text?: Bilingual | null;
-  paragraph_text?: Bilingual | null;
-  image?: string | null;
-  url?: string | null;
-}
-
-export interface MyProjectFinalResultItem {
-  type: "image" | "link";
-  image?: string | null;
-  url?: string | null;
-}
-
-export interface MyProjectParameterAnswer {
-  parameter_id: number;
-  type: "list" | "custom";
-  value_id: number | null;
-  value: Bilingual | null;
-}
-
-export interface MyProjectDetail {
-  id: number;
-  slug: string;
-  source: "save_art" | "art_ua_info";
-  status: string;
-  statusLabel: string;
-  title: Bilingual;
-  shortDescription: Bilingual;
-  artCategory: string | null;
-  artSubcategory: string | null;
-  tags: BilingualTags;
-  coverUrl: string | null;
-  authorType: "personal" | "legal" | "team" | string;
-  authorSlug: string | null;
-  contentBlocks: MyProjectContentBlock[];
-  finalResult: MyProjectFinalResultItem[];
-  soldExternally: boolean;
-  parameters: MyProjectParameterAnswer[];
-  likesCount: number;
-  isLiked: boolean;
-}
-
-interface RawMyProjectDetail {
-  id: number;
-  slug: string;
-  source: "save_art" | "art_ua_info";
-  status: string;
-  status_label: string;
-  title: Bilingual | null;
-  short_description: Bilingual | null;
-  art_category: string | null;
-  art_subcategory: string | null;
-  tags: BilingualTags | null;
-  cover_url: string | null;
-  author: { type: string; slug: string | null };
-  sold_externally: boolean;
-  content_blocks: MyProjectContentBlock[] | null;
-  final_result: MyProjectFinalResultItem[] | null;
-  parameters: MyProjectParameterAnswer[] | null;
-  likes_count: number;
-  is_liked: boolean;
-}
-
-export interface MyProjectListItem {
-  id: number;
-  slug: string;
-  status: string;
-  statusLabel: string;
-  title: string;
-  coverUrl: string | null;
-  likesCount: number;
-  soldExternally: boolean;
-}
-
-interface RawMyProjectListItem {
-  id: number;
-  slug: string;
-  status: string;
-  status_label: string;
-  title: string;
-  cover_url: string | null;
-  likes_count: number;
-  sold_externally?: boolean;
-}
-
-interface MyProjectsListResponse {
-  data: RawMyProjectListItem[];
-}
-
-function mapMyProjectListItem(project: RawMyProjectListItem): MyProjectListItem {
-  return {
-    id: project.id,
-    slug: project.slug,
-    status: project.status,
-    statusLabel: project.status_label,
-    soldExternally: Boolean(project.sold_externally),
-    title: project.title,
-    coverUrl: absoluteUrl(project.cover_url),
-    likesCount: project.likes_count,
-  };
 }
 
 export interface ProjectCardAuthor {
@@ -343,30 +139,6 @@ function mapProjectCardItem(raw: RawProjectCardItem): ProjectListCardItem {
 }
 
 export const projectsAPI = {
-  myList: async (
-    language: ApiLanguage,
-    params?: Record<string, string | number>
-  ): Promise<MyProjectListItem[]> => {
-    const response = await api.get<MyProjectsListResponse>("/v1/art-ua-info/my/projects", {
-      params: { language, ...params },
-    });
-    return response.data.data.map(mapMyProjectListItem);
-  },
-
-  // Завершені art-ua-info-проєкти — GET /v1/art-ua-info/my/projects/completed.
-  myCompletedList: async (
-    language: ApiLanguage,
-    params?: Record<string, string | number>
-  ): Promise<MyProjectListItem[]> => {
-    const response = await api.get<MyProjectsListResponse>(
-      "/v1/art-ua-info/my/projects/completed",
-      {
-        params: { language, ...params },
-      }
-    );
-    return response.data.data.map(mapMyProjectListItem);
-  },
-
   list: async (
     language: ApiLanguage,
     params?: Record<string, string | number>
@@ -410,44 +182,6 @@ export const projectsAPI = {
     return mapProjectDetail(response.data.data, language);
   },
 
-  donors: async (
-    slug: string,
-    params?: { per_page?: number; page?: number }
-  ): Promise<ProjectDonor[]> => {
-    const response = await api.get<ProjectDonorsResponse>(
-      `/v1/art-ua-info/projects/${slug}/donors`,
-      {
-        params,
-      }
-    );
-    return response.data.data;
-  },
-
-  createArtUaInfoProject: async (
-    payload: CreateArtUaInfoProjectPayload
-  ): Promise<CreateProjectResponse> => {
-    const response = await api.post<{ data: CreateProjectResponse }>(
-      "/v1/art-ua-info/projects",
-      payload
-    );
-    return response.data.data;
-  },
-
-  updateArtUaInfoProject: async (
-    slug: string,
-    payload: UpdateArtUaInfoProjectPayload
-  ): Promise<CreateProjectResponse> => {
-    const response = await api.put<{ data: CreateProjectResponse }>(
-      `/v1/art-ua-info/projects/${slug}`,
-      payload
-    );
-    return response.data.data;
-  },
-
-  myDelete: async (slug: string): Promise<void> => {
-    await api.delete(`/v1/art-ua-info/my/projects/${slug}`);
-  },
-
   // Project::getRouteKeyName() === 'slug', тож {project} у роуті лайка
   // резолвиться по slug, а не по числовому id.
   like: async (projectSlug: string): Promise<LikeResponse> => {
@@ -460,40 +194,6 @@ export const projectsAPI = {
       `/v1/art-ua-info/projects/${projectSlug}/like`
     );
     return response.data;
-  },
-
-  // Повні (нелокалізовані, {uk, en}) дані власного проєкту для форми редагування —
-  // GET /v1/art-ua-info/my/projects/{slug} без ?language.
-  myShow: async (slug: string): Promise<MyProjectDetail> => {
-    const response = await api.get<{ data: RawMyProjectDetail }>(
-      `/v1/art-ua-info/my/projects/${slug}`
-    );
-    const raw = response.data.data;
-    return {
-      id: raw.id,
-      slug: raw.slug,
-      source: raw.source,
-      status: raw.status,
-      statusLabel: raw.status_label,
-      title: raw.title ?? {},
-      shortDescription: raw.short_description ?? {},
-      artCategory: raw.art_category,
-      artSubcategory: raw.art_subcategory,
-      tags: { uk: raw.tags?.uk ?? [], en: raw.tags?.en ?? [] },
-      coverUrl: absoluteUrl(raw.cover_url),
-      authorType: raw.author?.type ?? "personal",
-      authorSlug: raw.author?.slug ?? null,
-      contentBlocks: (raw.content_blocks ?? []).map((block) =>
-        block.type === "image" ? { ...block, image: absoluteUrl(block.image) } : block
-      ),
-      finalResult: (raw.final_result ?? []).map((item) =>
-        item.type === "image" ? { ...item, image: absoluteUrl(item.image) } : item
-      ),
-      soldExternally: Boolean(raw.sold_externally),
-      parameters: raw.parameters ?? [],
-      likesCount: raw.likes_count ?? 0,
-      isLiked: Boolean(raw.is_liked),
-    };
   },
 };
 
@@ -803,22 +503,4 @@ function mapProjectDetail(raw: RawProjectDetail, language: ApiLanguage): PublicP
     canDonate: !!raw.can_donate,
     createdAt: raw.created_at,
   };
-}
-
-// ---------------------------------------------------------------------------
-// Project donors (GET /v1/art-ua-info/projects/{slug}/donors)
-// ---------------------------------------------------------------------------
-
-export interface ProjectDonor {
-  id: number;
-  name: string;
-  amount: number;
-  currency: string;
-  is_anonymous: boolean;
-  donated_at: string | null;
-}
-
-interface ProjectDonorsResponse {
-  data: ProjectDonor[];
-  meta?: Record<string, unknown>;
 }
