@@ -50,10 +50,6 @@ export default function ProjectPageClient({ project, initialIsLiked = false }: P
 
   const { projectDetails, projectDescriptionData } = project;
 
-  // Редагувати можна лише проєкти, створені через майстер art-ua-info (окремий флоу
-  // без бюджету/етапів/бонусів) — save-art проєкти редагуються на save-art.in.ua.
-  const canEdit = user?.id === project.authorId && project.source === "art_ua_info";
-
   const canModerate = !!user?.role && ["admin", "moderator", "developer"].includes(user.role);
 
   const authorLinkHref = projectDescriptionData.aboutAuthor.artUaLink
@@ -106,7 +102,6 @@ export default function ProjectPageClient({ project, initialIsLiked = false }: P
         isLiked={isLiked}
         onLikeClick={handleLikeClick}
         likeDisabled={likeLoading}
-        editHref={canEdit ? `/profile/${user!.slug}/edit-project?edit=${project.slug}` : undefined}
         author={{
           avatarUrl: projectDescriptionData.aboutAuthor.avatar,
           name: projectDescriptionData.aboutAuthor.name,

@@ -6,27 +6,18 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import { Card, CardContent } from "../../../../../components/ui/card";
-import EmptyState from "../../../../../components/ui/empty-state";
 import { teamsAPI } from "../../../../../lib/api/teams";
 import type { PublicArtistProject } from "../../../../../lib/api/authorProfiles";
 import { localeToApiLanguage, type Locale } from "../../../../../i18n/routing";
-import { useTeamProfile } from "../../TeamProfileContext";
-import { useAuth } from "../../../../../context/AuthContext";
-import { withProfileId } from "../../../../../lib/authorQuery";
 
 const FALLBACK_COVER = "/artists/artist-photo-5.png";
 
 export default function Projects() {
   const t = useTranslations("Team.projects");
-  const tProfile = useTranslations("Profile.projects");
-  const tAboutMe = useTranslations("Profile.aboutMe");
   const locale = useLocale() as Locale;
   const language = localeToApiLanguage(locale);
   const params = useParams<{ slug?: string }>();
   const slug = params?.slug ?? "";
-  const { isMember } = useTeamProfile();
-  const { user } = useAuth();
-  const canManage = isMember && Boolean(user?.slug);
   const [projects, setProjects] = useState<PublicArtistProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -107,22 +98,6 @@ export default function Projects() {
     <section className="w-full bg-[#414141] pt-4 pb-8 px-4 md:px-10 lg:px-[75px]">
       {hasProjects ? (
         <>
-          {canManage && (
-            <div className="mb-8 flex justify-center">
-              <Link
-                href={withProfileId("/profile/create-project", user!.slug)}
-                className="h-[60px] flex items-stretch transition-all duration-300 rounded-none bg-[#FECC39] hover:bg-white w-full md:w-[320px]"
-              >
-                <span className="flex items-center justify-center flex-1 px-6 font-bold text-black whitespace-nowrap">
-                  {tProfile("createButton")}
-                </span>
-                <div className="flex items-center justify-center w-[60px] flex-shrink-0 border-l border-black">
-                  <Image src="/plus.svg" alt={tProfile("plusAlt")} width={24} height={24} />
-                </div>
-              </Link>
-            </div>
-          )}
-
           <div className="w-full bg-[#343434] mb-8">
             <div className="flex items-center flex-wrap gap-4 min-h-[80px] px-4 md:px-[30px] py-4 md:py-0">
               <div className="flex items-center gap-8">
@@ -261,26 +236,11 @@ export default function Projects() {
                       </CardContent>
                     </Card>
                   </Link>
-                  {canManage && (
-                    <Link
-                      href={withProfileId(`/profile/edit-project?edit=${project.slug}`, user!.slug)}
-                      className="absolute right-3 top-3 z-20 flex items-center justify-center w-10 h-10 bg-[#FECC39] hover:bg-white transition-colors"
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      <Image src="/edit.svg" alt={tAboutMe("editAlt")} width={20} height={20} />
-                    </Link>
-                  )}
                 </div>
               ))}
             </div>
           </div>
         </>
-      ) : canManage ? (
-        <EmptyState
-          title={t("empty")}
-          buttonText={tProfile("createButton")}
-          buttonHref={withProfileId("/profile/create-project", user!.slug)}
-        />
       ) : (
         <div className="flex flex-col items-center justify-center min-h-[400px] py-16 px-4">
           <Image

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
-import WorkVideoEmbed from "../../app/[locale]/profile/[slug]/create-project/WorkVideoEmbed";
+import WorkVideoEmbed from "../WorkVideoEmbed";
 import { getVideoInfo } from "../../utils/videoUtils";
 import { useToast } from "../../context/ToastContext";
 

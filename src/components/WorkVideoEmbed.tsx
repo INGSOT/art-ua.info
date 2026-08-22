@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { getVideoInfo } from "../../../../../utils/videoUtils";
+import { getVideoInfo } from "../utils/videoUtils";
 
 type WorkVideoEmbedProps = {
   workVideoUrl: string;
