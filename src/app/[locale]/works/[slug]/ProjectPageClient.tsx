@@ -8,6 +8,7 @@ import { useAuth } from "../../../../context/AuthContext";
 import { useToast } from "../../../../context/ToastContext";
 import { projectsAPI, type LikeResponse } from "../../../../lib/api/projects";
 import ProjectResultShowcase from "../../../../components/project/ProjectResultShowcase";
+import ModerationPanel from "../../../../components/moderation/ModerationPanel";
 import { localeToApiLanguage, type Locale } from "../../../../i18n/routing";
 
 interface ProjectPageClientProps {
@@ -52,6 +53,8 @@ export default function ProjectPageClient({ project, initialIsLiked = false }: P
   // Редагувати можна лише проєкти, створені через майстер art-ua-info (окремий флоу
   // без бюджету/етапів/бонусів) — save-art проєкти редагуються на save-art.in.ua.
   const canEdit = user?.id === project.authorId && project.source === "art_ua_info";
+
+  const canModerate = !!user?.role && ["admin", "moderator", "developer"].includes(user.role);
 
   const authorLinkHref = projectDescriptionData.aboutAuthor.artUaLink
     ? `https://${projectDescriptionData.aboutAuthor.artUaLink}`
@@ -123,6 +126,13 @@ export default function ProjectPageClient({ project, initialIsLiked = false }: P
         descriptionParagraphs={projectDescriptionData.descriptionText}
         contentBlocks={projectDescriptionData.contentBlocks}
       />
+      {canModerate && project.status && project.statusModeration && (
+        <ModerationPanel
+          slug={project.slug}
+          initialStatus={project.status}
+          initialStatusModeration={project.statusModeration}
+        />
+      )}
     </section>
   );
 }

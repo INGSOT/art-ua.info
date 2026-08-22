@@ -90,6 +90,8 @@ function mapToProject(raw: PublicProjectDetail, t: ProjectDetailTranslations): P
     title: raw.title,
     slug: raw.slug,
     source: raw.source,
+    status: raw.status,
+    statusModeration: raw.statusModeration,
     date: formatDate(raw.announcedAt ?? raw.createdAt),
     artSubCategory: raw.artSubcategory ?? raw.artCategory ?? "",
     likes: raw.likesCount,

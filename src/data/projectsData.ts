@@ -75,6 +75,10 @@ export interface Project {
   authorAvatar: string;
   authorName: string;
   source?: "save_art" | "art_ua_info";
+  // Сирі бекенд-статуси (не salesStatus) — потрібні лише для гейтингу
+  // ModerationPanel, у мок-даних відсутні.
+  status?: string;
+  statusModeration?: string;
   projectDetails: ProjectDetails;
   projectDescriptionData: ProjectDescriptionData;
 }

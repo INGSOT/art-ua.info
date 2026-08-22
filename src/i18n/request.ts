@@ -19,6 +19,7 @@ const NAMESPACE_FILES = [
   "profileServices",
   "createProject",
   "modals",
+  "moderation",
 ] as const;
 
 export default getRequestConfig(async ({ requestLocale }) => {

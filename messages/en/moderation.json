@@ -1,0 +1,24 @@
+{
+  "Moderation": {
+    "panelTitle": "Moderation panel",
+    "collapse": "Collapse",
+    "tabActions": "Actions",
+    "tabMessage": "Message",
+    "startReview": "Start review",
+    "startingReview": "Starting review...",
+    "approve": "Approve",
+    "approving": "Approving...",
+    "reject": "Reject",
+    "rejecting": "Rejecting...",
+    "confirmReject": "Confirm rejection",
+    "cancel": "Cancel",
+    "reasonPlaceholder": "Rejection reason (required)",
+    "subjectPlaceholder": "Subject (optional)",
+    "messagePlaceholder": "Message to the author...",
+    "sendMessage": "Send message",
+    "sending": "Sending...",
+    "messageSent": "Message sent to the author",
+    "error": "Something went wrong. Please try again.",
+    "errorTitle": "Error"
+  }
+}

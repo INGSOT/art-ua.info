@@ -572,6 +572,7 @@ export interface PublicProjectDetail {
   source: "save_art" | "art_ua_info";
   status: string;
   statusLabel: string;
+  statusModeration: string;
   title: string;
   shortDescription: string;
   coverUrl: string | null;
@@ -667,6 +668,7 @@ interface RawProjectDetail {
   source: "save_art" | "art_ua_info";
   status: string;
   status_label: string;
+  status_moderation: string;
   title: LocalizedText | null;
   short_description: LocalizedText | null;
   cover_url: string | null;
@@ -714,6 +716,7 @@ function mapProjectDetail(raw: RawProjectDetail, language: ApiLanguage): PublicP
     source: raw.source,
     status: raw.status,
     statusLabel: raw.status_label,
+    statusModeration: raw.status_moderation,
     title: localize(raw.title, language),
     shortDescription: localize(raw.short_description, language),
     coverUrl: absoluteUrl(raw.cover_url),

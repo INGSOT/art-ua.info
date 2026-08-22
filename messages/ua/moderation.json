@@ -1,0 +1,24 @@
+{
+  "Moderation": {
+    "panelTitle": "Панель модерації",
+    "collapse": "Згорнути",
+    "tabActions": "Дії",
+    "tabMessage": "Повідомлення",
+    "startReview": "Взяти в модерацію",
+    "startingReview": "Беремо в розгляд...",
+    "approve": "Схвалити",
+    "approving": "Схвалюємо...",
+    "reject": "Відхилити",
+    "rejecting": "Відхиляємо...",
+    "confirmReject": "Підтвердити відхилення",
+    "cancel": "Скасувати",
+    "reasonPlaceholder": "Причина відхилення (обов'язково)",
+    "subjectPlaceholder": "Тема (необов'язково)",
+    "messagePlaceholder": "Текст повідомлення авторові...",
+    "sendMessage": "Надіслати повідомлення",
+    "sending": "Надсилаємо...",
+    "messageSent": "Повідомлення надіслано авторові",
+    "error": "Сталася помилка. Спробуйте ще раз.",
+    "errorTitle": "Помилка"
+  }
+}
