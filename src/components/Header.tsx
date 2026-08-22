@@ -11,6 +11,7 @@ import LoginModal from "./LoginModal";
 import RegistrationModal from "./RegistrationModal";
 import ResetPassModal from "./ResetPassModal";
 import ProfileMenuModal from "./ProfileMenuModal";
+import SearchModal from "./SearchModal";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { getImageUrl } from "../lib/url";
@@ -48,6 +49,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
     const [activeAuthModal, setActiveAuthModal] = useState<"login" | "register" | "reset" | null>(null);
     const [disableAuthAnimation, setDisableAuthAnimation] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const avatarUrl = getImageUrl(user?.avatar_url);
     const [loadedAvatarUrl, setLoadedAvatarUrl] = useState<string | null>(null);
@@ -175,6 +177,17 @@ export default function Header({ isHomePage = false }: HeaderProps) {
           </nav>
 
           <div className="inline-flex items-center justify-end gap-[30px]">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-5 h-5 p-0 hover:bg-transparent"
+              onClick={() => setIsSearchModalOpen(true)}
+              aria-label={t("search")}
+            >
+              <svg width="20" height="20" viewBox="14 14 18.998470306396484 18.998470306396484" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M28.8924 26.0639C29.5961 24.8729 30 23.4836 30 22C30 17.5817 26.4183 14 22 14C17.5817 14 14 17.5817 14 22C14 26.4183 17.5817 30 22 30C23.4836 30 24.8729 29.5961 26.0639 28.8924L30.17 32.9985L32.9985 30.17L28.8924 26.0639Z" fill="#FECC39"/>
+              </svg>
+            </Button>
             {socialIcons.map((icon, index) => (
               <Button
                 key={index}
@@ -226,6 +239,7 @@ export default function Header({ isHomePage = false }: HeaderProps) {
         </div>
       </header>
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+      <SearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
       {user && (
         <ProfileMenuModal
           isOpen={isProfileMenuOpen}

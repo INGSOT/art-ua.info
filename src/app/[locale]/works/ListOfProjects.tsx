@@ -41,7 +41,7 @@ export default function ListOfProjects({ projects, disableInteractions = false }
         >
           <CardContent className="p-0 flex flex-col gap-2 md:gap-3">
             <Link
-              href={`/projects/${project.slug}`}
+              href={`/works/${project.slug}`}
               tabIndex={disableInteractions ? -1 : 0}
               aria-disabled={disableInteractions}
               className="flex flex-col gap-2 md:gap-3"

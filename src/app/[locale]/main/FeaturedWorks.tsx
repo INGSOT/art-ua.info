@@ -136,7 +136,7 @@ useEffect(() => {
             className="flex flex-col min-w-[400px] h-[300px] items-start justify-center gap-2.5 relative"
           >
             <Link
-              href={`/projects/${artwork.slug}`}
+              href={`/works/${artwork.slug}`}
               aria-label={t("openProject", { title: artwork.title })}
               className="flex-1 w-full min-h-0 bg-cover bg-center bg-no-repeat relative group cursor-pointer overflow-hidden block shrink-0"
               style={{ backgroundImage: `url(${artwork.image})` }}
@@ -175,7 +175,7 @@ useEffect(() => {
           e.currentTarget.style.backgroundColor = "#FECC39";
         }}
       >
-        <Link href="/projects">{t("buttonText")}</Link>
+        <Link href="/works">{t("buttonText")}</Link>
       </Button>
     </section>
     )

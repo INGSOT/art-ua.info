@@ -646,7 +646,7 @@ export default function ProjectCreating() {
           editSlug,
           isDraft ? { ...commonPayload, status: "moderation" } : commonPayload
         );
-        router.push(`/projects/${updated.slug}`);
+        router.push(`/works/${updated.slug}`);
         return { type: "success", text: t("publication.messages.updateSuccess") };
       }
 

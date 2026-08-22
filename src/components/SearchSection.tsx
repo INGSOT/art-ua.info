@@ -24,7 +24,7 @@ export default function SearchSection({
     const placeholderByPath: Record<string, string> = {
         '/authors': t('placeholderAuthors'),
         '/catalogs': t('placeholderCatalogs'),
-        '/projects': t('placeholderProjects'),
+        '/works': t('placeholderProjects'),
         '/news-events': t('placeholderNews'),
         '/services': t('placeholderServices'),
     };

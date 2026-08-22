@@ -10,7 +10,7 @@ export interface SocialIcon {
 
 export const navigationItems: NavigationItem[] = [
   { key: "authors", href: "/authors" },
-  { key: "projects", href: "/projects" },
+  { key: "projects", href: "/works" },
   { key: "services", href: "/services" },
   { key: "catalogs", href: "/catalogs" },
   { key: "newsEvents", href: "/news-events" },

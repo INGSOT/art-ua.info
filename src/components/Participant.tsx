@@ -293,7 +293,7 @@ export default function Participant({
           {photos.map((photo, index) => (
             <Link
               key={index}
-              href={photo.slug ? `/projects/${photo.slug}` : "#"}
+              href={photo.slug ? `/works/${photo.slug}` : "#"}
               onClick={(event) => {
                 if (!photo.slug) {
                   event.preventDefault();

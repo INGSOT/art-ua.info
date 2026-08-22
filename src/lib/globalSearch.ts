@@ -33,13 +33,13 @@ export interface GlobalSearchSuggestion {
 }
 
 const PARTICIPANTS_PATH = "/authors";
-const PROJECTS_PATH = "/projects";
+const PROJECTS_PATH = "/works";
 const SERVICES_PATH = "/services";
 const CATALOGS_PATH = "/catalogs";
 const NEWS_PATH = "/news-events";
 
 const LABEL_PARTICIPANTS = "Учасники";
-const LABEL_PROJECTS = "Проєкти";
+const LABEL_PROJECTS = "Роботи";
 const LABEL_SERVICES = "Послуги";
 const LABEL_CATALOGS = "Каталоги";
 const LABEL_NEWS = "Новини та події";

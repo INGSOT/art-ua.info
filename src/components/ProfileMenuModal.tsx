@@ -72,7 +72,7 @@ export default function ProfileMenuModal({ isOpen, onClose, user, onLogout, unre
           підкладки, це компактний дропдаун, а не повноекранна панель. */}
       <div className="fixed inset-0 z-40" onClick={onClose} />
 
-      <div className="fixed top-4 right-4 md:top-[30px] md:right-[30px] w-[calc(100%-2rem)] max-w-[360px] bg-[#FFFCF5] shadow-xl z-50 p-[30px]">
+      <div className="fixed top-0 right-0 w-full max-w-[360px] bg-[#FFFCF5] shadow-xl z-50 p-[30px]">
         <button
           type="button"
           onClick={onClose}

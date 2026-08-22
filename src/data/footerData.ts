@@ -60,7 +60,7 @@ export const navigationData: NavigationColumn[] = [
     links: [
       { key: "members", href: "/authors" },
       { key: "catalogs", href: "/catalogs" },
-      { key: "projects", href: "/projects" },
+      { key: "projects", href: "/works" },
       { key: "services", href: "/services" },
       { key: "newsEvents", href: "/news-events" },
       { key: "faq", href: "/faq" },
