@@ -12,8 +12,9 @@ interface ModerationPanelProps {
   initialStatusModeration: string;
 }
 
-type PendingAction = "start-review" | "approve" | "reject" | "message" | null;
+type PendingAction = "start-review" | "approve" | "reject" | "revision" | "message" | null;
 type View = "collapsed" | "actions" | "message";
+type ActionForm = "reject" | "revision" | null;
 
 function ShieldIcon({ className }: { className?: string }) {
   return (
@@ -56,6 +57,20 @@ function MessageIcon() {
   );
 }
 
+function RevisionIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M4 10h11a4 4 0 0 1 0 8h-3M4 10l4-4M4 10l4 4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 const STATUS_LABEL: Record<string, string> = {
   pending: "Очікує на розгляд",
   processing: "У розгляді",
@@ -70,8 +85,9 @@ export default function ModerationPanel({ slug, initialStatus, initialStatusMode
   const [view, setView] = useState<View>("actions");
   const [collapsed, setCollapsed] = useState(false);
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
-  const [isRejectFormOpen, setIsRejectFormOpen] = useState(false);
+  const [activeForm, setActiveForm] = useState<ActionForm>(null);
   const [reason, setReason] = useState("");
+  const [revisionComment, setRevisionComment] = useState("");
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
   const [messageSent, setMessageSent] = useState(false);
@@ -114,8 +130,24 @@ export default function ModerationPanel({ slug, initialStatus, initialStatusMode
     try {
       const result = await moderationAPI.reject(slug, reason.trim());
       showToast(result.message, "green");
-      setIsRejectFormOpen(false);
+      setActiveForm(null);
       setReason("");
+      if (result.status) setStatus(result.status);
+    } catch (error) {
+      showToast(getApiErrorMessage(error, t("error")), "red", t("errorTitle"));
+    } finally {
+      setPendingAction(null);
+    }
+  };
+
+  const handleReturnForRevision = async () => {
+    if (!revisionComment.trim()) return;
+    setPendingAction("revision");
+    try {
+      const result = await moderationAPI.returnForRevision(slug, revisionComment.trim());
+      showToast(result.message, "green");
+      setActiveForm(null);
+      setRevisionComment("");
       if (result.status) setStatus(result.status);
     } catch (error) {
       showToast(getApiErrorMessage(error, t("error")), "red", t("errorTitle"));
@@ -215,7 +247,7 @@ export default function ModerationPanel({ slug, initialStatus, initialStatusMode
       <div className="p-4">
         {view === "actions" && (
           <div className="flex flex-col gap-2.5">
-            {isRejectFormOpen ? (
+            {activeForm === "reject" && (
               <>
                 <textarea
                   value={reason}
@@ -237,7 +269,7 @@ export default function ModerationPanel({ slug, initialStatus, initialStatusMode
                   <button
                     type="button"
                     onClick={() => {
-                      setIsRejectFormOpen(false);
+                      setActiveForm(null);
                       setReason("");
                     }}
                     className="rounded-lg px-4 py-2.5 text-[12px] font-bold text-[#A0A0A0] ring-1 ring-white/10 transition-colors hover:text-white"
@@ -246,7 +278,42 @@ export default function ModerationPanel({ slug, initialStatus, initialStatusMode
                   </button>
                 </div>
               </>
-            ) : (
+            )}
+
+            {activeForm === "revision" && (
+              <>
+                <textarea
+                  value={revisionComment}
+                  onChange={(e) => setRevisionComment(e.target.value)}
+                  placeholder={t("revisionCommentPlaceholder")}
+                  required
+                  rows={3}
+                  className="w-full resize-none rounded-lg bg-[#141414] px-3 py-2.5 text-[13px] text-white placeholder-[#6b6b6b] outline-none ring-1 ring-white/5 focus:ring-[#FECC39]/50"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleReturnForRevision}
+                    disabled={!revisionComment.trim() || pendingAction === "revision"}
+                    className="flex-1 rounded-lg bg-[#FECC39] py-2.5 text-[12px] font-bold text-[#272727] transition-colors hover:bg-white disabled:opacity-40"
+                  >
+                    {pendingAction === "revision" ? t("returningForRevision") : t("confirmReturnForRevision")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveForm(null);
+                      setRevisionComment("");
+                    }}
+                    className="rounded-lg px-4 py-2.5 text-[12px] font-bold text-[#A0A0A0] ring-1 ring-white/10 transition-colors hover:text-white"
+                  >
+                    {t("cancel")}
+                  </button>
+                </div>
+              </>
+            )}
+
+            {activeForm === null && (
               <>
                 {statusModeration === "pending" && (
                   <button
@@ -260,23 +327,33 @@ export default function ModerationPanel({ slug, initialStatus, initialStatusMode
                 )}
 
                 {statusModeration === "processing" && (
-                  <div className="flex gap-2">
+                  <>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleApprove}
+                        disabled={pendingAction === "approve"}
+                        className="flex-1 rounded-lg bg-[#4BAE4F] py-2.5 text-[12px] font-bold text-white transition-colors hover:bg-[#3f9843] disabled:opacity-40"
+                      >
+                        {pendingAction === "approve" ? t("approving") : t("approve")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveForm("reject")}
+                        className="flex-1 rounded-lg bg-[#E14B4B] py-2.5 text-[12px] font-bold text-white transition-colors hover:bg-[#c73f3f]"
+                      >
+                        {t("reject")}
+                      </button>
+                    </div>
                     <button
                       type="button"
-                      onClick={handleApprove}
-                      disabled={pendingAction === "approve"}
-                      className="flex-1 rounded-lg bg-[#4BAE4F] py-2.5 text-[12px] font-bold text-white transition-colors hover:bg-[#3f9843] disabled:opacity-40"
+                      onClick={() => setActiveForm("revision")}
+                      className="flex w-full items-center justify-center gap-1.5 rounded-lg py-2.5 text-[12px] font-bold text-[#A0A0A0] ring-1 ring-white/10 transition-colors hover:text-white"
                     >
-                      {pendingAction === "approve" ? t("approving") : t("approve")}
+                      <RevisionIcon />
+                      {t("returnForRevision")}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsRejectFormOpen(true)}
-                      className="flex-1 rounded-lg bg-[#E14B4B] py-2.5 text-[12px] font-bold text-white transition-colors hover:bg-[#c73f3f]"
-                    >
-                      {t("reject")}
-                    </button>
-                  </div>
+                  </>
                 )}
               </>
             )}

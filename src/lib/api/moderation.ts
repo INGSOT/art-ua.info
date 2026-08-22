@@ -31,6 +31,14 @@ export const moderationAPI = {
     return response.data;
   },
 
+  returnForRevision: async (slug: string, comment: string): Promise<ModerationActionResponse> => {
+    const response = await api.post<ModerationActionResponse>(
+      `/v1/moderation/projects/${slug}/return-for-revision`,
+      { comment }
+    );
+    return response.data;
+  },
+
   message: async (slug: string, content: string, subject?: string): Promise<{ message: string }> => {
     const response = await api.post<{ message: string }>(
       `/v1/moderation/projects/${slug}/message`,
